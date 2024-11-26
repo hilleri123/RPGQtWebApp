@@ -5,7 +5,7 @@ from scheme import *
 from npc_model import NpcTreeModel
 from repositories import *
 from widgets.npc_widget import NpcWidget
-from common import AutoResizingTextEdit
+from common import AutoResizingTextEdit, AutoResizingListWidget
 
 
 class LocationWidget(QWidget):
@@ -21,7 +21,7 @@ class LocationWidget(QWidget):
         self.save.setEnabled(IS_EDITABLE)
         self.save.clicked.connect(self.on_save)
         self.location = None
-        self.npc_list = QListWidget()
+        self.npc_list = AutoResizingListWidget()
         layout = QVBoxLayout(self)
         tmp_layout = QHBoxLayout()
         layout.addLayout(tmp_layout)

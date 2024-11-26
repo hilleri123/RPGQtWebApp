@@ -5,7 +5,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
-from common import AutoResizingTextEdit
+from common import AutoResizingTextEdit, AutoResizingListWidget
 
 
 class NpcWidget(QWidget):
@@ -58,8 +58,8 @@ class NpcWidget(QWidget):
             self.appearance_field.setReadOnly(True)
             layout.addWidget(self.appearance_field)
 
-        self.loc_dialogs_list = QListWidget()  # Список локальных диалогов
-        self.dialogs_list = QListWidget()  # Список общих диалогов
+        self.loc_dialogs_list = AutoResizingListWidget()  # Список локальных диалогов
+        self.dialogs_list = AutoResizingListWidget()  # Список общих диалогов
 
         # Кнопки для управления диалогами
         # self.add_dialog_button = QPushButton("Добавить общий диалог")
