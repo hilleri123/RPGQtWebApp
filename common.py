@@ -1,23 +1,21 @@
-from PyQt5.QtCore import QRect
+from PyQt5.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QWidget
+from PyQt5.QtCore import QSize, Qt
+# from PyQt5.QtGui import Qt
 
+class AutoResizingTextEdit(QTextEdit):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-class Location:
-    curr_id = 0
+        self.textChanged.connect(self.updateGeometry)
 
-    def __init__(self, name="", description="", rect=QRect):
-        self.id = Location.curr_id
-        Location.curr_id += 1
-        self.name = name
-        self.description = description
-        self.rect = rect
+    def sizeHint(self) -> QSize:
+        document = self.document()
+        margins = self.contentsMargins()
+        document.setTextWidth(self.viewport().width())
+        height = margins.top() + document.size().height() + margins.bottom()
+        size = QSize(self.width(), int(height))
+        self.setFixedSize(size)
 
-
-test_locs = [Location("a", "a"*20, QRect(10,10,20,20)), Location("b", "b"*20, QRect(100,10,20,20))]
-
-def get_location_list():
-    return test_locs
-
-def get_location_by_id(location_id: int):
-    for l in test_locs:
-        if l.id == location_id:
-            return l
+        return size

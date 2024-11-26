@@ -5,6 +5,7 @@ from scheme import *
 from npc_model import NpcTreeModel
 from repositories import *
 from widgets.npc_widget import NpcWidget
+from common import AutoResizingTextEdit
 
 
 class LocationWidget(QWidget):
@@ -13,7 +14,7 @@ class LocationWidget(QWidget):
         self.session = Session()
         self.name = QLineEdit()
         self.name.setReadOnly(not IS_EDITABLE)
-        self.description = QTextEdit()
+        self.description = AutoResizingTextEdit()
         self.description.setReadOnly(not IS_EDITABLE)
         self.save = QPushButton()
         self.save.setIcon(QIcon.fromTheme("document-save"))
@@ -70,7 +71,7 @@ class LocationWidget(QWidget):
             npc = self.session.query(NPC).filter(NPC.id == npc_id).first()
             if npc is not None:
                 item = QListWidgetItem(self.npc_list)
-                widget = NpcWidget(npc=npc, appearance=appearance, location=self.location)
+                widget = NpcWidget(npc=npc, appearance=appearance[npc.id], location=self.location)
                 self.npc_list.setItemWidget(item, widget)
                 item.setSizeHint(widget.sizeHint())
 

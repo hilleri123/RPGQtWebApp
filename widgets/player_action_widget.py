@@ -2,6 +2,9 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QFormLayout, QLineEdit, QTextEdit, QComboBox, QPushButton, QLabel, QHBoxLayout
 )
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QIcon
+
+from scheme import *
 
 
 class PlayerActionWidget(QWidget):
@@ -42,40 +45,6 @@ class PlayerActionWidget(QWidget):
 
         self.setLayout(layout)
 
-    def set_data(self, player_action, marks=None, game_items=None):
-        """
-        Устанавливает данные в виджет.
-        
-        :param player_action: Объект PlayerAction для отображения/редактирования.
-        :param marks: Список доступных меток (Mark), если нужно.
-        :param game_items: Список доступных игровых предметов (GameItem), если нужно.
-        """
-        # Устанавливаем данные в поля
-        self.id_field.setText(str(player_action.id))
-        self.description_field.setPlainText(player_action.description or "")
-        self.need_skill_ids_field.setPlainText(player_action.needSkillIdsConditionsJson or "")
-        
-        # Заполняем выпадающий список меток
-        if marks:
-            self.change_mark_field.clear()
-            for mark in marks:
-                self.change_mark_field.addItem(mark.name, mark.id)
-            if player_action.changeMarkId is not None:
-                index = self.change_mark_field.findData(player_action.changeMarkId)
-                if index != -1:
-                    self.change_mark_field.setCurrentIndex(index)
-
-        # Заполняем выпадающий список игровых предметов
-        if game_items:
-            self.get_game_item_field.clear()
-            for item in game_items:
-                self.get_game_item_field.addItem(item.name, item.id)
-            if player_action.getGameItemId is not None:
-                index = self.get_game_item_field.findData(player_action.getGameItemId)
-                if index != -1:
-                    self.get_game_item_field.setCurrentIndex(index)
-
-        self.need_game_item_ids_field.setPlainText(player_action.needGameItemIdsJson or "")
 
     def save_data(self):
         """

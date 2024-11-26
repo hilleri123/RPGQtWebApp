@@ -5,6 +5,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
+from common import AutoResizingTextEdit
 
 
 class NpcWidget(QWidget):
@@ -29,52 +30,56 @@ class NpcWidget(QWidget):
                 GameCondition.npcId == npc.id
             ).all()
         )
-
-        # Поля для редактирования
-        self.npc_name_field = QLineEdit()  # Поле для имени NPC
-        self.appearance_field = QTextEdit()  # Поле для списка внешностей (appearance)
-        self.loc_dialogs_list = QListWidget()  # Список локальных диалогов
-        self.dialogs_list = QListWidget()  # Список общих диалогов
-
-        # Кнопки для управления диалогами
-        self.add_loc_dialog_button = QPushButton("Добавить локальный диалог")
-        self.add_loc_dialog_button.setIcon(QIcon.fromTheme("list-add"))
-        self.add_dialog_button = QPushButton("Добавить общий диалог")
-        self.add_dialog_button.setIcon(QIcon.fromTheme("document-new"))
-        self.save_button = QPushButton("Сохранить")
-        # self.save_button.clicked.connect(self.save_data)
-
         # Основной макет
         layout = QVBoxLayout(self)
 
         # Формы для полей
-        form_layout = QFormLayout()
-        form_layout.addRow("Имя NPC:", self.npc_name_field)
-        form_layout.addRow("Внешности (appearance):", self.appearance_field)
+        tmp = QHBoxLayout()
+        self.npc_name_field = QLineEdit()  # Поле для имени NPC
+        self.npc_name_field.setText(npc.name)
+        self.npc_name_field.setReadOnly(True)
+        tmp.addWidget(self.npc_name_field)
+        self.edit_npc_button = QPushButton()
+        self.edit_npc_button.setIcon(QIcon.fromTheme("preferences-system"))
+        self.edit_npc_button.setEnabled(IS_EDITABLE)
+        self.edit_npc_button.clicked.connect(self.on_edit_npc)
+        tmp.addWidget(self.edit_npc_button)
+        self.add_loc_dialog_button = QPushButton()
+        self.add_loc_dialog_button.setIcon(QIcon.fromTheme("list-add"))
+        self.add_loc_dialog_button.setEnabled(IS_EDITABLE)
+        self.add_loc_dialog_button.clicked.connect(self.on_add_loc_dialog)
+        tmp.addWidget(self.add_loc_dialog_button)
+        layout.addLayout(tmp)
 
-        layout.addLayout(form_layout)
-        layout.addWidget(self.save_button)
+        # TODO редактировать appearance
+        if appearance is not None:
+            self.appearance_field = AutoResizingTextEdit()  # Поле для списка внешностей (appearance)
+            self.appearance_field.setText('; '.join(appearance))
+            self.appearance_field.setReadOnly(True)
+            layout.addWidget(self.appearance_field)
+
+        self.loc_dialogs_list = QListWidget()  # Список локальных диалогов
+        self.dialogs_list = QListWidget()  # Список общих диалогов
+
+        # Кнопки для управления диалогами
+        # self.add_dialog_button = QPushButton("Добавить общий диалог")
+        # self.add_dialog_button.setIcon(QIcon.fromTheme("document-new"))
+        # self.save_button = QPushButton("Сохранить")
+        # self.save_button.clicked.connect(self.save_data)
 
         # Локальные диалоги
-        loc_dialogs_layout = QVBoxLayout()
-        loc_dialogs_layout.addWidget(QLabel("Локальные диалоги:"))
-        loc_dialogs_layout.addWidget(self.loc_dialogs_list)
-        
-        loc_buttons_layout = QHBoxLayout()
-        loc_buttons_layout.addWidget(self.add_loc_dialog_button)
-        
-        loc_dialogs_layout.addLayout(loc_buttons_layout)
-        
-        layout.addLayout(loc_dialogs_layout)
+        layout.addWidget(QLabel("Локальные диалоги:"))
+        layout.addWidget(self.loc_dialogs_list)
 
         # Общие диалоги
-        dialogs_layout = QVBoxLayout()
-        dialogs_layout.addWidget(QLabel("Общие диалоги:"))
-        dialogs_layout.addWidget(self.dialogs_list)
-        
-        dialog_buttons_layout = QHBoxLayout()
-        dialog_buttons_layout.addWidget(self.add_dialog_button)
-        dialogs_layout.addLayout(dialog_buttons_layout)
-        
-        layout.addLayout(dialogs_layout)
+        layout.addWidget(QLabel("Общие диалоги:"))
+        layout.addWidget(self.dialogs_list)
+
+
+    def on_edit_npc(self):
+        pass #TODO
+
+
+    def on_add_loc_dialog(self):
+        pass #TODO
 
