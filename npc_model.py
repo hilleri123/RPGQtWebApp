@@ -18,19 +18,21 @@ class Holder:
         return 0
 
 
-@dataclass()
+@dataclass
 class PlayerActionHolder(Holder):
     parent: Holder
     action: PlayerAction
 
     def data(self, clm):
-        return self.action.id
+        if clm == 0:
+            return self.action.id
+        return None
 
     def column(self):
         return 1
 
 
-@dataclass()
+@dataclass
 class NpcHolder(Holder):
     npc: NPC
     appearance: list[str]
@@ -62,88 +64,141 @@ class NpcTreeModel(QAbstractItemModel):
         self.beginResetModel()
         self.npcs = []
         if location is None:
+            self.endResetModel()  # Завершаем сброс модели, если локация пустая
             return
-        npcs_conditions = check_marks_in_condition(self.session.query(GameCondition).filter(
-            GameCondition.playerActionId == None,
-            GameCondition.locationId == location.id,
-            GameCondition.npcId != None
-        ).all())  # appearence
+
+        # Получаем условия появления NPC
+        npcs_conditions = check_marks_in_condition(
+            self.session.query(GameCondition).filter(
+                GameCondition.playerActionId == None,
+                GameCondition.locationId == location.id,
+                GameCondition.npcId != None
+            ).all()
+        )
+        
         appearance = {}
         for npc_c in npcs_conditions:
             if npc_c.npcId in appearance:
                 appearance[npc_c.npcId].append(npc_c.text)
             else:
                 appearance[npc_c.npcId] = [npc_c.text]
+
         for npc_id in appearance:
             npc = self.session.query(NPC).filter(NPC.id == npc_id).first()
-            loc_dialogs = check_marks_in_condition(self.session.query(GameCondition).filter(
-                GameCondition.playerActionId != None,
-                GameCondition.locationId == location.id,
-                GameCondition.npcId == npc_id
-            ).all())
-            dialogs = check_marks_in_condition(self.session.query(GameCondition).filter(
-                GameCondition.playerActionId != None,
-                GameCondition.locationId == None,
-                GameCondition.npcId == npc_id
-            ).all())
-            self.npcs.append(NpcHolder(
+            
+            loc_dialogs = check_marks_in_condition(
+                self.session.query(GameCondition).filter(
+                    GameCondition.playerActionId != None,
+                    GameCondition.locationId == location.id,
+                    GameCondition.npcId == npc_id
+                ).all()
+            )
+            
+            dialogs = check_marks_in_condition(
+                self.session.query(GameCondition).filter(
+                    GameCondition.playerActionId != None,
+                    GameCondition.locationId == None,
+                    GameCondition.npcId == npc_id
+                ).all()
+            )
+            
+            # Создаем NpcHolder с корректным parent для дочерних элементов
+            npc_holder = NpcHolder(
                 npc=npc,
                 appearance=appearance[npc_id],
-                loc_dialogs=[PlayerActionHolder(parent=len(self.npcs), action=i) for i in loc_dialogs],
-                dialogs=[PlayerActionHolder(parent=len(self.npcs), action=i) for i in dialogs]
-            ))
+                loc_dialogs=[
+                    PlayerActionHolder(parent=None, action=i) for i in loc_dialogs
+                ],
+                dialogs=[
+                    PlayerActionHolder(parent=None, action=i) for i in dialogs
+                ]
+            )
+            
+            # Устанавливаем parent для дочерних элементов
+            for child in npc_holder.children():
+                child.parent = npc_holder
+            
+            self.npcs.append(npc_holder)
+        
         self.endResetModel()
 
     def rowCount(self, parent: QModelIndex = ...) -> int:
         if parent.column() > 0:
             return 0
+
         if not parent.isValid():
             return len(self.npcs)
-        if type(parent.internalPointer()) is PlayerActionHolder:
+
+        item = parent.internalPointer()
+        
+        if isinstance(item, PlayerActionHolder):
             return 0
-        if type(parent.internalPointer()) is NpcHolder:
-            npc_holder = parent.internalPointer()
-            return len(npc_holder.children())
+        
+        if isinstance(item, NpcHolder):
+            return len(item.children())
+        
         return 0
 
-    def columnCount(self, paren: QModelIndex = ...):
+    def columnCount(self, parent: QModelIndex = ...) -> int:
         return 2
 
-    def data(self, index, role):
+    def data(self, index: QModelIndex, role: int) -> QVariant:
         if not index.isValid():
             return QVariant()
 
         item = index.internalPointer()
-        if role == Qt.DisplayRole:
+        
+        if role == Qt.DisplayRole and item is not None:
             return item.data(index.column())
-
+        
         return QVariant()
 
-    def headerData(self, column, orientation, role):
-        if (orientation == Qt.Horizontal and role == Qt.DisplayRole):
-            return QVariant("Npcs")
-
+    def headerData(self, section: int, orientation: Qt.Orientation, role: int) -> QVariant:
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            if section == 0:
+                return "NPC Name"
+            elif section == 1:
+                return "Appearance"
+        
         return QVariant()
 
-    def index(self, row, column, parent):
-        if not parent.isValid(): #!!!!!!!!!!
-            return self.createIndex(row, column, self.npcs[row])
+    def index(self, row: int, column: int, parent: QModelIndex) -> QModelIndex:
+        if not parent.isValid():
+            if row < len(self.npcs):
+                return self.createIndex(row, column, self.npcs[row])
 
-        if type(parent.internalPointer()) is PlayerActionHolder:
-            return QModelIndex()
-
-        if type(parent.internalPointer()) is NpcHolder:
-            npc_holder = parent.internalPointer()
-            return self.createIndex(row, column, npc_holder.children()[row])
+        item = parent.internalPointer()
+        
+        if isinstance(item, NpcHolder) and row < len(item.children()):
+            child_item = item.children()[row]
+            return self.createIndex(row, column, child_item)
 
         return QModelIndex()
 
-    def parent(self, index):
+    def parent(self, index: QModelIndex) -> QModelIndex:
         if not index.isValid():
             return QModelIndex()
 
         item = index.internalPointer()
-        if not item or type(item) is NpcHolder:
+        
+        if isinstance(item, PlayerActionHolder) and item.parent is not None:
+            parent_item = item.parent
+            row = self.npcs.index(parent_item)
+            return self.createIndex(row, 0, parent_item)
+
+        if isinstance(item, NpcHolder):
             return QModelIndex()
 
-        return self.createIndex(item.parent, 0, QModelIndex())
+        return QModelIndex()
+    
+    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+        if not index.isValid():
+            return Qt.NoItemFlags
+        
+        item = index.internalPointer()
+        
+        # Проверяем тип элемента и разрешаем редактирование
+        if isinstance(item, PlayerActionHolder):
+            return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
+        
+        return Qt.ItemIsSelectable | Qt.ItemIsEnabled

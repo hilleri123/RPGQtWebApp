@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton
-from map_widget import MapWidget
-from location_widget import LocationWidget
+from widgets.map_widget import MapWidget
+from widgets.location_widget import LocationWidget
 
 
 class MainWindow(QMainWindow):
