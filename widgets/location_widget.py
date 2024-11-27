@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QPushButton, QLabel, QListWidget, QListWidgetItem, QCheckBox, QSpinBox, QTreeView, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTextEdit
+from PyQt5.QtWidgets import QPushButton, QLabel, QGridLayout, QListWidget, QListWidgetItem, QCheckBox, QSpinBox, QTreeView, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTextEdit
 from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent, QIcon
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
