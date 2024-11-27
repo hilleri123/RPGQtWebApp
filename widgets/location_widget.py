@@ -11,6 +11,7 @@ from common import AutoResizingTextEdit, AutoResizingListWidget
 class LocationWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+
         self.session = Session()
         self.name = QLineEdit()
         self.name.setReadOnly(not IS_EDITABLE)
@@ -21,29 +22,46 @@ class LocationWidget(QWidget):
         self.save.setEnabled(IS_EDITABLE)
         self.save.clicked.connect(self.on_save)
         self.is_start_location = QCheckBox("Start") if IS_EDITABLE else None
-        self.is_shown = QCheckBox("show")
-        self.coords = {"x":QSpinBox(), "y":QSpinBox(), "w":QSpinBox(), "h":QSpinBox()}
+        self.is_shown = QCheckBox("Show")
+        self.coords = {"x": QSpinBox(), "y": QSpinBox(), "w": QSpinBox(), "h": QSpinBox()}
         self.location = None
         self.npc_list = AutoResizingListWidget()
-        layout = QVBoxLayout(self)
-        tmp_layout = QHBoxLayout()
-        layout.addLayout(tmp_layout)
-        tmp_layout.addWidget(self.name)
-        tmp_layout.addWidget(self.save)
+
+        # Создаем макет сетки
+        layout = QGridLayout(self)
+
+        # Добавляем элементы в сетку
+        row = 0  # Начальная строка
+
+        # Первая строка: name, save, is_start_location (если есть), is_shown
+        layout.addWidget(QLabel("Name:"), row, 0)
+        layout.addWidget(self.name, row, 1)
+        layout.addWidget(self.save, row, 2)
         if self.is_start_location is not None:
-            tmp_layout.addWidget(self.is_start_location)
-        tmp_layout.addWidget(self.is_shown)
+            layout.addWidget(self.is_start_location, row, 3)
+        layout.addWidget(self.is_shown, row, 4)
+
+        # Вторая строка: координаты (если редактирование включено)
         if IS_EDITABLE:
-            tmp_layout = QHBoxLayout()
-            layout.addLayout(tmp_layout)
+            row += 1
+            col = 0
             for key, val in self.coords.items():
-                tmp_layout.addWidget(QLabel(key))
+                layout.addWidget(QLabel(key), row, col)  # Метка координаты
+                col += 1
                 val.setMinimum(0)
                 val.setMaximum(10000)
-                tmp_layout.addWidget(val)
-        layout.addLayout(tmp_layout)
-        layout.addWidget(self.description)
-        layout.addWidget(self.npc_list)
+                layout.addWidget(val, row, col)  # Поле ввода координаты
+                col += 1
+
+        # Третья строка: описание (description)
+        row += 1
+        layout.addWidget(QLabel("Description:"), row, 0, 1, 1)  # Метка для описания
+        layout.addWidget(self.description, row, 1, 1, -1)  # Описание занимает всю оставшуюся ширину
+
+        # Четвертая строка: список NPC (npc_list)
+        row += 1
+        layout.addWidget(QLabel("NPC List:"), row, 0)  # Метка для списка NPC
+        layout.addWidget(self.npc_list, row, 1, 1, -1) 
 
     def on_location_selected(self, location_id: int) -> None:
         self.location = self.session.query(Location).filter(Location.id == location_id).first()
