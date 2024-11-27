@@ -36,6 +36,7 @@ class Location(Base):
     width = Column(Integer)
     height = Column(Integer)
     description = Column(String)
+    is_shown = Column(Integer, default=0) #Как boolean, но 2 - это значит конст
     mapId = Column(Integer, ForeignKey('SceneMap.id', ondelete='CASCADE'))
 
 
@@ -63,6 +64,7 @@ class PlayerAction(Base):
     needSkillIdsConditionsJson = Column(String, default=None, )
     changeMarkId = Column(Integer, ForeignKey('Mark.id', ondelete='CASCADE'), default=None)
     getGameItemId = Column(Integer, ForeignKey('GameItem.id', ondelete='CASCADE'), default=None, )
+    is_activated = Column(Boolean, default=False)
     # npcId = Column(Integer, ForeignKey('NPC.id', ondelete='CASCADE'), default=None,) # TODO вроде не нужно
     needGameItemIdsJson = Column(String, default=None, )
 

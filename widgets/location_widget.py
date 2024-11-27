@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QPushButton, QListWidget, QListWidgetItem, QTreeView, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTextEdit
+from PyQt5.QtWidgets import QPushButton, QLabel, QListWidget, QListWidgetItem, QCheckBox, QSpinBox, QTreeView, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTextEdit
 from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent, QIcon
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
@@ -20,6 +20,9 @@ class LocationWidget(QWidget):
         self.save.setIcon(QIcon.fromTheme("document-save"))
         self.save.setEnabled(IS_EDITABLE)
         self.save.clicked.connect(self.on_save)
+        self.is_start_location = QCheckBox("Start") if IS_EDITABLE else None
+        self.is_shown = QCheckBox("show")
+        self.coords = {"x":QSpinBox(), "y":QSpinBox(), "w":QSpinBox(), "h":QSpinBox()}
         self.location = None
         self.npc_list = AutoResizingListWidget()
         layout = QVBoxLayout(self)
@@ -27,6 +30,18 @@ class LocationWidget(QWidget):
         layout.addLayout(tmp_layout)
         tmp_layout.addWidget(self.name)
         tmp_layout.addWidget(self.save)
+        if self.is_start_location is not None:
+            tmp_layout.addWidget(self.is_start_location)
+        tmp_layout.addWidget(self.is_shown)
+        if IS_EDITABLE:
+            tmp_layout = QHBoxLayout()
+            layout.addLayout(tmp_layout)
+            for key, val in self.coords.items():
+                tmp_layout.addWidget(QLabel(key))
+                val.setMinimum(0)
+                val.setMaximum(10000)
+                tmp_layout.addWidget(val)
+        layout.addLayout(tmp_layout)
         layout.addWidget(self.description)
         layout.addWidget(self.npc_list)
 
@@ -37,6 +52,14 @@ class LocationWidget(QWidget):
 
         self.name.setText(self.location.name)
         self.description.setText(self.location.description)
+        tmp = self.location.is_shown if self.location.is_shown is not None else 2
+        self.is_start_location.setChecked(tmp == 2) #
+        self.is_shown.setChecked(tmp > 0) #
+        self.coords["x"].setValue(self.location.offsetX)
+        self.coords["y"].setValue(self.location.offsetY)
+        self.coords["w"].setValue(self.location.width)
+        self.coords["h"].setValue(self.location.height)
+
         self.set_npcs()
 
 

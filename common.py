@@ -7,26 +7,41 @@ class AutoResizingTextEdit(QTextEdit):
         super().__init__(parent)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.previous_width = 0
 
-        self.textChanged.connect(self.updateGeometry)
+        self.textChanged.connect(self.auto_resize)
 
-    def sizeHint(self) -> QSize:
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        current_width = self.width()
+        if current_width != self.previous_width:
+            self.previous_width = current_width
+            self.auto_resize()
+
+    def auto_resize(self):
         document = self.document()
         margins = self.contentsMargins()
         document.setTextWidth(self.viewport().width())
         height = margins.top() + document.size().height() + margins.bottom()
         size = QSize(self.width(), int(height))
-        self.setFixedSize(size)
-
-        return size
+        # self.setMaximumSize(size)
+        self.setMaximumHeight(int(height+1))
     
 class AutoResizingListWidget(QListWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.previous_width = 0
 
-        self.itemChanged.connect(self.updateGeometry)
+        self.itemChanged.connect(self.auto_resize)
 
-    def sizeHint(self) -> QSize:
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        current_width = self.width()
+        if current_width != self.previous_width:
+            self.previous_width = current_width
+            self.auto_resize()
+
+    def auto_resize(self):
         margins = self.contentsMargins()
         frame_width = self.frameWidth()
         total_height = 0
@@ -34,10 +49,9 @@ class AutoResizingListWidget(QListWidget):
             item = self.item(index)
             total_height += self.visualItemRect(item).height()
         total_height += margins.top() + margins.bottom() + frame_width * 2
-        width = self.sizeHintForColumn(0) + margins.left() + margins.right() + frame_width * 2
-        size = QSize(width, total_height)
-        self.setFixedSize(size)
-
-        return size
+        # width = self.sizeHintForColumn(0) + margins.left() + margins.right() + frame_width * 2
+        # size = QSize(width, total_height)
+        # self.setMaximumSize(size)
+        self.setMaximumHeight(int(total_height+1))
 
 
