@@ -3,14 +3,12 @@ from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent
 from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QSize
 import typing
 from scheme import *
-from common import BaseMapLabel, GlobalMapWidget
+from common import BaseMapLabel, BaseMapWidget
 
 
 class MapLabel(BaseMapLabel):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.session = Session()
-        self.map = None
         self.set_map()
 
     def set_map(self):
@@ -23,7 +21,7 @@ class MapLabel(BaseMapLabel):
         self.setScaledContents(True)
 
 
-class MapWidget(GlobalMapWidget):
+class MapWidget(BaseMapWidget):
     location_clicked = pyqtSignal(int)
 
     def __init__(self, parent=None):
@@ -42,19 +40,7 @@ class MapWidget(GlobalMapWidget):
         
     def on_select(self, idx):
         map_id = self.mapSelector.itemData(idx)
-        print(idx, map_id)
-        record_to_update = self.session.query(SceneMap) \
-            .filter(SceneMap.isCurrent == True).first()
-        if record_to_update is not None:
-            record_to_update.isCurrent = False
-        print(record_to_update.name, record_to_update.isCurrent)
-        record_to_update = self.session.query(SceneMap) \
-            .filter(SceneMap.id == map_id).first()
-        if record_to_update is not None:
-            record_to_update.isCurrent = True
-        print(record_to_update.name, record_to_update.isCurrent)
-        self.session.commit()
-        self.mapLabel.set_map()
+        self.set_current_map(map_id)
         self.location_clicked.emit(-1)
 
     def on_loc_update(self):
