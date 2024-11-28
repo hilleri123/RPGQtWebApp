@@ -56,3 +56,7 @@ class AutoResizingListWidget(QListWidget):
         # size = QSize(width, total_height)
         # self.setMaximumSize(size)
         self.setMaximumHeight(int(total_height+1))
+
+    def setItemWidget(self, item, widget):
+        super().setItemWidget(item, widget)
+        self.auto_resize()

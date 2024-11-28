@@ -1,6 +1,6 @@
 import os
 import shutil
-from PyQt5.QtWidgets import QApplication, QLineEdit, QDateTimeEdit, QVBoxLayout, QHBoxLayout, QFileDialog, QPushButton, QLabel, QWidget, QListWidget
+from PyQt5.QtWidgets import QApplication, QMenu, QAction, QLineEdit, QDateTimeEdit, QVBoxLayout, QHBoxLayout, QFileDialog, QPushButton, QLabel, QWidget, QListWidget
 from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent
 from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QSize, Qt
 import typing
@@ -27,13 +27,7 @@ class BaseMapLabel(QLabel):
         for item in self.items:
             if self.item_rect(item).contains(pos):
                 if ev.button() == Qt.RightButton:
-                    if item.is_shown != 2:
-                        if item.is_shown > 0:
-                            item.is_shown = 0
-                        else:
-                            item.is_shown = 1
-                        self.session.commit()
-                        self.repaint()
+                    self.show_context_menu(ev.globalPos(), item)
                 else:
                     self.item_clicked.emit(item.id)
                 break
@@ -74,6 +68,39 @@ class BaseMapLabel(QLabel):
             self.map.filePath = file_name
             self.session.commit()
             self.set_map()
+
+    def show_context_menu(self, pos, item):
+        self.session = Session()
+        menu = QMenu(self)
+        action_show = QAction("Toggle", self)
+        action_show.triggered.connect(lambda: self.toggle_item_visibility(item))
+        menu.addAction(action_show)
+
+        for character in self.session.query(PlayerCharacter).all():
+            action = QAction(character.name, self)
+            action.setCheckable(True)
+            action.setChecked(self.character_presence(item, character))
+            action.triggered.connect(lambda checked, c=character: self.toggle_character_presence(item, c))
+            menu.addAction(action)
+        menu.exec_(pos)
+
+
+    def character_presence(self, item, character):
+        pass
+
+    def toggle_character_presence(self, item, character):
+        pass
+        # character.
+        # self.session.commit()
+
+    def toggle_item_visibility(self, item):
+        if item.is_shown != 2:
+            if item.is_shown > 0:
+                item.is_shown = 0
+            else:
+                item.is_shown = 1
+            self.session.commit()
+            self.repaint()
 
     def add_item(self, name):
         pass

@@ -27,6 +27,18 @@ class MapLabel(BaseMapLabel):
         self.session.add(tmp_loc)
         self.session.commit()
         self.set_map()
+    
+    def character_presence(self, item, character):
+        if character.map_id != self.map.id:
+            return False
+        if character.location_id != item.id:
+            return False
+        return True
+
+    def toggle_character_presence(self, item, character):
+        character.map_id = self.map.id
+        character.location_id = item.id
+        self.session.commit()
 
 
 class MapWidget(BaseMapWidget):

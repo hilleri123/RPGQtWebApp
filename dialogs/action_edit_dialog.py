@@ -31,7 +31,7 @@ class ActionEditDialog(QDialog):
         button_layout = QHBoxLayout()
         
         add_skill_button = QPushButton("Добавить навык")
-        add_skill_button.clicked.connect(self.add_stat)
+        add_skill_button.clicked.connect(self.add_skill)
 
         self.skill_combobox = QComboBox()
         for skill in session.query(Skill).all():
@@ -39,7 +39,7 @@ class ActionEditDialog(QDialog):
         self.skill_value = QSpinBox()
 
         remove_skill_button = QPushButton("Удалить навык")
-        remove_skill_button.clicked.connect(self.remove_stat)
+        remove_skill_button.clicked.connect(self.remove_skill)
 
         button_layout.addWidget(add_skill_button)
         button_layout.addWidget(self.skill_combobox)
@@ -88,10 +88,8 @@ class ActionEditDialog(QDialog):
             item_widget = QListWidgetItem(self.skills_list_widget)
             widget = QLabel(txt)
             self.skills_list_widget.setItemWidget(item_widget, widget)
-        
-        print(self.skills_list_widget.children())
 
-    def add_stat(self):
+    def add_skill(self):
         skill_id = self.skill_combobox.currentData()
         skill_value = self.skill_value.value()
         if skill_value == 0:
@@ -103,18 +101,20 @@ class ActionEditDialog(QDialog):
 
         self.load_stats()
 
-    def remove_stat(self):
+    def remove_skill(self):
         selected_items = self.skills_list_widget.selectedItems()
         if not selected_items:
             return
         
+        pos_to_del = []
         for item in selected_items:
-            skill_text = item.text()
-            skill_name = skill_text.split(": ")[0]
-            stat_to_delete = session.query(Stat).join(Skill).filter(Skill.name == skill_name).first()
-            if stat_to_delete:
-                session.delete(stat_to_delete)
-                session.commit()
+            pos_to_del.append(self.skills_list_widget.indexFromItem(item))
+
+        pos_to_del = sorted(pos_to_del)
+        for pos in pos_to_del[::-1]:
+            self.json_skills.pop(pos.row())
+        self.action.needSkillIdsConditionsJson = json.dumps(self.json_skills)
+        session.commit()
         
         self.load_stats()
 

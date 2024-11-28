@@ -12,13 +12,17 @@ class SkillListWidget(QWidget):
         self.action_id = action_id
         # Основной макет
         self.skill_layout = QHBoxLayout(self)
-        self.skill_layout = QHBoxLayout()
-        
+
         self.load_skills()
 
     def load_skills(self):
-        for item in self.skill_layout.children():
-            self.skill_layout.removeItem(item)
+        while self.skill_layout.count():
+            item = self.skill_layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()  # Удаляем виджет
+            else:
+                del item
 
         action = session.query(PlayerAction).get(self.action_id)
         if action is None:

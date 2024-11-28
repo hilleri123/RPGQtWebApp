@@ -29,6 +29,15 @@ class GlobalMapLabel(BaseMapLabel):
         self.session.add(tmp_map)
         self.session.commit()
         self.set_map()
+        
+    def character_presence(self, item, character):
+        if character.map_id != item.id:
+            return False
+        return True
+
+    def toggle_character_presence(self, item, character):
+        character.map_id = item.id
+        self.session.commit()
 
 
 

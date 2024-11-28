@@ -108,8 +108,8 @@ class PlayerCharacter(Base):
     shortDesc = Column(String)
     story = Column(String)
     time = Column(DateTime)
-    map_id = Column(Integer, ForeignKey('Location.id', ondelete='CASCADE'))
-    location_id = Column(Integer, ForeignKey('SceneMap.id', ondelete='CASCADE'))
+    map_id = Column(Integer, ForeignKey('Location.id'))
+    location_id = Column(Integer, ForeignKey('SceneMap.id'))
 
 
 class Skill(Base):

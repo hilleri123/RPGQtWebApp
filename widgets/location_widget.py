@@ -139,7 +139,7 @@ class LocationWidget(BaseMapObject):
         )
         
         for condition in actions_conditions:
-            action = self.session.query(PlayerAction).get(condition.npcId)
+            action = self.session.query(PlayerAction).get(condition.playerActionId)
             if action is not None:
                 item = QListWidgetItem(self.action_list)
                 widget = ActionWidget(action_id=action.id)

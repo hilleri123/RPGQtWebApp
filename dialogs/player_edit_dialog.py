@@ -99,7 +99,7 @@ class PlayerCharacterDialog(QDialog):
         for item in selected_items:
             skill_text = item.text()
             skill_name = skill_text.split(": ")[0]
-            stat_to_delete = session.query(Stat).join(Skill).filter(Skill.name == skill_name).first()
+            stat_to_delete = session.query(Stat).join(Skill).filter(Stat.characterId == self.character_id).filter(Skill.name == skill_name).first()
             if stat_to_delete:
                 session.delete(stat_to_delete)
                 session.commit()
