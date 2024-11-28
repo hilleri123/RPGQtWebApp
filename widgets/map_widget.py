@@ -3,7 +3,7 @@ from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent
 from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QSize
 import typing
 from scheme import *
-from common import BaseMapLabel
+from common import BaseMapLabel, GlobalMapWidget
 
 
 class MapLabel(BaseMapLabel):
@@ -23,25 +23,23 @@ class MapLabel(BaseMapLabel):
         self.setScaledContents(True)
 
 
-class MapWidget(QWidget):
+class MapWidget(GlobalMapWidget):
     location_clicked = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setMaximumSize(700, 500)
-        self.session = Session()
-        self.setLayout(QVBoxLayout())
-        self.mapLabel = MapLabel()
-        self.mapLabel.item_clicked.connect(self.location_clicked)
-        self.layout().addWidget(self.mapLabel)
         self.mapSelector = QComboBox()
         for sceneMap in self.session.query(SceneMap).all():
             self.mapSelector.addItem(sceneMap.name, sceneMap.id)
         if self.mapLabel.map is not None:
             self.mapSelector.setCurrentText(self.mapLabel.map.name)
         self.mapSelector.activated.connect(self.on_select)
-        self.layout().addWidget(self.mapSelector)
+        self.button_layout.addWidget(self.mapSelector)
 
+    def setup_label(self):
+        self.mapLabel = MapLabel()
+        self.mapLabel.item_clicked.connect(self.location_clicked)
+        
     def on_select(self, idx):
         map_id = self.mapSelector.itemData(idx)
         print(idx, map_id)

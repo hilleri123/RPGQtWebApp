@@ -1,4 +1,6 @@
-from PyQt5.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QLabel, QWidget, QListWidget
+import os
+import shutil
+from PyQt5.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QHBoxLayout, QFileDialog, QPushButton, QLabel, QWidget, QListWidget
 from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent
 from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QSize, Qt
 import typing
@@ -63,6 +65,8 @@ class BaseMapLabel(QLabel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.original = QPixmap()
+        self.map = None
+        self.session = None
         self.items = []
 
     def mousePressEvent(self, ev: typing.Optional[QMouseEvent]) -> None:
@@ -84,7 +88,7 @@ class BaseMapLabel(QLabel):
             painter.drawRect(self.item_rect(item))
 
     def item_rect(self, item) -> QRect:
-        if item is None:
+        if item is None or self.original.width() == 0 or self.original.height():
             return QRect()
         w_aspect = self.size().width() / self.original.width()
         h_aspect = self.size().height() / self.original.height()
@@ -92,3 +96,60 @@ class BaseMapLabel(QLabel):
                      int(item.offsetY * h_aspect)),
                      QSize(int(item.width * w_aspect),
                      int(item.height * h_aspect)))
+
+    def set_file_path(self, file_path):
+        if self.map is not None and self.session is not None:
+            file_name = os.path.basename(file_path)
+            destination_directory = 'data/imgs'
+            if os.path.isfile(os.path.join((destination_directory, file_name))):
+                print(f"Warning: Файл с именем '{file_name}' уже существует в директории '{destination_directory}'.")
+
+            destination_path = os.path.join(destination_directory, file_name)
+            shutil.copy2(file_path, destination_path)
+
+            self.map.filePath = file_name
+            self.session.commit()
+            self.set_map()
+
+    def add_item(self):
+        pass
+
+
+class BaseMapWidget(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setMaximumSize(700, 500)
+        base_layout = QVBoxLayout()
+        self.setLayout(base_layout)
+        self.mapLabel = None
+        self.setup_label()
+        base_layout.addWidget(self.mapLabel)
+        self.button_layout = QHBoxLayout()
+        base_layout.addLayout(self.button_layout)
+        self.select_file_button = QPushButton("select file")
+        self.select_file_button.clicked.connect(self.open_file_dialog)
+        self.button_layout.addWidget(self.select_file_button)
+        self.add_item_button = QPushButton("add item")
+        self.add_item_button.clicked.connect(self.add_item)
+        self.button_layout.addWidget(self.add_item_button)
+
+    def setup_label(self):
+        self.mapLabel = BaseMapLabel()
+
+    def open_file_dialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.ReadOnly
+
+        # Открываем диалог выбора файла
+        file_name, _ = QFileDialog.getOpenFileName(
+            self,
+            "Выберите изображение",
+            "",
+            "Изображения (*.png *.jpg *.jpeg *.bmp);;Все файлы (*)",
+            options=options
+        )
+        if file_name:
+            self.mapLabel.set_file_path(file_name)
+
+    def add_item(self):
+        self.mapLabel.add_item()

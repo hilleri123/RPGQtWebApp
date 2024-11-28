@@ -95,6 +95,7 @@ class SceneMap(Base):
     offsetY = Column(Integer)
     width = Column(Integer)
     height = Column(Integer)
+    is_shown = Column(Integer, default=0) #Как boolean, но 2 - это значит конст
     icon_file_path = Column(String)
 
 
