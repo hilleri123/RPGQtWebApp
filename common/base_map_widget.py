@@ -1,6 +1,6 @@
 import os
 import shutil
-from PyQt5.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QHBoxLayout, QFileDialog, QPushButton, QLabel, QWidget, QListWidget
+from PyQt5.QtWidgets import QApplication, QLineEdit, QVBoxLayout, QHBoxLayout, QFileDialog, QPushButton, QLabel, QWidget, QListWidget
 from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent
 from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QSize, Qt
 import typing
@@ -61,7 +61,10 @@ class BaseMapLabel(QLabel):
             self.session.commit()
             self.set_map()
 
-    def add_item(self):
+    def add_item(self, name):
+        pass
+
+    def set_map(self):
         pass
 
 
@@ -83,6 +86,8 @@ class BaseMapWidget(QWidget):
         self.select_file_button = QPushButton("select file")
         self.select_file_button.clicked.connect(self.open_file_dialog)
         self.button_layout.addWidget(self.select_file_button)
+        self.name_edit = QLineEdit("Name")
+        self.button_layout.addWidget(self.name_edit)
         self.add_item_button = QPushButton("add item")
         self.add_item_button.clicked.connect(self.add_item)
         self.button_layout.addWidget(self.add_item_button)
@@ -106,7 +111,7 @@ class BaseMapWidget(QWidget):
             self.mapLabel.set_file_path(file_name)
 
     def add_item(self):
-        self.mapLabel.add_item()
+        self.mapLabel.add_item(self.name_edit.text())
 
     def set_current_map(self, map_id: int):
         record_to_update = self.session.query(SceneMap) \
@@ -122,3 +127,7 @@ class BaseMapWidget(QWidget):
         self.session.commit()
         self.mapLabel.set_map()
         self.map_changed.emit(map_id)
+
+    
+    def on_map_update(self):
+        self.mapLabel.set_map()

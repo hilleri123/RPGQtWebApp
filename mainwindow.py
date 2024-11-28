@@ -9,14 +9,8 @@ from scheme import IS_EDITABLE
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.set_up()
-
-    def set_up(self):
-        w = QWidget()
-        self.main_layout = QVBoxLayout()
-        w.setLayout(self.main_layout)
-        self.setCentralWidget(w)
-
+        global IS_EDITABLE
+        
         menu_bar = self.menuBar()
         settings_menu = menu_bar.addMenu("Settings")
         self.checkbox_action = QAction("Editable", self)
@@ -27,6 +21,15 @@ class MainWindow(QMainWindow):
         self.reset_action = QAction("Reset", self)
         self.reset_action.triggered.connect(self.set_up)
         settings_menu.addAction(self.reset_action)
+
+        self.set_up()
+
+    def set_up(self):
+        w = QWidget()
+        self.main_layout = QVBoxLayout()
+        w.setLayout(self.main_layout)
+        self.setCentralWidget(w)
+
 
         self.map_tabs = QTabWidget()
         self.data_tabs = QTabWidget()
@@ -57,7 +60,7 @@ class MainWindow(QMainWindow):
         self.main_layout.addWidget(self.button)
 
         self.map.location_clicked.connect(self.location.on_location_selected)
-        self.location.location_updated.connect(self.map.on_loc_update)
+        self.location.map_object_updated.connect(self.map.on_map_update)
 
     def on_checkbox_toggled(self, checked):
         global IS_EDITABLE

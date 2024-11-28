@@ -12,13 +12,21 @@ class MapLabel(BaseMapLabel):
         self.set_map()
 
     def set_map(self):
+        self.session = Session()
         self.map = self.session.query(SceneMap).filter(SceneMap.isCurrent == True).first()
         if self.map is None:
             return
         self.items = self.session.query(Location).filter(Location.mapId == self.map.id).all()
-        self.original = QPixmap(f'data/{self.map.filePath}')
+        self.original = QPixmap(f'data/imgs/{self.map.filePath}')
         self.setPixmap(self.original)
         self.setScaledContents(True)
+        self.repaint()
+
+    def add_item(self, name):
+        tmp_loc = Location(name=name, offsetX=0, offsetY=0, width=100, height=100, mapId=self.map.id)
+        self.session.add(tmp_loc)
+        self.session.commit()
+        self.set_map()
 
 
 class MapWidget(BaseMapWidget):
@@ -42,6 +50,3 @@ class MapWidget(BaseMapWidget):
         map_id = self.mapSelector.itemData(idx)
         self.set_current_map(map_id)
         self.location_clicked.emit(-1)
-
-    def on_loc_update(self):
-        self.mapLabel.set_map()

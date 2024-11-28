@@ -12,6 +12,7 @@ class GlobalMapLabel(BaseMapLabel):
         self.set_map()
 
     def set_map(self):
+        self.session = Session()
         self.map = self.session.query(GlobalMap).first()
         if self.map is None:
             self.map = GlobalMap(name="Base map")
@@ -21,9 +22,10 @@ class GlobalMapLabel(BaseMapLabel):
         self.original = QPixmap(f'data/imgs/{self.map.filePath}')
         self.setPixmap(self.original)
         self.setScaledContents(True)
+        self.repaint()
 
-    def add_item(self):
-        tmp_map = SceneMap(name="", isCurrent=False, offsetX=0, offsetY=0, width=100, height=100)
+    def add_item(self, name):
+        tmp_map = SceneMap(name=name, isCurrent=False, offsetX=0, offsetY=0, width=100, height=100)
         self.session.add(tmp_map)
         self.session.commit()
         self.set_map()
