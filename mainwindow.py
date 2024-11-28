@@ -2,6 +2,8 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTab
 from widgets.map_widget import MapWidget
 from widgets.global_map_widget import GlobalMapWidget
 from widgets.location_widget import LocationWidget
+from widgets.npc_list_widget import NpcListWidget
+from widgets.map_settings_widget import MapSettingsWidget
 
 from scheme import IS_EDITABLE
 
@@ -40,9 +42,9 @@ class MainWindow(QMainWindow):
         self.map_tabs.addTab(self.global_map, "global map")
         self.map_tabs.addTab(self.map, "map")
 
-        self.map_settings = QWidget()
+        self.map_settings = MapSettingsWidget()
         self.location = LocationWidget()
-        self.npcs = QWidget()
+        self.npcs = NpcListWidget()
         self.items = QWidget()
         self.marks = QWidget()
         self.notes = QWidget()
@@ -59,8 +61,14 @@ class MainWindow(QMainWindow):
         tmp_layout.addWidget(self.data_tabs)
         self.main_layout.addWidget(self.button)
 
+        self.global_map.map_changed.connect(self.map_settings.on_map_selected)
+        self.global_map.map_changed.connect(self.map.set_current_map)
+        self.map_settings.map_object_updated.connect(self.global_map.on_map_update)
         self.map.location_clicked.connect(self.location.on_location_selected)
+        self.map.map_changed.connect(self.map_settings.on_map_selected)
         self.location.map_object_updated.connect(self.map.on_map_update)
+
+        self.npcs.npc_list_changed.connect(self.location.set_npcs)
 
     def on_checkbox_toggled(self, checked):
         global IS_EDITABLE

@@ -35,12 +35,8 @@ class MapWidget(BaseMapWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.mapSelector = QComboBox()
-        for sceneMap in self.session.query(SceneMap).all():
-            self.mapSelector.addItem(sceneMap.name, sceneMap.id)
-        if self.mapLabel.map is not None:
-            self.mapSelector.setCurrentText(self.mapLabel.map.name)
-        self.mapSelector.activated.connect(self.on_select)
         self.button_layout.addWidget(self.mapSelector)
+        self.resetup()
 
     def setup_label(self):
         self.mapLabel = MapLabel()
@@ -50,3 +46,11 @@ class MapWidget(BaseMapWidget):
         map_id = self.mapSelector.itemData(idx)
         self.set_current_map(map_id)
         self.location_clicked.emit(-1)
+
+    def resetup(self):
+        self.session = Session()
+        for sceneMap in self.session.query(SceneMap).all():
+            self.mapSelector.addItem(sceneMap.name, sceneMap.id)
+        if self.mapLabel.map is not None:
+            self.mapSelector.setCurrentText(self.mapLabel.map.name)
+        self.mapSelector.activated.connect(self.on_select)

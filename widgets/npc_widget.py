@@ -9,34 +9,28 @@ from common import AutoResizingTextEdit, AutoResizingListWidget
 
 
 class NpcWidget(QWidget):
-    def __init__(self, npc: NPC, appearance: list[str] = None, location: Location = None, parent=None):
+    def __init__(self, npc: NPC, parent=None, **args):
         super().__init__(parent)
         self.session = Session()
-
-        loc_dialogs = []
-        if location is not None:
-            loc_dialogs = check_marks_in_condition(
-                self.session.query(GameCondition).filter(
-                    GameCondition.playerActionId != None,
-                    GameCondition.locationId == location.id,
-                    GameCondition.npcId == npc.id
-                ).all()
-            )
+        self.npc = npc
+        self.base_layout = QVBoxLayout(self)
+        self.setup(**args)
+        self.add_lists(**args)
         
+
+    def setup(self, **args):
         dialogs = check_marks_in_condition(
             self.session.query(GameCondition).filter(
                 GameCondition.playerActionId != None,
                 GameCondition.locationId == None,
-                GameCondition.npcId == npc.id
+                GameCondition.npcId == self.npc.id
             ).all()
         )
-        # Основной макет
-        layout = QVBoxLayout(self)
 
         # Формы для полей
         tmp = QHBoxLayout()
         self.npc_name_field = QLineEdit()  # Поле для имени NPC
-        self.npc_name_field.setText(npc.name)
+        self.npc_name_field.setText(self.npc.name)
         self.npc_name_field.setReadOnly(True)
         tmp.addWidget(self.npc_name_field)
         self.edit_npc_button = QPushButton()
@@ -44,42 +38,33 @@ class NpcWidget(QWidget):
         self.edit_npc_button.setEnabled(IS_EDITABLE)
         self.edit_npc_button.clicked.connect(self.on_edit_npc)
         tmp.addWidget(self.edit_npc_button)
-        self.add_loc_dialog_button = QPushButton()
-        self.add_loc_dialog_button.setIcon(QIcon.fromTheme("list-add"))
-        self.add_loc_dialog_button.setEnabled(IS_EDITABLE)
-        self.add_loc_dialog_button.clicked.connect(self.on_add_loc_dialog)
-        tmp.addWidget(self.add_loc_dialog_button)
-        layout.addLayout(tmp)
+        self.add_dialog_button = QPushButton()
+        self.add_dialog_button.setIcon(QIcon.fromTheme("list-add"))
+        self.add_dialog_button.setEnabled(IS_EDITABLE)
+        self.add_dialog_button.clicked.connect(self.on_add_dialog)
+        tmp.addWidget(self.add_dialog_button)
+        self.delete_button = QPushButton()
+        self.delete_button.setIcon(QIcon.fromTheme("list-remove"))
+        self.delete_button.setEnabled(IS_EDITABLE)
+        self.delete_button.clicked.connect(self.on_delete)
+        tmp.addWidget(self.delete_button)
+        self.base_layout.addLayout(tmp)
 
-        # TODO редактировать appearance
-        if appearance is not None:
-            self.appearance_field = AutoResizingTextEdit()  # Поле для списка внешностей (appearance)
-            self.appearance_field.setText('; '.join(appearance))
-            self.appearance_field.setReadOnly(True)
-            layout.addWidget(self.appearance_field)
 
-        self.loc_dialogs_list = AutoResizingListWidget()  # Список локальных диалогов
-        self.dialogs_list = AutoResizingListWidget()  # Список общих диалогов
-
-        # Кнопки для управления диалогами
-        # self.add_dialog_button = QPushButton("Добавить общий диалог")
-        # self.add_dialog_button.setIcon(QIcon.fromTheme("document-new"))
-        # self.save_button = QPushButton("Сохранить")
-        # self.save_button.clicked.connect(self.save_data)
-
-        # Локальные диалоги
-        layout.addWidget(QLabel("Локальные диалоги:"))
-        layout.addWidget(self.loc_dialogs_list)
-
-        # Общие диалоги
-        layout.addWidget(QLabel("Общие диалоги:"))
-        layout.addWidget(self.dialogs_list)
+    def add_lists(self, **args):
+        self.dialogs_list = AutoResizingListWidget()
+        self.base_layout.addWidget(QLabel("Общие диалоги:"))
+        self.base_layout.addWidget(self.dialogs_list)
 
 
     def on_edit_npc(self):
         pass #TODO
 
 
-    def on_add_loc_dialog(self):
+    def on_add_dialog(self):
+        pass #TODO
+
+
+    def on_delete(self):
         pass #TODO
 

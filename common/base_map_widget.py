@@ -16,7 +16,6 @@ class BaseMapLabel(QLabel):
         super().__init__(parent)
         self.original = QPixmap()
         self.map = None
-        self.session = Session()
         self.items = []
 
     def mousePressEvent(self, ev: typing.Optional[QMouseEvent]) -> None:
@@ -26,15 +25,29 @@ class BaseMapLabel(QLabel):
 
         for item in self.items:
             if self.item_rect(item).contains(pos):
-                self.item_clicked.emit(item.id)
+                if ev.button() == Qt.RightButton:
+                    if item.is_shown != 2:
+                        if item.is_shown > 0:
+                            item.is_shown = 0
+                        else:
+                            item.is_shown = 1
+                        self.session.commit()
+                        self.repaint()
+                else:
+                    self.item_clicked.emit(item.id)
                 break
 
     def paintEvent(self, a0: typing.Optional[QPaintEvent]) -> None:
         super().paintEvent(a0)
         painter = QPainter(self)
-        painter.setPen(QColor(255, 0, 0))
 
         for item in self.items:
+            if item.is_shown == 2:
+                painter.setPen(QColor(0, 0, 255))
+            elif item.is_shown > 0:
+                painter.setPen(QColor(0, 255, 0))
+            else:
+                painter.setPen(QColor(255, 0, 0))
             painter.drawRect(self.item_rect(item))
 
     def item_rect(self, item) -> QRect:
@@ -74,7 +87,6 @@ class BaseMapWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setMaximumSize(700, 500)
-        self.session = Session()
         base_layout = QVBoxLayout()
         self.setLayout(base_layout)
         self.mapLabel = None
@@ -114,6 +126,7 @@ class BaseMapWidget(QWidget):
         self.mapLabel.add_item(self.name_edit.text())
 
     def set_current_map(self, map_id: int):
+        self.session = Session()
         record_to_update = self.session.query(SceneMap) \
             .filter(SceneMap.isCurrent == True).first()
         if record_to_update is not None:

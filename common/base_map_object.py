@@ -25,7 +25,7 @@ class BaseMapObject(QWidget):
         self.is_start_location.setEnabled(IS_EDITABLE)
         self.is_shown = QCheckBox("Show")
         self.coords = {"x": QSpinBox(), "y": QSpinBox(), "w": QSpinBox(), "h": QSpinBox()}
-        self.npc_list = AutoResizingListWidget()
+        
         self.object = None
 
         self.base_layout = QGridLayout(self)
@@ -48,19 +48,25 @@ class BaseMapObject(QWidget):
                 val.setMaximum(10000)
                 self.base_layout.addWidget(val, self.row, col)  # Поле ввода координаты
                 col += 1
+        
+        BaseMapObject.connect_all(self)
 
 
     def setup_map_object(self) -> None:
         if self.object is None:
             return
+        self.disconnect_all()
         self.name.setText(self.object.name)
         tmp = self.object.is_shown if self.object.is_shown is not None else 2
         self.is_start_location.setChecked(tmp == 2) #
         self.is_shown.setChecked(tmp > 0) #
+
         self.coords["x"].setValue(self.object.offsetX)
         self.coords["y"].setValue(self.object.offsetY)
         self.coords["w"].setValue(self.object.width)
         self.coords["h"].setValue(self.object.height)
+
+        self.connect_all()
 
 
     def on_save(self):
@@ -69,8 +75,8 @@ class BaseMapObject(QWidget):
         self.object.name = self.name.text()
         self.object.offsetX = self.coords["x"].value()
         self.object.offsetY = self.coords["y"].value()
-        self.object.width = self.coords["h"].value()
-        self.object.height = self.coords["w"].value()
+        self.object.width = self.coords["w"].value()
+        self.object.height = self.coords["h"].value()
         if self.is_start_location.isChecked():
             self.object.is_shown = 2
         elif self.is_shown.isChecked():
@@ -79,4 +85,19 @@ class BaseMapObject(QWidget):
             self.object.is_shown = 0
         self.session.commit()
         self.map_object_updated.emit()
+
+    def connect_all(self):
+        self.name.textChanged.connect(self.on_save)
+        self.is_start_location.stateChanged.connect(self.on_save)
+        self.is_shown.stateChanged.connect(self.on_save)
+        for _, w in self.coords.items():
+            w.valueChanged.connect(self.on_save)
+
+    def disconnect_all(self):
+        self.name.textChanged.disconnect(self.on_save)
+        self.is_start_location.stateChanged.disconnect(self.on_save)
+        self.is_shown.stateChanged.disconnect(self.on_save)
+        for _, w in self.coords.items():
+            w.valueChanged.disconnect(self.on_save)
+        
 

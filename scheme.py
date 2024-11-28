@@ -138,7 +138,11 @@ class WhereObject(Base):
 
 engine = create_engine(f'sqlite:///{DB_URL}')
 Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
+SessionMaker = sessionmaker(bind=engine)
+session = SessionMaker()
+
+def Session():
+    return session
 
 
 IS_EDITABLE = True
