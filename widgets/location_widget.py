@@ -105,3 +105,6 @@ class LocationWidget(BaseMapObject):
         self.session.commit()
 
         self.set_npcs()
+
+
+
