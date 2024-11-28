@@ -6,11 +6,14 @@ from widgets.npc_list_widget import NpcListWidget
 from widgets.map_settings_widget import MapSettingsWidget
 from widgets.player_list_widget import PlayerListWidget
 from dialogs.skills_dialog import SkillsDialog
+from PyQt5.QtCore import pyqtSignal
 
 from scheme import IS_EDITABLE
 
 
 class MainWindow(QMainWindow):
+    need_to_reload = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         global IS_EDITABLE
@@ -45,6 +48,7 @@ class MainWindow(QMainWindow):
         self.map_tabs = QTabWidget()
         self.data_tabs = QTabWidget()
         self.button = QPushButton("test")
+        self.button.clicked.connect(self.need_to_reload)
 
         self.global_map = GlobalMapWidget()
         self.map = MapWidget()

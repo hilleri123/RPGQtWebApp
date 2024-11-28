@@ -2,6 +2,8 @@ from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 
 
+SKILL_GROUP = ("Научные", "Технические", "Межличностные", "Основные")
+
 DB_URL = 'data/rpgtool.db'
 
 

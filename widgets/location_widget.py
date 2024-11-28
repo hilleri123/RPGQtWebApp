@@ -46,7 +46,7 @@ class LocationWidget(BaseMapObject):
         self.setup_map_object()
 
         self.disconnect_all()
-        self.description.setText(self.object.description)
+        self.description.setHtml(self.object.description)
         self.connect_all()
 
         self.set_npcs()

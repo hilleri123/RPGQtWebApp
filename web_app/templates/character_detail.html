@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ character.name }}</title>
+  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            var socket = io.connect('http://' + document.domain + ':' + location.port);
+            socket.on('reload', function(data) {
+                console.log(data.message);
+                // Обновляем страницу
+                location.reload();
+            });
+        });
+    </script>
+</head>
+<body>
+  <h1>{{ character.name }}</h1>
+  <p>{{ character.shortDesc }}</p>
+
+  <h2>Skills</h2>
+  {% for groupName, skills in skills_by_group.items() %}
+      <h3>{{ groupName }}</h3>
+      <ul>
+      {% for skill_name, value in skills %}
+          <li>{{ skill_name }}: {{ value }}</li>
+      {% endfor %}
+      </ul>
+  {% endfor %}
+  
+  <!-- Здесь можно добавить код для отображения изображения -->
+</body>
+</html>

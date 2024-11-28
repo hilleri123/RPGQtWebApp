@@ -10,7 +10,7 @@ from common import BaseMapObject, AutoResizingTextEdit, AutoResizingListWidget
 
 
 class NpcListWidget(QWidget):
-    npc_list_changed = pyqtSignal(int)
+    npc_list_changed = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)

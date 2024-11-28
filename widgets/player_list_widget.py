@@ -40,7 +40,7 @@ class PlayerListWidget(QWidget):
             item.setSizeHint(widget.sizeHint())
 
     def on_add_npc(self):
-        npc = NPC(name=self.player_name.text())
-        self.session.add(npc)
+        player = PlayerCharacter(name=self.player_name.text())
+        self.session.add(player)
         self.session.commit()
         self.fill_npcs()

@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (
-    QApplication, QDialog, QVBoxLayout, QHBoxLayout, QListWidget, QPushButton, QLineEdit, QLabel
+    QApplication, QDialog, QVBoxLayout, QComboBox, QHBoxLayout, QListWidget, QPushButton, QLineEdit, QLabel
 )
 from scheme import *
 
@@ -8,7 +8,6 @@ class SkillsDialog(QDialog):
         super().__init__()
 
         self.setWindowTitle("Управление навыками")
-        self.setGeometry(100, 100, 400, 300)
 
         # Основной макет
         layout = QVBoxLayout(self)
@@ -21,6 +20,9 @@ class SkillsDialog(QDialog):
         self.input_name = QLineEdit()
         self.input_name.setPlaceholderText("Введите название навыка")
         layout.addWidget(self.input_name)
+        self.group_combobox = QComboBox()
+        self.group_combobox.addItems(SKILL_GROUP)
+        layout.addWidget(self.group_combobox)
 
         # Кнопки добавления и удаления
         button_layout = QHBoxLayout()
@@ -47,13 +49,13 @@ class SkillsDialog(QDialog):
             self.list_widget.addItem(f"{skill.name} ({skill.groupName})")
 
     def add_skill(self):
-        """Добавляет новый навык в базу данных и обновляет список."""
         name = self.input_name.text().strip()
+        group = self.group_combobox.currentText()
         
         if not name:
             return  # Не добавляем пустые строки
         
-        new_skill = Skill(name=name, groupName="Default Group")
+        new_skill = Skill(name=name, groupName=group)
         
         session.add(new_skill)
         session.commit()
@@ -63,18 +65,14 @@ class SkillsDialog(QDialog):
         self.load_skills()
 
     def delete_skill(self):
-        """Удаляет выбранный навык из базы данных и обновляет список."""
         selected_items = self.list_widget.selectedItems()
-        
         if not selected_items:
             return
         
         for item in selected_items:
             skill_text = item.text()
             skill_name = skill_text.split(" (")[0]
-            
             skill_to_delete = session.query(Skill).filter(Skill.name == skill_name).first()
-            
             if skill_to_delete:
                 session.delete(skill_to_delete)
                 session.commit()

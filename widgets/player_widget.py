@@ -6,6 +6,7 @@ from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
 from common import AutoResizingTextEdit, AutoResizingListWidget
+from dialogs.player_edit_dialog import PlayerCharacterDialog
 
 
 class PlayerWidget(QWidget):
@@ -18,7 +19,7 @@ class PlayerWidget(QWidget):
         self.player_name_field = QLineEdit()  # Поле для имени NPC
         self.player_name_field.setText(self.player.name)
         self.player_name_field.setReadOnly(True)
-        tmp.addWidget(self.npc_naplayer_name_fieldme_field)
+        tmp.addWidget(self.player_name_field)
         self.edit_npc_button = QPushButton()
         self.edit_npc_button.setIcon(QIcon.fromTheme("preferences-system"))
         self.edit_npc_button.setEnabled(IS_EDITABLE)
@@ -35,7 +36,8 @@ class PlayerWidget(QWidget):
         self.base_layout.addWidget(self.datetime_edit)
         
     def on_edit(self):
-        pass
+        dialog = PlayerCharacterDialog(character_id = self.player.id)
+        dialog.exec()
 
     def on_delete(self):
         pass
