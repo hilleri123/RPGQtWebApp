@@ -40,6 +40,7 @@ class NpcListWidget(QWidget):
             self.npc_list.addItem
             item = QListWidgetItem(self.npc_list)
             widget = NpcWidget(npc=npc)
+            widget.deleted.connect(self.fill_npcs)
             self.npc_list.setItemWidget(item, widget)
             item.setSizeHint(widget.sizeHint())
 

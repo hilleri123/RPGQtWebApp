@@ -1,16 +1,17 @@
 import os
 import shutil
-from PyQt5.QtWidgets import QApplication, QLineEdit, QVBoxLayout, QHBoxLayout, QFileDialog, QPushButton, QLabel, QWidget, QListWidget
+from PyQt5.QtWidgets import QApplication, QLineEdit, QDateTimeEdit, QVBoxLayout, QHBoxLayout, QFileDialog, QPushButton, QLabel, QWidget, QListWidget
 from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent
 from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QSize, Qt
 import typing
-from scheme import SceneMap, Session, IS_EDITABLE
-# from PyQt5.QtGui import Qt
+from scheme import SceneMap, GlobalMap, PlayerCharacter, Session, IS_EDITABLE
+from .datetime_editor import DateTimeEditWidget
 
 
 
 class BaseMapLabel(QLabel):
     item_clicked = pyqtSignal(int)
+    time_changed = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -83,26 +84,36 @@ class BaseMapLabel(QLabel):
 
 class BaseMapWidget(QWidget):
     map_changed = pyqtSignal(int)
+    datetime_changed = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setMaximumSize(700, 500)
         base_layout = QVBoxLayout()
         self.setLayout(base_layout)
         self.mapLabel = None
         self.setup_label()
         base_layout.addWidget(self.mapLabel)
         self.button_layout = QHBoxLayout()
-        if IS_EDITABLE:
-            base_layout.addLayout(self.button_layout)
+        base_layout.addLayout(self.button_layout)
         self.select_file_button = QPushButton("select file")
         self.select_file_button.clicked.connect(self.open_file_dialog)
         self.button_layout.addWidget(self.select_file_button)
         self.name_edit = QLineEdit("Name")
-        self.button_layout.addWidget(self.name_edit)
+        if IS_EDITABLE:
+            self.button_layout.addWidget(self.name_edit)
         self.add_item_button = QPushButton("add item")
         self.add_item_button.clicked.connect(self.add_item)
-        self.button_layout.addWidget(self.add_item_button)
+        if IS_EDITABLE:
+            self.button_layout.addWidget(self.add_item_button)
+        self.datetime_base_edit = QDateTimeEdit()
+        self.datetime_base_edit.dateTimeChanged.connect(self.on_base_timeeditor)
+        if IS_EDITABLE:
+            self.button_layout.addWidget(self.datetime_base_edit)
+        self.datetime_edit = DateTimeEditWidget()
+        self.datetime_edit.dateTimeChanged.connect(self.on_timeeditor)
+        self.button_layout.addWidget(self.datetime_edit)
+
+        self.datetime_changed.connect(self.on_datetime_changed)
 
     def setup_label(self):
         self.mapLabel = BaseMapLabel()
@@ -144,3 +155,34 @@ class BaseMapWidget(QWidget):
     
     def on_map_update(self):
         self.mapLabel.set_map()
+
+    def on_datetime_changed(self):
+        g_map = self.session.query(GlobalMap).first()
+        if g_map is None:
+            return
+        dt = g_map.time
+        self.datetime_edit.setDateTime(dt)
+        self.datetime_base_edit.setDateTime(dt)
+    
+    def on_base_timeeditor(self):
+        self.session = Session()
+        g_map = self.session.query(GlobalMap).first()
+        if g_map is None:
+            return
+        dt = self.datetime_base_edit.dateTime().toPyDateTime()
+        g_map.time = dt
+        self.session.commit()
+        for character in self.session.query(PlayerCharacter).all():
+            character.time = dt
+            self.session.commit()
+        
+        self.datetime_changed.emit()
+
+    def on_timeeditor(self):
+        g_map = self.session.query(GlobalMap).first()
+        if g_map is None:
+            return
+        g_map.time = self.datetime_edit.dateTime().toPyDateTime()
+        self.session.commit()
+        
+        self.datetime_changed.emit()

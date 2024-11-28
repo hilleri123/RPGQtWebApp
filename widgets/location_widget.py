@@ -6,6 +6,7 @@ from npc_model import NpcTreeModel
 from repositories import *
 from widgets.location_npc_widget import LocationNpcWidget
 from common import BaseMapObject, AutoResizingTextEdit, AutoResizingListWidget
+from .action_widget import ActionWidget
 
 
 class LocationWidget(BaseMapObject):
@@ -36,6 +37,22 @@ class LocationWidget(BaseMapObject):
         self.npc_list = AutoResizingListWidget()
         self.base_layout.addWidget(self.npc_list, self.row, 0, 1, -1) 
 
+        
+        self.row += 1
+        tmp_layout = QHBoxLayout()
+        self.base_layout.addLayout(tmp_layout, self.row, 0)
+        tmp_layout.addWidget(QLabel("Action List:"))
+        tmp_layout.addStretch()
+
+        self.add_action_button = QPushButton()
+        self.add_action_button.setIcon(QIcon.fromTheme("list-add"))
+        self.add_action_button.clicked.connect(self.on_add_action)
+        if IS_EDITABLE:
+            tmp_layout.addWidget(self.add_action_button)
+        self.row += 1 # Метка для списка NPC
+        self.action_list = AutoResizingListWidget()
+        self.base_layout.addWidget(self.action_list, self.row, 0, 1, -1) 
+
         self.connect_all()
 
     def on_location_selected(self, location_id: int) -> None:
@@ -50,6 +67,7 @@ class LocationWidget(BaseMapObject):
         self.connect_all()
 
         self.set_npcs()
+        self.set_actions()
 
     def connect_all(self):
         super().connect_all()
@@ -92,6 +110,7 @@ class LocationWidget(BaseMapObject):
             if npc is not None:
                 item = QListWidgetItem(self.npc_list)
                 widget = LocationNpcWidget(npc=npc, appearance=appearance[npc.id], location=self.object)
+                widget.deleted.connect(self.set_npcs)
                 self.npc_list.setItemWidget(item, widget)
                 item.setSizeHint(widget.sizeHint())
 
@@ -108,3 +127,34 @@ class LocationWidget(BaseMapObject):
 
 
 
+    def set_actions(self):
+        self.action_list.clear()
+
+        actions_conditions = check_marks_in_condition(
+            self.session.query(GameCondition).filter(
+                GameCondition.playerActionId != None,
+                GameCondition.locationId == self.object.id,
+                GameCondition.npcId == None
+            ).all()
+        )
+        
+        for condition in actions_conditions:
+            action = self.session.query(PlayerAction).get(condition.npcId)
+            if action is not None:
+                item = QListWidgetItem(self.action_list)
+                widget = ActionWidget(action_id=action.id)
+                widget.deleted.connect(self.set_actions)
+                self.action_list.setItemWidget(item, widget)
+                item.setSizeHint(widget.sizeHint())
+
+
+    def on_add_action(self):
+        action = PlayerAction()
+        self.session.add(action)
+        self.session.commit()
+        # TODO Mark
+        c = GameCondition(locationId=self.object.id, playerActionId=action.id)
+        self.session.add(c)
+        self.session.commit()
+
+        self.set_actions()

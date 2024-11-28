@@ -5,7 +5,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
-from common import AutoResizingTextEdit, AutoResizingListWidget
+from common import AutoResizingTextEdit, DateTimeEditWidget, AutoResizingListWidget
 from dialogs.player_edit_dialog import PlayerCharacterDialog
 
 
@@ -31,7 +31,7 @@ class PlayerWidget(QWidget):
         self.delete_button.clicked.connect(self.on_delete)
         tmp.addWidget(self.delete_button)
         self.base_layout.addLayout(tmp)
-        self.datetime_edit = QDateTimeEdit()
+        self.datetime_edit = DateTimeEditWidget()
         self.datetime_edit.dateTimeChanged.connect(self.on_save)
         self.base_layout.addWidget(self.datetime_edit)
         
@@ -43,5 +43,5 @@ class PlayerWidget(QWidget):
         pass
 
     def on_save(self):
-        self.player.time = self.datetime_edit.dateTime()
+        self.player.time = self.datetime_edit.dateTime().toPyDateTime()
         self.session.commit()

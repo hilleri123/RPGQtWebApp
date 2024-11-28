@@ -6,7 +6,7 @@ from widgets.npc_list_widget import NpcListWidget
 from widgets.map_settings_widget import MapSettingsWidget
 from widgets.player_list_widget import PlayerListWidget
 from dialogs.skills_dialog import SkillsDialog
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QSize
 
 from scheme import IS_EDITABLE
 
@@ -54,6 +54,7 @@ class MainWindow(QMainWindow):
         self.map = MapWidget()
         self.map_tabs.addTab(self.global_map, "global map")
         self.map_tabs.addTab(self.map, "map")
+        self.map_tabs.setMaximumSize(QSize(700, 700))
 
         self.map_settings = MapSettingsWidget()
         self.location = LocationWidget()

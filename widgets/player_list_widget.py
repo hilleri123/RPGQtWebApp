@@ -26,14 +26,14 @@ class PlayerListWidget(QWidget):
 
         self.player_list = AutoResizingListWidget()
         self.base_layout.addWidget(self.player_list)
-        self.fill_npcs()
+        self.fill_players()
 
-    def fill_npcs(self):
+    def fill_players(self):
         self.player_list.clear()
         self.session = Session()
 
         for player in self.session.query(PlayerCharacter).all():
-            self.player_list.addItem
+            # self.player_list.addItem
             item = QListWidgetItem(self.player_list)
             widget = PlayerWidget(player=player)
             self.player_list.setItemWidget(item, widget)
@@ -43,4 +43,4 @@ class PlayerListWidget(QWidget):
         player = PlayerCharacter(name=self.player_name.text())
         self.session.add(player)
         self.session.commit()
-        self.fill_npcs()
+        self.fill_players()

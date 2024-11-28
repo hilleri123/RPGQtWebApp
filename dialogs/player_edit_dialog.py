@@ -75,7 +75,7 @@ class PlayerCharacterDialog(QDialog):
     def load_stats(self):
         self.stats_list_widget.clear()
         for stat, skill in session.query(Stat, Skill).join(Skill).filter(Stat.characterId == self.character_id).all():
-            item_text = f"{skill.name}: {stat.value}"
+            item_text = f"{skill.name}: {stat.initValue}"
             item_widget = QListWidgetItem(item_text)
             item_widget.setData(Qt.UserRole, stat)  # Сохраняем объект Stat в элементе списка
             self.stats_list_widget.addItem(item_widget)
@@ -84,7 +84,7 @@ class PlayerCharacterDialog(QDialog):
         try:
             skill_id = self.skill_combobox.currentData()
             skill_value = self.skill_value.value()
-            stat = Stat(characterId=self.character_id, skillId=skill_id, value=skill_value)
+            stat = Stat(characterId=self.character_id, skillId=skill_id, initValue=skill_value, value=skill_value)
             session.add(stat)
             session.commit()
             self.load_stats()

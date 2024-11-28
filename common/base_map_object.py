@@ -3,7 +3,6 @@ from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent, QIc
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
-from widgets.npc_widget import NpcWidget
 from common import AutoResizingTextEdit, AutoResizingListWidget
 
 
