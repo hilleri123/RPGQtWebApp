@@ -9,6 +9,8 @@ from common import AutoResizingTextEdit, AutoResizingListWidget
 
 
 class LocationWidget(QWidget):
+    location_updated = pyqtSignal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -87,6 +89,7 @@ class LocationWidget(QWidget):
         self.location.name = self.name.text()
         self.location.description = self.description.toHtml()
         self.session.commit()
+        self.location_updated.emit()
 
     def set_npcs(self):
         self.npc_list.clear()

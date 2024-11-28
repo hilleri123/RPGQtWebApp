@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, UniqueConstraint, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, UniqueConstraint, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 
 
@@ -35,6 +35,7 @@ class Location(Base):
     offsetY = Column(Integer)
     width = Column(Integer)
     height = Column(Integer)
+    icon_file_path = Column(String)
     description = Column(String)
     is_shown = Column(Integer, default=0) #Как boolean, но 2 - это значит конст
     mapId = Column(Integer, ForeignKey('SceneMap.id', ondelete='CASCADE'))
@@ -62,19 +63,26 @@ class PlayerAction(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     description = Column(String)
     needSkillIdsConditionsJson = Column(String, default=None, )
-    changeMarkId = Column(Integer, ForeignKey('Mark.id', ondelete='CASCADE'), default=None)
-    getGameItemId = Column(Integer, ForeignKey('GameItem.id', ondelete='CASCADE'), default=None, )
+    changeMarkId = Column(Integer, ForeignKey('Mark.id'), default=None)
+    getGameItemId = Column(Integer, ForeignKey('GameItem.id'), default=None, )
     is_activated = Column(Boolean, default=False)
-    # npcId = Column(Integer, ForeignKey('NPC.id', ondelete='CASCADE'), default=None,) # TODO вроде не нужно
-    needGameItemIdsJson = Column(String, default=None, )
+    needGameItemIdsJson = Column(String, default=None)
+    add_time = Column(DateTime, default=None)
 
 
-class PlayerCharacter(Base):
-    __tablename__ = 'PlayerCharacter'
+class Note(Base):
+    __tablename__ = 'Note'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    xml_text = Column(String)
+    action_id = Column(Integer, ForeignKey('PlayerAction.id'), default=None)
+
+
+class GlobalMap(Base):
+    __tablename__ = 'GlobalMap'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
-    shortDesc = Column(String)
-    story = Column(String)
+    filePath = Column(String)
+    time = Column(DateTime)
 
 
 class SceneMap(Base):
@@ -83,6 +91,22 @@ class SceneMap(Base):
     name = Column(String)
     filePath = Column(String)
     isCurrent = Column(Boolean)
+    offsetX = Column(Integer)
+    offsetY = Column(Integer)
+    width = Column(Integer)
+    height = Column(Integer)
+    icon_file_path = Column(String)
+
+
+class PlayerCharacter(Base):
+    __tablename__ = 'PlayerCharacter'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
+    shortDesc = Column(String)
+    story = Column(String)
+    time = Column(DateTime)
+    map_id = Column(Integer, ForeignKey('Location.id', ondelete='CASCADE'))
+    location_id = Column(Integer, ForeignKey('SceneMap.id', ondelete='CASCADE'))
 
 
 class Skill(Base):

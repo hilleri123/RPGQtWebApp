@@ -1,5 +1,7 @@
-from PyQt5.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QWidget, QListWidget
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QLabel, QWidget, QListWidget
+from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent
+from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QSize, Qt
+import typing
 # from PyQt5.QtGui import Qt
 
 class AutoResizingTextEdit(QTextEdit):
@@ -55,3 +57,38 @@ class AutoResizingListWidget(QListWidget):
         self.setMaximumHeight(int(total_height+1))
 
 
+class BaseMapLabel(QLabel):
+    item_clicked = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.original = QPixmap()
+        self.items = []
+
+    def mousePressEvent(self, ev: typing.Optional[QMouseEvent]) -> None:
+        if ev is None:
+            return
+        pos = ev.pos()
+
+        for item in self.items:
+            if self.item_rect(item).contains(pos):
+                self.item_clicked.emit(item.id)
+                break
+
+    def paintEvent(self, a0: typing.Optional[QPaintEvent]) -> None:
+        super().paintEvent(a0)
+        painter = QPainter(self)
+        painter.setPen(QColor(255, 0, 0))
+
+        for item in self.items:
+            painter.drawRect(self.item_rect(item))
+
+    def item_rect(self, item) -> QRect:
+        if item is None:
+            return QRect()
+        w_aspect = self.size().width() / self.original.width()
+        h_aspect = self.size().height() / self.original.height()
+        return QRect(QPoint(int(item.offsetX * w_aspect),
+                     int(item.offsetY * h_aspect)),
+                     QSize(int(item.width * w_aspect),
+                     int(item.height * h_aspect)))
