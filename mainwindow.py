@@ -5,6 +5,7 @@ from widgets.location_widget import LocationWidget
 from widgets.npc_list_widget import NpcListWidget
 from widgets.map_settings_widget import MapSettingsWidget
 from widgets.player_list_widget import PlayerListWidget
+from widgets.item_list_widget import ItemListWidget
 from dialogs.skills_dialog import SkillsDialog
 from common import AutoResizingTextEdit, LogWidget, get_local_ip
 from PyQt5.QtCore import pyqtSignal, QSize
@@ -63,7 +64,7 @@ class MainWindow(QMainWindow):
         self.map_settings = MapSettingsWidget()
         self.location = LocationWidget()
         self.npcs = NpcListWidget()
-        self.items = QWidget()
+        self.items = ItemListWidget()
         self.marks = QWidget()
         self.notes = QWidget()
         self.data_tabs.addTab(self.map_settings, "map settings")
@@ -89,11 +90,14 @@ class MainWindow(QMainWindow):
         tmp_tmp_layout.addWidget(self.player_list)
         tmp_tmp_layout.addWidget(self.logs)
         self.main_layout.addWidget(self.button)
+        
+        self.fill()
 
         self.global_map.map_changed.connect(self.map_settings.on_map_selected)
         self.global_map.map_changed.connect(self.map.set_current_map)
         self.map_settings.map_object_updated.connect(self.global_map.on_map_update)
         self.map.location_clicked.connect(self.location.on_location_selected)
+        self.map.location_clicked.connect(self.items.set_location)
         self.map.map_changed.connect(self.map_settings.on_map_selected)
         self.location.map_object_updated.connect(self.map.on_map_update)
         self.maps_update.connect(self.global_map.on_map_update)
@@ -101,7 +105,9 @@ class MainWindow(QMainWindow):
 
         self.intro.textChanged.connect(self.on_save)
 
+        self.items.item_list_changed.connect(self.location.set_items)
         self.npcs.npc_list_changed.connect(self.location.set_npcs)
+
 
     def on_checkbox_toggled(self, checked):
         global IS_EDITABLE
@@ -117,6 +123,9 @@ class MainWindow(QMainWindow):
     def update_character_stat(self, character_id, stats):
         # print(character_id, stats)
         self.logs.log_stat_change(character_id, stats)
+
+    def fill(self):
+        pass
 
     def on_save(self):
         session = Session()

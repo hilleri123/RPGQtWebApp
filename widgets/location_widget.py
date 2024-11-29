@@ -5,6 +5,7 @@ from scheme import *
 from npc_model import NpcTreeModel
 from repositories import *
 from widgets.location_npc_widget import LocationNpcWidget
+from widgets.location_item_widget import LocationGameItemWidget
 from common import BaseMapObject, AutoResizingTextEdit, AutoResizingListWidget
 from .action_widget import ActionWidget
 
@@ -52,6 +53,9 @@ class LocationWidget(BaseMapObject):
         self.row += 1 # Метка для списка NPC
         self.action_list = AutoResizingListWidget()
         self.base_layout.addWidget(self.action_list, self.row, 0, 1, -1) 
+        self.row += 1 # Метка для списка NPC
+        self.items_list = AutoResizingListWidget()
+        self.base_layout.addWidget(self.items_list, self.row, 0, 1, -1) 
 
         self.connect_all()
 
@@ -68,6 +72,7 @@ class LocationWidget(BaseMapObject):
 
         self.set_npcs()
         self.set_actions()
+        self.set_items()
 
     def connect_all(self):
         super().connect_all()
@@ -125,7 +130,16 @@ class LocationWidget(BaseMapObject):
 
         self.set_npcs()
 
+    def set_items(self):
+        self.items_list.clear()
 
+        item_list = self.session.query(GameItem).all()
+        for game_item in item_list:
+            item = QListWidgetItem(self.items_list)
+            widget = LocationGameItemWidget(item=game_item)
+            widget.deleted.connect(self.set_items)
+            self.items_list.setItemWidget(item, widget)
+            item.setSizeHint(widget.sizeHint())
 
     def set_actions(self):
         self.action_list.clear()
@@ -158,3 +172,5 @@ class LocationWidget(BaseMapObject):
         self.session.commit()
 
         self.set_actions()
+
+
