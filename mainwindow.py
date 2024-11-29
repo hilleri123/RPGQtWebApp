@@ -9,7 +9,7 @@ from dialogs.skills_dialog import SkillsDialog
 from common import AutoResizingTextEdit, LogWidget, get_local_ip
 from PyQt5.QtCore import pyqtSignal, QSize
 
-from scheme import IS_EDITABLE
+from scheme import IS_EDITABLE, GlobalMap, Session
 
 
 class MainWindow(QMainWindow):
@@ -99,6 +99,8 @@ class MainWindow(QMainWindow):
         self.maps_update.connect(self.global_map.on_map_update)
         self.maps_update.connect(self.map.on_map_update)
 
+        self.intro.textChanged.connect(self.on_save)
+
         self.npcs.npc_list_changed.connect(self.location.set_npcs)
 
     def on_checkbox_toggled(self, checked):
@@ -115,3 +117,12 @@ class MainWindow(QMainWindow):
     def update_character_stat(self, character_id, stats):
         # print(character_id, stats)
         self.logs.log_stat_change(character_id, stats)
+
+    def on_save(self):
+        session = Session()
+        global_map = session.query(GlobalMap).first()
+        if global_map is None:
+            return
+        global_map.intro = self.intro.toHtml()
+        session.commit()
+    

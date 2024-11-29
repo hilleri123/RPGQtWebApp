@@ -86,6 +86,7 @@ class GlobalMap(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     filePath = Column(String)
+    intro = Column(String)
     time = Column(DateTime)
 
 
