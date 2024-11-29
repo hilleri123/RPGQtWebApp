@@ -1,0 +1,55 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+
+.skill-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.skill-item input {
+    width: 50px; /* Увеличена ширина для удобства ввода */
+    text-align: center; /* Центрируем текст внутри */
+}
+
+.skill-item p,
+.skill-item button {
+    margin: 0;
+}
+
+@media (max-width: 600px) {
+  .skill-item {
+      flex-direction: column; /* Переключаемся на колонку для узких экранов */
+      align-items: flex-start;
+  }
+  
+  .skill-item button,
+  .skill-item input {
+      margin-top: 5px; /* Добавляем отступы между элементами */
+  }
+}
+  
+label, input[type="color"] {
+    display: block;
+    margin-bottom: 10px;
+}
+    
+#selectAddress {
+    display: block;
+    margin-bottom: 20px;
+}
