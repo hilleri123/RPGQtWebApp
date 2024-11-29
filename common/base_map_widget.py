@@ -1,12 +1,13 @@
 import os
 import shutil
 from PyQt5.QtWidgets import QApplication, QMenu, QAction, QLineEdit, QDateTimeEdit, QVBoxLayout, QHBoxLayout, QFileDialog, QPushButton, QLabel, QWidget, QListWidget
-from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent
-from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QSize, Qt
+from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent, QPolygonF
+from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QPointF, QSize, Qt
 import typing
 from scheme import SceneMap, GlobalMap, PlayerCharacter, Session, IS_EDITABLE
 from .datetime_editor import DateTimeEditWidget
 
+TRIANGLE_SIZE = 15
 
 
 class BaseMapLabel(QLabel):
@@ -37,13 +38,33 @@ class BaseMapLabel(QLabel):
         painter = QPainter(self)
 
         for item in self.items:
+            painter.save()
             if item.is_shown == 2:
                 painter.setPen(QColor(0, 0, 255))
             elif item.is_shown > 0:
                 painter.setPen(QColor(0, 255, 0))
             else:
                 painter.setPen(QColor(255, 0, 0))
-            painter.drawRect(self.item_rect(item))
+            rect = self.item_rect(item)
+            painter.drawRect(rect)
+
+            x = rect.x()
+            y = rect.y()
+            for character in self.characters_in_item(item):
+                color = QColor(100, 150, 100, 128)  # RGB + Alpha (128 из 255 — это 50%)
+                if character.color:
+                    color = QColor(character.color.hex)
+                    color.setAlpha(128)
+                painter.setBrush(color)
+                painter.setPen(color)
+                triangle = QPolygonF([
+                    QPointF(x, y),
+                    QPointF(x+TRIANGLE_SIZE, y),
+                    QPointF(x+TRIANGLE_SIZE/2, y+TRIANGLE_SIZE/1.4)
+                ])
+                painter.drawPolygon(triangle)
+            painter.restore()
+
 
     def item_rect(self, item) -> QRect:
         if item is None or self.original.width() == 0 or self.original.height() == 0:
@@ -84,6 +105,13 @@ class BaseMapLabel(QLabel):
             menu.addAction(action)
         menu.exec_(pos)
 
+    def characters_in_item(self, item) -> list[PlayerCharacter]:
+        self.session = Session()
+        res = []
+        for character in self.session.query(PlayerCharacter).all():
+            if self.character_presence(item, character):
+                res.append(character)
+        return res
 
     def character_presence(self, item, character):
         pass
@@ -181,6 +209,7 @@ class BaseMapWidget(QWidget):
 
     
     def on_map_update(self):
+        print("!")
         self.mapLabel.set_map()
 
     def on_datetime_changed(self):

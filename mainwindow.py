@@ -6,6 +6,7 @@ from widgets.npc_list_widget import NpcListWidget
 from widgets.map_settings_widget import MapSettingsWidget
 from widgets.player_list_widget import PlayerListWidget
 from dialogs.skills_dialog import SkillsDialog
+from common import AutoResizingTextEdit, LogWidget, get_local_ip
 from PyQt5.QtCore import pyqtSignal, QSize
 
 from scheme import IS_EDITABLE
@@ -13,10 +14,12 @@ from scheme import IS_EDITABLE
 
 class MainWindow(QMainWindow):
     need_to_reload = pyqtSignal()
+    maps_update = pyqtSignal()
 
     def __init__(self):
         super().__init__()
         global IS_EDITABLE
+        self.setWindowTitle(get_local_ip())
         
         menu_bar = self.menuBar()
         settings_menu = menu_bar.addMenu("Settings")
@@ -52,6 +55,7 @@ class MainWindow(QMainWindow):
 
         self.global_map = GlobalMapWidget()
         self.map = MapWidget()
+        self.intro = AutoResizingTextEdit()
         self.map_tabs.addTab(self.global_map, "global map")
         self.map_tabs.addTab(self.map, "map")
         self.map_tabs.setMaximumSize(QSize(700, 700))
@@ -70,12 +74,20 @@ class MainWindow(QMainWindow):
         self.data_tabs.addTab(self.notes, "notes")
 
         self.player_list = PlayerListWidget()
+        self.logs = LogWidget()
 
         tmp_layout = QHBoxLayout()
         self.main_layout.addLayout(tmp_layout)
-        tmp_layout.addWidget(self.map_tabs)
+        tmp_tmp_layout = QVBoxLayout()
+        tmp_layout.addLayout(tmp_tmp_layout)
+        tmp_tmp_layout.addWidget(self.map_tabs)
+        tmp_tmp_layout.addWidget(self.intro)
         tmp_layout.addWidget(self.data_tabs)
-        tmp_layout.addWidget(self.player_list)
+        self.main_layout.addLayout(tmp_layout)
+        tmp_tmp_layout = QVBoxLayout()
+        tmp_layout.addLayout(tmp_tmp_layout)
+        tmp_tmp_layout.addWidget(self.player_list)
+        tmp_tmp_layout.addWidget(self.logs)
         self.main_layout.addWidget(self.button)
 
         self.global_map.map_changed.connect(self.map_settings.on_map_selected)
@@ -84,6 +96,8 @@ class MainWindow(QMainWindow):
         self.map.location_clicked.connect(self.location.on_location_selected)
         self.map.map_changed.connect(self.map_settings.on_map_selected)
         self.location.map_object_updated.connect(self.map.on_map_update)
+        self.maps_update.connect(self.global_map.on_map_update)
+        self.maps_update.connect(self.map.on_map_update)
 
         self.npcs.npc_list_changed.connect(self.location.set_npcs)
 
@@ -95,4 +109,9 @@ class MainWindow(QMainWindow):
     def show_skill_dialog(self):
         self.skill_dialog.exec()
 
-    
+    def update_map(self): # почему-то не работает
+        self.maps_update.emit()
+
+    def update_character_stat(self, character_id, stats):
+        # print(character_id, stats)
+        self.logs.log_stat_change(character_id, stats)

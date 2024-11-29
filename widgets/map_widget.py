@@ -39,6 +39,7 @@ class MapLabel(BaseMapLabel):
         character.map_id = self.map.id
         character.location_id = item.id
         self.session.commit()
+        self.repaint()
 
 
 class MapWidget(BaseMapWidget):

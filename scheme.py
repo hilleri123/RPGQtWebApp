@@ -1,5 +1,7 @@
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, UniqueConstraint, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
+from sqlalchemy_utils import ColorType
+from colour import Color
 
 
 SKILL_GROUP = ("Научные", "Технические", "Межличностные", "Основные")
@@ -108,6 +110,9 @@ class PlayerCharacter(Base):
     shortDesc = Column(String)
     story = Column(String)
     time = Column(DateTime)
+    color = Column(ColorType)
+    address = Column(String)
+    player_locked = Column(Boolean)
     map_id = Column(Integer, ForeignKey('Location.id'))
     location_id = Column(Integer, ForeignKey('SceneMap.id'))
 

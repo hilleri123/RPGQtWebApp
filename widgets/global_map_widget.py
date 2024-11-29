@@ -36,8 +36,12 @@ class GlobalMapLabel(BaseMapLabel):
         return True
 
     def toggle_character_presence(self, item, character):
+        if character.map_id == item.id:
+            return 
         character.map_id = item.id
+        character.location_id = None
         self.session.commit()
+        self.repaint()
 
 
 
