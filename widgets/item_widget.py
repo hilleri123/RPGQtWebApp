@@ -24,6 +24,8 @@ class ItemWidget(QWidget):
         self.item_name_field.setText(self.item.name)
         self.item_name_field.setReadOnly(True)
         tmp.addWidget(self.item_name_field)
+        self.where_label = QLabel()
+        tmp.addWidget(self.where_label)
         self.edit_item_button = QPushButton()
         self.edit_item_button.setIcon(QIcon.fromTheme("preferences-system"))
         self.edit_item_button.setEnabled(IS_EDITABLE)
@@ -41,7 +43,23 @@ class ItemWidget(QWidget):
         tmp.addWidget(self.delete_button)
         self.base_layout.addLayout(tmp)
 
+        self.update_where()
 
+    def update_where(self):
+        where = self.session.query(WhereObject).filter(WhereObject.gameItemId == self.item.id).first()
+        if where is None:
+            icon = QIcon.fromTheme("dialog-error")
+        elif where.locationId is not None:
+            icon = QIcon.fromTheme("go-home")
+        elif where.playerId is not None:
+            icon = QIcon.fromTheme("user-available")
+        elif where.npcId is not None:
+            icon = QIcon.fromTheme("user-offline")
+        else:
+            icon = QIcon.fromTheme("dialog-error")
+        
+        pixmap = icon.pixmap()  
+        self.where_label.setPixmap(pixmap)
 
     def on_edit_item(self):
         text, ok = QInputDialog.getMultiLineText(
@@ -59,4 +77,6 @@ class ItemWidget(QWidget):
         self.deleted.emit()
 
     def on_move_item(self):
-        pass
+        r = GameItemMoveDialog().exec()
+        if r:
+            self.update_where()
