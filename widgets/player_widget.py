@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
 from common import AutoResizingTextEdit, DateTimeEditWidget, AutoResizingListWidget
-from dialogs.player_edit_dialog import PlayerCharacterDialog
+from dialogs import PlayerCharacterDialog
 
 
 class PlayerWidget(QWidget):

@@ -26,16 +26,19 @@ class GameItemMoveDialog(QDialog):
 
         for row, location in enumerate(self.session.query(Location).all()):
             item = QTableWidgetItem(location.name)
+            item.setFlags(item.flags() & ~Qt.ItemIsEditable)
             item.setData(Qt.UserRole, location.id)
             self.table.setItem(row, 0, item)
 
         for row, player in enumerate(self.session.query(PlayerCharacter).all()):
             item = QTableWidgetItem(player.name)
+            item.setFlags(item.flags() & ~Qt.ItemIsEditable)
             item.setData(Qt.UserRole, player.id)
             self.table.setItem(row, 1, item)
 
         for row, npc in enumerate(self.session.query(NPC).all()):
             item = QTableWidgetItem(npc.name)
+            item.setFlags(item.flags() & ~Qt.ItemIsEditable)
             item.setData(Qt.UserRole, npc.id)
             self.table.setItem(row, 2, item)
 
@@ -43,16 +46,16 @@ class GameItemMoveDialog(QDialog):
         layout = QVBoxLayout(self)
         layout.addWidget(self.table)
 
-    def on_item_double_clicked(self, item):
+    def on_item_double_clicked(self, item: QTableWidgetItem):
         location_id, player_id, npc_id = None, None, None
         id_ = item.data(Qt.UserRole)
         if id_ is None:
             return
-        if item.column == 0:
+        if item.column() == 0:
             location_id = id_
-        elif item.column == 1:
+        elif item.column() == 1:
             player_id = id_
-        elif item.column == 1:
+        elif item.column() == 2:
             npc_id = id_
         else:
             return

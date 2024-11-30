@@ -25,10 +25,10 @@ class ItemListWidget(QWidget):
         tmp_layout.addWidget(QLabel("Item list:")) 
         self.item_name = QLineEdit()
         tmp_layout.addWidget(self.item_name)
-        self.add_npc_button = QPushButton()
-        self.add_npc_button.setIcon(QIcon.fromTheme("list-add"))
-        self.add_npc_button.clicked.connect(self.on_add_npc)
-        tmp_layout.addWidget(self.add_npc_button)
+        self.add_item_button = QPushButton()
+        self.add_item_button.setIcon(QIcon.fromTheme("list-add"))
+        self.add_item_button.clicked.connect(self.on_add_item)
+        tmp_layout.addWidget(self.add_item_button)
         self.location_label = QLabel()
         tmp_layout.addWidget(self.location_label)
         self.item_description = AutoResizingTextEdit()
@@ -57,9 +57,18 @@ class ItemListWidget(QWidget):
             self.item_list.setItemWidget(item, widget)
             item.setSizeHint(widget.sizeHint())
 
-    def on_add_npc(self):
+    def on_add_item(self):
         item = GameItem(name=self.item_name.text(), text=self.item_description.toHtml())
         self.session.add(item)
         self.session.commit()
+        if self.location_id is not None:
+            where = self.session.query(WhereObject).filter(WhereObject.gameItemId == item.id).first()
+            if where is None:
+                where = WhereObject(gameItemId=item.id)
+                self.session.add(where)
+            where.locationId = self.location_id
+            where.playerId = None
+            where.npcId = None
+            self.session.commit()
         self.fill_items()
         self.item_list_changed.emit()

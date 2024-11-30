@@ -139,6 +139,7 @@ class WhereObject(Base):
     gameItemId = Column(Integer, ForeignKey('GameItem.id', ondelete='CASCADE'), nullable=False)
     npcId = Column(Integer, ForeignKey('NPC.id', ondelete='CASCADE'), default=None)
     locationId = Column(Integer, ForeignKey('Location.id', ondelete='CASCADE'), default=None)
+    playerId = Column(Integer, ForeignKey('Location.id', ondelete='CASCADE'), default=None)
     __table_args__ = (
         UniqueConstraint('gameItemId', name='uq_game_item_id'),
     )

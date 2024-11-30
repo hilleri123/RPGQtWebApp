@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QFormLayout, QListWidgetItem, QInputDialog, QLineEdit, QTextEdit, QListWidget, QPushButton, QHBoxLayout, QLabel
 )
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QSize
 from scheme import *
 from repositories import *
 from common import AutoResizingTextEdit, AutoResizingListWidget
@@ -58,7 +58,7 @@ class ItemWidget(QWidget):
         else:
             icon = QIcon.fromTheme("dialog-error")
         
-        pixmap = icon.pixmap()  
+        pixmap = icon.pixmap(QSize(16,16))  
         self.where_label.setPixmap(pixmap)
 
     def on_edit_item(self):
@@ -77,6 +77,6 @@ class ItemWidget(QWidget):
         self.deleted.emit()
 
     def on_move_item(self):
-        r = GameItemMoveDialog().exec()
+        r = GameItemMoveDialog(self.item).exec()
         if r:
             self.update_where()
