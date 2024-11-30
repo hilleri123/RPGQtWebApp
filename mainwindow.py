@@ -1,12 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTabWidget, QMenuBar, QAction, QPushButton
-from widgets.map_widget import MapWidget
-from widgets.global_map_widget import GlobalMapWidget
-from widgets.location_widget import LocationWidget
-from widgets.npc_list_widget import NpcListWidget
-from widgets.map_settings_widget import MapSettingsWidget
-from widgets.player_list_widget import PlayerListWidget
-from widgets.item_list_widget import ItemListWidget
-from dialogs.skills_dialog import SkillsDialog
+from widgets import MapWidget, ItemListWidget, GlobalMapWidget, LocationWidget, NpcListWidget, PlayerListWidget, MapSettingsWidget
+from dialogs import SkillsDialog
 from common import AutoResizingTextEdit, LogWidget, get_local_ip
 from PyQt5.QtCore import pyqtSignal, QSize
 

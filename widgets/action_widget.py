@@ -5,7 +5,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QIcon
 from common import SkillListWidget
 from scheme import *
-from dialogs.action_edit_dialog import ActionEditDialog
+from dialogs import ActionEditDialog
 
 
 class ActionWidget(QWidget):

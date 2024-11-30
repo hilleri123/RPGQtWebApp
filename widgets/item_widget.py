@@ -7,6 +7,7 @@ from scheme import *
 from repositories import *
 from common import AutoResizingTextEdit, AutoResizingListWidget
 from .action_widget import ActionWidget
+from dialogs import GameItemMoveDialog
 
 
 class ItemWidget(QWidget):
@@ -28,6 +29,11 @@ class ItemWidget(QWidget):
         self.edit_item_button.setEnabled(IS_EDITABLE)
         self.edit_item_button.clicked.connect(self.on_edit_item)
         tmp.addWidget(self.edit_item_button)
+        self.move_item_button = QPushButton()
+        self.move_item_button.setIcon(QIcon.fromTheme("document-send"))
+        self.move_item_button.setEnabled(IS_EDITABLE)
+        self.move_item_button.clicked.connect(self.on_move_item)
+        tmp.addWidget(self.move_item_button)
         self.delete_button = QPushButton()
         self.delete_button.setIcon(QIcon.fromTheme("list-remove"))
         self.delete_button.setEnabled(IS_EDITABLE)
@@ -52,3 +58,5 @@ class ItemWidget(QWidget):
 
         self.deleted.emit()
 
+    def on_move_item(self):
+        pass
