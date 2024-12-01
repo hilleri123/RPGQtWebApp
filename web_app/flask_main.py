@@ -152,7 +152,7 @@ def process_choice():
     data = request.json
     choice = data.get('choice')
     print(f"Выбрано: {choice}")
-    return jsonify({'message': f'Вы выбрали: {choice}'})
+    return {'message': f'Вы выбрали: {choice}'}
 
 if __name__ == '__main__':
     app.run(debug=True)
