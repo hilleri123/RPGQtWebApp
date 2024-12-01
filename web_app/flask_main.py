@@ -90,8 +90,10 @@ def character_detail(id):
         if skill.groupName not in skills_by_group:
             skills_by_group[skill.groupName] = []
         skills_by_group[skill.groupName].append([id, skill.id, skill.name, stat.value, stat.initValue])
-    print(skills_by_group)
-    return render_template('character_detail.html', character=character, skills_by_group=skills_by_group)
+    # print(skills_by_group)
+    items = g.db_session.query(GameItem).join(WhereObject).filter(WhereObject.playerId == id).all()
+
+    return render_template('character_detail.html', character=character, skills_by_group=skills_by_group, gameitems=items)
 
 @app.route('/update_skill', methods=['POST'])
 def update_skill():
@@ -144,6 +146,13 @@ def save_address():
         return {'success': True}
     
     return {'success': False}, 400
+
+@app.route('/process_choice', methods=['POST'])
+def process_choice():
+    data = request.json
+    choice = data.get('choice')
+    print(f"Выбрано: {choice}")
+    return jsonify({'message': f'Вы выбрали: {choice}'})
 
 if __name__ == '__main__':
     app.run(debug=True)

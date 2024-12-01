@@ -24,7 +24,9 @@
         <p>{{ group }}</p>
         {% for character_id, skill_id, skill_name, stat_val, stat_initValue in skills %}
         <div class="skill-item">
+          <div class="name">
             {{ skill_name }}:
+          </div>
             <button onclick="updateSkill('{{ character_id }}', '{{ skill_id }}', 'skill-{{ skill_id }}', 1)">+1</button>
             <input type="number" id="skill-{{ skill_id }}" value="{{ stat_val }}" readonly/>
             <p>/ {{ stat_initValue }}</p>
@@ -33,6 +35,16 @@
         {% endfor %}
       {% endfor %}
       
+      <h2>Items</h2>
+      {% for gameitem in gameitems %}
+        <div class="gameitem-item">
+          <div class="name">
+            {{ gameitem.name }}
+          </div>
+          <div class="description">{{gameitem.description}}</div>
+          <button onclick="chooseOption()">move</button>
+        </div>
+      {% endfor %}
       <!-- Здесь можно добавить код для отображения изображения -->
   </div>
 </body>
