@@ -13,25 +13,29 @@ socketio = SocketIO(app)
 
 callback_map_global = None
 callback_loc_global = None
+callback_item_global = None
 callback_char_global = None
 callback_char_stat_global = None
 
 def set_callbacks(
         callback_map = None,
         callback_loc = None, 
+        callback_item = None, 
         callback_char = None, 
         callback_char_stat = None
         ):
-    global callback_map_global, callback_loc_global, callback_char_global, callback_char_stat_global
+    global callback_map_global, callback_loc_global, callback_item_global, callback_char_global, callback_char_stat_global
     if callback_map:
         callback_map_global = callback_map
     if callback_loc:
         callback_loc_global = callback_loc
+    if callback_item:
+        callback_item_global = callback_item
     if callback_char:
         callback_char_global = callback_char
     if callback_char_stat:
         callback_char_stat_global = callback_char_stat
-    print(callback_map_global, callback_loc_global, callback_char_global, callback_char_stat_global)
+    # print(callback_map_global, callback_loc_global, callback_char_global, callback_char_stat_global)
 
 @app.before_request
 def before_request():
@@ -54,9 +58,6 @@ def get_client_ip():
     ip_addr = request.headers.get('X-Forwarded-For', request.remote_addr)
     return ip_addr
 
-def broadcast_reload():
-    socketio.emit('reload', {'message': 'Please reload the page'})
-
 @socketio.on('connect')
 def handle_connect():
     print('Client connected')
@@ -76,6 +77,13 @@ def upload_file():
         file.save(filepath)
         # Здесь можно обновить путь к изображению в базе данных
         return redirect(url_for('index'))
+
+@app.route('/player/<int:id>')
+def player(id):
+    character = g.db_session.query(PlayerCharacter).get(id)
+
+    return render_template('player.html', character=character)
+
 
 @app.route('/character/<int:id>')
 def character_detail(id):
@@ -147,12 +155,55 @@ def save_address():
     
     return {'success': False}, 400
 
+@app.route('/get_characters', methods=['GET'])
+def get_characters():
+    characters = g.db_session.query(PlayerCharacter).all()
+    character_data = [{'id': character.id, 'name': character.name} for character in characters]
+    return character_data
+
 @app.route('/process_choice', methods=['POST'])
 def process_choice():
     data = request.json
-    choice = data.get('choice')
-    print(f"Выбрано: {choice}")
-    return {'message': f'Вы выбрали: {choice}'}
+    character_id = data.get('character_id')
+    item_id = data.get('item_id')
+    choice_id = data.get('choice_id')
+
+    where = g.db_session.query(WhereObject)\
+        .filter(WhereObject.gameItemId == item_id)\
+        .filter(WhereObject.playerId == character_id).first()
+    if where is None:
+        return {'success': False}, 400
+    
+    location_id = None
+    npc_id = None
+    character_to_id = None
+    if choice_id is None:
+        player = g.db_session.query(PlayerCharacter).get(character_id)
+        if player is None:
+            return {'success': False}, 400
+        location_id = player.location_id
+    else:
+        character_to_id = choice_id
+
+    where.npcId = npc_id
+    where.locationId = location_id
+    where.playerId = character_to_id
+    g.db_session.commit()
+
+    if callback_item_global:
+        callback_item_global(from_player=character_id, to_player=character_to_id, to_location_id=location_id)
+
+    return {'success': True}
+
+
+def broadcast_reload():
+    socketio.emit('reload', {'message': 'Please reload the page'})
+
+def broadcast_character_reload():
+    socketio.emit('character_reload', {'message': 'Please reload the page'})
+
+def broadcast_map_reload():
+    socketio.emit('map_reload', {'message': 'Please reload the page'})
 
 if __name__ == '__main__':
     app.run(debug=True)

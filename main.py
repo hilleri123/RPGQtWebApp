@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication
 from mainwindow import MainWindow
 from scheme import *
 from PyQt5.QtCore import QThread, QObject
-from web_app.flask_main import app, broadcast_reload, set_callbacks
+from web_app.flask_main import app, broadcast_reload, broadcast_character_reload, broadcast_map_reload, set_callbacks
 
 class FlaskThread(QThread):
     def __init__(self, flask_app):
@@ -15,6 +15,12 @@ class FlaskThread(QThread):
 
     def reload(self):
         broadcast_reload()
+        
+    def reload_character(self):
+        broadcast_character_reload()
+        
+    def reload_map(self):
+        broadcast_map_reload()
 
 if __name__ == "__main__":
     flask_thread = FlaskThread(app)
@@ -24,8 +30,11 @@ if __name__ == "__main__":
     m = MainWindow()
     set_callbacks(
         callback_map=m.update_map,
+        callback_item=m.update_character_item,
         callback_char_stat=m.update_character_stat
         )
     m.need_to_reload.connect(flask_thread.reload)
+    m.characters_updated.connect(flask_thread.reload_character)
+    m.map_updated.connect(flask_thread.reload_map)
     m.show()
     sys.exit(app.exec_())

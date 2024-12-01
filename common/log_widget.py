@@ -43,3 +43,7 @@ class LogWidget(QListWidget):
         last_item = self.item(count - 1)
         
         return self.visualItemRect(last_item).top() <= self.viewport().height()
+
+    def log_move_item(self, from_player, to_player, to_location_id):
+        # TODO
+        self.add_item(f'{from_player} -> {to_player} {to_location_id}')

@@ -8,8 +8,11 @@ from scheme import IS_EDITABLE, GlobalMap, Session
 
 
 class MainWindow(QMainWindow):
+    maps_update = pyqtSignal() #убрать
+
     need_to_reload = pyqtSignal()
-    maps_update = pyqtSignal()
+    map_updated = pyqtSignal()
+    characters_updated = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -45,8 +48,10 @@ class MainWindow(QMainWindow):
 
         self.map_tabs = QTabWidget()
         self.data_tabs = QTabWidget()
-        self.button = QPushButton("test")
+        self.button = QPushButton("reload")
         self.button.clicked.connect(self.need_to_reload)
+        self.button_char = QPushButton("reload char")
+        self.button_char.clicked.connect(self.characters_updated)
 
         self.global_map = GlobalMapWidget()
         self.map = MapWidget()
@@ -84,6 +89,7 @@ class MainWindow(QMainWindow):
         tmp_tmp_layout.addWidget(self.player_list)
         tmp_tmp_layout.addWidget(self.logs)
         self.main_layout.addWidget(self.button)
+        self.main_layout.addWidget(self.button_char)
         
         self.fill()
 
@@ -115,8 +121,11 @@ class MainWindow(QMainWindow):
         self.maps_update.emit()
 
     def update_character_stat(self, character_id, stats):
-        # print(character_id, stats)
         self.logs.log_stat_change(character_id, stats)
+
+    def update_character_item(self, from_player, to_player, to_location_id):
+        self.logs.log_move_item(from_player, to_player, to_location_id)
+        self.characters_updated.emit()
 
     def fill(self):
         pass
@@ -127,5 +136,5 @@ class MainWindow(QMainWindow):
         if global_map is None:
             return
         global_map.intro = self.intro.toHtml()
-        session.commit()
+        session.commit()()
     
