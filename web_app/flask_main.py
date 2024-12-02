@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from flask_socketio import SocketIO, emit
+from datetime import datetime
 import os
 from scheme import *
 
@@ -103,8 +104,12 @@ def get_curr_map_image():
 def character_detail(id):
     character = g.db_session.query(PlayerCharacter).get(id)
     # Получение навыков персонажа по группам
+    global_map = g.db_session.query(GlobalMap).first()
+    global_datetime = datetime.now()
+    if global_map and global_map.time:
+        global_datetime = global_map.time
+
     skills_by_group = {}
-    
     stats = g.db_session.query(Stat).filter_by(characterId=id).all()
     
     for stat in stats:
@@ -115,7 +120,7 @@ def character_detail(id):
     # print(skills_by_group)
     items = g.db_session.query(GameItem).join(WhereObject).filter(WhereObject.playerId == id).all()
 
-    return render_template('character_detail.html', character=character, skills_by_group=skills_by_group, gameitems=items)
+    return render_template('character_detail.html', character=character, global_datetime=global_datetime, skills_by_group=skills_by_group, gameitems=items)
 
 @app.route('/update_skill', methods=['POST'])
 def update_skill():

@@ -99,7 +99,7 @@ class BaseMapLabel(QLabel):
         if self.map is not None and self.session is not None:
             file_name = os.path.basename(file_path)
             if os.path.isfile(os.path.join(IMGS_DIR, file_name)):
-                print(f"Warning: Файл с именем '{file_name}' уже существует в директории '{destination_directory}'.")
+                print(f"Warning: Файл c именем '{file_name}' уже существует в директории '{destination_directory}'.")
 
             destination_path = os.path.join(IMGS_DIR, file_name)
             shutil.copy2(file_path, destination_path)

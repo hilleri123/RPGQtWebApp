@@ -1,5 +1,6 @@
 <div class="container character">
   <h1>{{ character.name }}</h1>
+  <p>{{ character.time.strftime('%Y-%m-%d %H:%M:%S') if character.time else '' }} / {{ global_datetime.strftime('%Y-%m-%d %H:%M:%S') }}</p>
   <label for="colorPicker">Выберите цвет:</label>
   <input type="color" id="colorPicker" value="{{ character.color }}" onchange="updateColor('{{ character.id }}')">
   <button id="selectAddress" onclick="saveAddress('{{ character.id }}')">Выбрать</button>
