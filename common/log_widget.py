@@ -44,6 +44,15 @@ class LogWidget(QListWidget):
         
         return self.visualItemRect(last_item).top() <= self.viewport().height()
 
-    def log_move_item(self, from_player, to_player, to_location_id):
-        # TODO
-        self.add_item(f'{from_player} -> {to_player} {to_location_id}')
+    def log_move_item(self, item_id, from_player_id, to_player_id, to_location_id):
+        self.session = Session()
+        item = self.session.query(GameItem).get(item_id)
+        from_player = self.session.query(PlayerCharacter).get(from_player_id)
+        to_player = self.session.query(PlayerCharacter).get(to_player_id)
+        to_location = self.session.query(Location).get(to_location_id)
+        if item is None or from_player is None:
+            return 
+        if to_player:
+            self.add_item(f'{from_player.name} -> {to_player.name} передал {item.name}')
+        elif to_location:
+            self.add_item(f'{from_player.name} оставил {item.name} -> {to_location.name}')

@@ -2,12 +2,22 @@ from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 from sqlalchemy_utils import ColorType
 from colour import Color
+import os
 
 
 SKILL_GROUP = ("Научные", "Технические", "Межличностные", "Основные")
 
-DB_URL = 'data/rpgtool.db'
+DEFAULT_DIR = 'data'
+IMGS_DIR = f'{DEFAULT_DIR}/imgs'
+ICONS_DIR = f'{DEFAULT_DIR}/icons'
+TMP_DIR = f'{DEFAULT_DIR}/tmp'
+GLOBAL_MAP_PATH = f'{TMP_DIR}/global_map.png'
+CURR_MAP_PATH = f'{TMP_DIR}/curr_map.png'
+DB_URL = f'{DEFAULT_DIR}/rpgtool.db'
 
+for d in [DEFAULT_DIR, IMGS_DIR, ICONS_DIR, TMP_DIR]:
+    if not os.path.exists(d):
+        os.mkdir(d)
 
 Base = declarative_base()
 
@@ -104,6 +114,18 @@ class SceneMap(Base):
     icon_file_path = Column(String)
 
 
+class MapObjectPolygon(Base):
+    __tablename__ = 'MapObject'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
+    global_map_id = Column(Integer, ForeignKey('GlobalMap.id'))
+    map_id = Column(Integer, ForeignKey('SceneMap.id'))
+    is_shown = Column(Boolean, default=False)
+    if_filled = Column(Boolean, default=False)
+    if_line = Column(Boolean, default=False)
+    poygon_list_json = Column(String)
+
+
 class PlayerCharacter(Base):
     __tablename__ = 'PlayerCharacter'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -114,8 +136,8 @@ class PlayerCharacter(Base):
     color = Column(ColorType)
     address = Column(String)
     player_locked = Column(Boolean)
-    map_id = Column(Integer, ForeignKey('Location.id'))
-    location_id = Column(Integer, ForeignKey('SceneMap.id'))
+    map_id = Column(Integer, ForeignKey('SceneMap.id'))
+    location_id = Column(Integer, ForeignKey('Location.id'))
 
 
 class Skill(Base):

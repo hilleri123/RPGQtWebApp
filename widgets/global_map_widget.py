@@ -42,7 +42,9 @@ class GlobalMapLabel(BaseMapLabel):
         character.location_id = None
         self.session.commit()
         self.repaint()
-
+    
+    def file_name(self):
+        return GLOBAL_MAP_PATH
 
 
 class GlobalMapWidget(BaseMapWidget):

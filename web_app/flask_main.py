@@ -191,7 +191,7 @@ def process_choice():
     g.db_session.commit()
 
     if callback_item_global:
-        callback_item_global(from_player=character_id, to_player=character_to_id, to_location_id=location_id)
+        callback_item_global(item_id=item_id, from_player=character_id, to_player=character_to_id, to_location_id=location_id)
 
     return {'success': True}
 

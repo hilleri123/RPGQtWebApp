@@ -41,6 +41,9 @@ class MapLabel(BaseMapLabel):
         self.session.commit()
         self.repaint()
 
+    def file_name(self):
+        return CURR_MAP_PATH
+
 
 class MapWidget(BaseMapWidget):
     location_clicked = pyqtSignal(int)

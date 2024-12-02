@@ -35,6 +35,6 @@ if __name__ == "__main__":
         )
     m.need_to_reload.connect(flask_thread.reload)
     m.characters_updated.connect(flask_thread.reload_character)
-    m.map_updated.connect(flask_thread.reload_map)
+    m.map_image_saved.connect(flask_thread.reload_map)
     m.show()
     sys.exit(app.exec_())
