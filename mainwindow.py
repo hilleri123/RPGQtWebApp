@@ -19,6 +19,7 @@ class MainWindow(QMainWindow):
     need_to_reload = pyqtSignal()
     map_updated = pyqtSignal()
     characters_updated = pyqtSignal()
+    notes_updated = pyqtSignal()
 
     def __init__(self):
         super().__init__()

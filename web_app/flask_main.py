@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, g
+from flask import Flask, render_template, request, send_file, redirect, url_for, g
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
@@ -81,9 +81,23 @@ def upload_file():
 @app.route('/player/<int:id>')
 def player(id):
     character = g.db_session.query(PlayerCharacter).get(id)
-
     return render_template('player.html', character=character)
 
+@app.route('/get_global_map_image', methods=['GET'])
+def get_global_map_image():
+    try:
+        return send_file(f'../{GLOBAL_MAP_PATH}', mimetype='image/png')
+    except Exception as e:
+        print(e)
+        return str(e), 404
+    
+@app.route('/get_curr_map_image', methods=['GET'])
+def get_curr_map_image():
+    try:
+        return send_file(f'../{CURR_MAP_PATH}', mimetype='image/png')
+    except Exception as e:
+        print(e)
+        return str(e), 404
 
 @app.route('/character/<int:id>')
 def character_detail(id):
@@ -204,6 +218,9 @@ def broadcast_character_reload():
 
 def broadcast_map_reload():
     socketio.emit('map_reload', {'message': 'Please reload the page'})
+
+def broadcast_notes_reload():
+    socketio.emit('notes_reload', {'message': 'Please reload the page'})
 
 if __name__ == '__main__':
     app.run(debug=True)

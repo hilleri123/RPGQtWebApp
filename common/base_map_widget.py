@@ -40,12 +40,12 @@ class BaseMapLabel(QLabel):
         self.pix_map_for_save = self.original
         pix_map_painter = QPainter(self.pix_map_for_save)
         painter = QPainter(self)
-        self.paint(painter, paint_hidden=True)
-        self.paint(pix_map_painter, paint_hidden=False)
+        self.paint(painter, paint_hidden=True, scale=True)
+        self.paint(pix_map_painter, paint_hidden=False, scale=False)
 
         self.saveImage()
 
-    def paint(self, painter: QPainter, paint_hidden = False):
+    def paint(self, painter: QPainter, paint_hidden = False, scale = True):
         for item in self.items:
             painter.save()
             if item.is_shown == 2:
@@ -57,7 +57,7 @@ class BaseMapLabel(QLabel):
             if item.is_shown <= 0 and not paint_hidden:
                 painter.restore()
                 continue
-            rect = self.item_rect(item)
+            rect = self.item_rect(item, scale=scale)
             painter.drawRect(rect)
 
             x = rect.x()
@@ -83,11 +83,13 @@ class BaseMapLabel(QLabel):
             self.pix_map_for_save.save(self.file_name())
             self.map_image_saved.emit()
 
-    def item_rect(self, item) -> QRect:
+    def item_rect(self, item, scale=True) -> QRect:
         if item is None or self.original.width() == 0 or self.original.height() == 0:
             return QRect()
         w_aspect = self.size().width() / self.original.width()
         h_aspect = self.size().height() / self.original.height()
+        if not scale:
+            w_aspect, h_aspect = 1, 1
         return QRect(QPoint(int(item.offsetX * w_aspect),
                      int(item.offsetY * h_aspect)),
                      QSize(int(item.width * w_aspect),
