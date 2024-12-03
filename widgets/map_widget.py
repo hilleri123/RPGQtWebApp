@@ -17,7 +17,7 @@ class MapLabel(BaseMapLabel):
         if self.map is None:
             return
         self.items = self.session.query(Location).filter(Location.mapId == self.map.id).all()
-        self.original = QPixmap(f'data/imgs/{self.map.filePath}')
+        self.original = QPixmap(f'{IMGS_DIR}/{self.map.filePath}')
         self.setPixmap(self.original)
         self.setScaledContents(True)
         self.repaint()

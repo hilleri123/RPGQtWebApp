@@ -123,6 +123,7 @@ class MapObjectPolygon(Base):
     is_shown = Column(Boolean, default=False)
     if_filled = Column(Boolean, default=False)
     if_line = Column(Boolean, default=False)
+    color = Column(ColorType)
     poygon_list_json = Column(String)
 
 

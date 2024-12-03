@@ -19,7 +19,7 @@ class GlobalMapLabel(BaseMapLabel):
             self.session.add(self.map)
             self.session.commit()
         self.items = self.session.query(SceneMap).all()
-        self.original = QPixmap(f'data/imgs/{self.map.filePath}')
+        self.original = QPixmap(f'{IMGS_DIR}/{self.map.filePath}')
         self.setPixmap(self.original)
         self.setScaledContents(True)
         self.repaint()
