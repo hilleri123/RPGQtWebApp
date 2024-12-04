@@ -8,12 +8,13 @@ from scheme import *
 from repositories import *
 from common import AutoResizingTextEdit, DateTimeEditWidget, AutoResizingListWidget
 from dialogs import PlayerCharacterDialog
+import json
 
 
 class CheckableComboBox(QComboBox):
     state_chenged = pyqtSignal()
 
-    def __init__(self, items_dict):
+    def __init__(self, items_dict, ids):
         super(CheckableComboBox, self).__init__()
         
         self.items_dict = items_dict
@@ -22,7 +23,7 @@ class CheckableComboBox(QComboBox):
         for item_id, item in items_dict.items():
             standard_item = QStandardItem(item)
             standard_item.setFlags(standard_item.flags() | Qt.ItemIsUserCheckable)
-            standard_item.setData(Qt.Unchecked, Qt.CheckStateRole)
+            standard_item.setData(Qt.Checked if item_id in ids else Qt.Unchecked, Qt.CheckStateRole)
             self.model.appendRow(standard_item)
         
         self.setModel(self.model)
@@ -61,7 +62,10 @@ class NoteWidget(QWidget):
         self.shown_all = QCheckBox()
         self.shown_all.clicked.connect(self.set_all)
         tmp.addWidget(self.shown_all)
-        self.shown_combobox = CheckableComboBox({p.id: p.name for p in self.players})
+        self.shown_combobox = CheckableComboBox(
+            {p.id: p.name for p in self.players}, 
+            json.loads(self.note.player_shown_json)
+            )
         self.shown_combobox.state_chenged.connect(self.update_shown)
         tmp.addWidget(self.shown_combobox)
         self.delete_button = QPushButton()
