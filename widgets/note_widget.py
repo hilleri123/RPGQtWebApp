@@ -70,12 +70,12 @@ class NoteWidget(QWidget):
         self.delete_button.clicked.connect(self.on_delete)
         tmp.addWidget(self.delete_button)
         self.base_layout.addLayout(tmp)
-        self.text = AutoResizingTextEdit()
-        self.text = note.xml_text
+        self.note_text = AutoResizingTextEdit()
+        self.note_text.setHtml(note.xml_text)
         if not IS_EDITABLE:
-            self.text.setReadOnly(True)
-        self.text.textChanged.connect(self.on_save)
-        self.base_layout.addWidget(self.text)
+            self.note_text.setReadOnly(True)
+        self.note_text.textChanged.connect(self.on_save)
+        self.base_layout.addWidget(self.note_text)
         
     
     def on_delete(self):
@@ -87,7 +87,7 @@ class NoteWidget(QWidget):
     def on_save(self):
         ids = self.shown_combobox.get_checked_items_ids()
         self.note.player_shown_json = ids.__repr__()
-        self.note.xml_text = self.text.toHtml()
+        self.note.xml_text = self.note_text.toHtml()
         self.session.commit()
 
     def set_all(self):

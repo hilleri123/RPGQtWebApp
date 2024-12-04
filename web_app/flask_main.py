@@ -175,7 +175,7 @@ def save_address():
     
     return {'success': False}, 400
 
-@app.route('/get_notes/<int:id>', methods=['GET'])
+@app.route('/get_notes/<int:player_id>', methods=['GET'])
 def notes(player_id):
     notes = []
     for note in g.db_session.query(Note).all():
