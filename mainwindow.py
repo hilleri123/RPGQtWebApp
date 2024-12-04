@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QWidget, QMenu, QMessageBox, QFileDialog, QHBoxLayout, QVBoxLayout, QTabWidget, QMenuBar, QAction, QPushButton
-from widgets import MapWidget, ItemListWidget, GlobalMapWidget, LocationWidget, NpcListWidget, PlayerListWidget, MapSettingsWidget
+from widgets import MapWidget, ItemListWidget, GlobalMapWidget, NoteListWidget, LocationWidget, NpcListWidget, PlayerListWidget, MapSettingsWidget
 from dialogs import SkillsDialog
 from common import AutoResizingTextEdit, LogWidget, get_local_ip
 from PyQt5.QtCore import pyqtSignal, QSize
@@ -80,7 +80,7 @@ class MainWindow(QMainWindow):
         self.npcs = NpcListWidget()
         self.items = ItemListWidget()
         self.marks = QWidget()
-        self.notes = QWidget()
+        self.notes = NoteListWidget()
         self.data_tabs.addTab(self.map_settings, "map settings")
         self.data_tabs.addTab(self.location, "location")
         self.data_tabs.addTab(self.npcs, "npcs")

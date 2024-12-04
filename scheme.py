@@ -88,6 +88,7 @@ class Note(Base):
     __tablename__ = 'Note'
     id = Column(Integer, primary_key=True, autoincrement=True)
     xml_text = Column(String)
+    player_shown_json = Column(String)
     action_id = Column(Integer, ForeignKey('PlayerAction.id'), default=None)
 
 
