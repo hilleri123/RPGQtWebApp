@@ -11,6 +11,8 @@ from dialogs import PlayerCharacterDialog
 
 
 class CheckableComboBox(QComboBox):
+    state_chenged = pyqtSignal()
+
     def __init__(self, items_dict):
         super(CheckableComboBox, self).__init__()
         
@@ -24,6 +26,7 @@ class CheckableComboBox(QComboBox):
             self.model.appendRow(standard_item)
         
         self.setModel(self.model)
+        self.model.itemChanged.connect(self.state_chenged)
 
     def get_checked_items_ids(self):
         checked_items_ids = []
@@ -40,7 +43,7 @@ class CheckableComboBox(QComboBox):
     def set_all(self, checked):
         for row in range(self.model.rowCount()):
             item = self.model.item(row)
-            item = checked
+            item.setData(checked, Qt.CheckStateRole)
 
 
 
@@ -52,13 +55,14 @@ class NoteWidget(QWidget):
         super().__init__(parent)
         self.session = Session()
         self.note = note
+        self.players = self.session.query(PlayerCharacter).all()
         self.base_layout = QVBoxLayout(self)
         tmp = QHBoxLayout()
         self.shown_all = QCheckBox()
         self.shown_all.clicked.connect(self.set_all)
         tmp.addWidget(self.shown_all)
-        self.shown_combobox = CheckableComboBox()
-        self.shown_combobox.activated.connect(self.update_shown)
+        self.shown_combobox = CheckableComboBox({p.id: p.name for p in self.players})
+        self.shown_combobox.state_chenged.connect(self.update_shown)
         tmp.addWidget(self.shown_combobox)
         self.delete_button = QPushButton()
         self.delete_button.setIcon(QIcon.fromTheme("list-remove"))
@@ -67,6 +71,7 @@ class NoteWidget(QWidget):
         tmp.addWidget(self.delete_button)
         self.base_layout.addLayout(tmp)
         self.text = AutoResizingTextEdit()
+        self.text = note.xml_text
         if not IS_EDITABLE:
             self.text.setReadOnly(True)
         self.text.textChanged.connect(self.on_save)
@@ -87,11 +92,12 @@ class NoteWidget(QWidget):
 
     def set_all(self):
         if self.shown_all.checkState() == Qt.Checked:
-            self.shown_all.setCheckState(Qt.Unchecked)
-            return
+            state = Qt.Checked
         else:
-            self.shown_all.setCheckState(Qt.Checked)
-            return
+            state = Qt.Unchecked
+        self.shown_all.setCheckState(state)
+        self.shown_combobox.set_all(state)
+        self.on_save()
 
     def update_shown(self):
         ids = self.shown_combobox.get_checked_items_ids()

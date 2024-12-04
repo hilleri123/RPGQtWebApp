@@ -20,8 +20,6 @@ class NoteListWidget(QWidget):
         tmp_layout = QHBoxLayout()
         self.base_layout.addLayout(tmp_layout)
         tmp_layout.addWidget(QLabel("Note List:")) 
-        self.npc_name = QLineEdit()
-        tmp_layout.addWidget(self.npc_name)
         self.add_note_button = QPushButton()
         self.add_note_button.setIcon(QIcon.fromTheme("list-add"))
         self.add_note_button.clicked.connect(self.on_add_note)

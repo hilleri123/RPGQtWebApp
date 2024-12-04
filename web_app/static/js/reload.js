@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log(data.message);
         location.reload();
     });
+
     socket.on('character_reload', function(data) {
         console.log('Character reload event received.');
         console.log(data.message);
@@ -28,22 +29,6 @@ document.addEventListener("DOMContentLoaded", function() {
     socket.on('notes_reload', function(data) {
         console.log('Notes reload event received.');
         console.log(data.message);
-        // loadMapImage();
+        loadNotes(playerId);
     });
 });
-
-function loadCharacter(characterId) {
-    const timestamp = new Date().getTime();
-    fetch(`/character/${characterId}?t=${timestamp}`)
-        .then(response => response.text())
-        .then(html => {
-            const container = document.getElementById('characterContainer');
-            if (container) {
-                container.innerHTML = ''; // Удаляем предыдущий контент
-                container.innerHTML = html; // Загружаем новый контент
-            } else {
-                console.error('Элемент characterContainer не найден.');
-            }
-        })
-        .catch(error => console.error('Ошибка при загрузке персонажа:', error));
-}

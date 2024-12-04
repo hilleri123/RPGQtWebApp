@@ -127,6 +127,8 @@ class MainWindow(QMainWindow):
         self.items.item_list_changed.connect(self.location.set_items)
         self.npcs.npc_list_changed.connect(self.location.set_npcs)
 
+        self.notes.noteschange.connect(self.notes_updated)
+
     def fill_map_object(self):
         session = Session()
         global_map = session.query(GlobalMap).first()

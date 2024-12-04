@@ -4,6 +4,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from flask_socketio import SocketIO, emit
 from datetime import datetime
+import json
 import os
 from scheme import *
 
@@ -173,6 +174,15 @@ def save_address():
         return {'success': True}
     
     return {'success': False}, 400
+
+@app.route('/get_notes/<int:id>', methods=['GET'])
+def notes(player_id):
+    notes = []
+    for note in g.db_session.query(Note).all():
+        ids = json.loads(note.player_shown_json)
+        if player_id in ids:
+            notes.append(note)
+    return render_template('notes.html', notes=notes)
 
 @app.route('/get_characters', methods=['GET'])
 def get_characters():
