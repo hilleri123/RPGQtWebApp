@@ -8,7 +8,9 @@ import json
 import os
 from scheme import *
 
-app = Flask(__name__, root_path='/home/shurik/Work/python/RPGQtWebApp/web_app')
+WEB_APP_DIR = f'{os.getcwd()}/web_app'
+
+app = Flask(__name__, root_path=WEB_APP_DIR)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
@@ -18,15 +20,17 @@ callback_loc_global = None
 callback_item_global = None
 callback_char_global = None
 callback_char_stat_global = None
+callback_connection_global = None
 
 def set_callbacks(
         callback_map = None,
         callback_loc = None, 
         callback_item = None, 
         callback_char = None, 
-        callback_char_stat = None
+        callback_char_stat = None,
+        callback_connection = None
         ):
-    global callback_map_global, callback_loc_global, callback_item_global, callback_char_global, callback_char_stat_global
+    global callback_map_global, callback_loc_global, callback_item_global, callback_char_global, callback_char_stat_global, callback_connection_global
     if callback_map:
         callback_map_global = callback_map
     if callback_loc:
@@ -37,6 +41,8 @@ def set_callbacks(
         callback_char_global = callback_char
     if callback_char_stat:
         callback_char_stat_global = callback_char_stat
+    if callback_connection:
+        callback_connection_global = callback_connection
     # print(callback_map_global, callback_loc_global, callback_char_global, callback_char_stat_global)
 
 @app.before_request
@@ -171,6 +177,7 @@ def save_address():
             return {'success': False}, 402
         character.address = address
         g.db_session.commit()
+        callback_connection_global()
         return {'success': True}
     
     return {'success': False}, 400
@@ -183,6 +190,12 @@ def notes(player_id):
         if player_id in ids:
             notes.append(note)
     return render_template('notes.html', notes=notes)
+
+@app.route('/get_note/<int:note_id>', methods=['GET'])
+def note(note_id):
+    note = g.db_session.query(Note).get(note_id)
+    print(note.xml_text)
+    return note.xml_text if note else ""
 
 @app.route('/get_characters', methods=['GET'])
 def get_characters():

@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSignal, QSize
 import sys
 import os
 import shutil
-from zipfile import ZipFile
+from zipfile import ZipFile, ZIP_DEFLATED
 
 from scheme import *
 
@@ -35,6 +35,9 @@ class MainWindow(QMainWindow):
         settings_menu.addAction(self.checkbox_action)
         self.open_action = QAction("Open", self)
         self.open_action.triggered.connect(self.open_zip_file)
+        settings_menu.addAction(self.open_action)
+        self.open_action = QAction("Save", self)
+        self.open_action.triggered.connect(self.save_to_zip_file)
         settings_menu.addAction(self.open_action)
         self.reset_action = QAction("Reset", self)
         self.reset_action.triggered.connect(self.set_up)
@@ -110,12 +113,16 @@ class MainWindow(QMainWindow):
 
         self.global_map.map_changed.connect(self.map_settings.on_map_selected)
         self.global_map.map_changed.connect(self.map.set_current_map)
+        self.global_map.datetime_changed.connect(self.map.on_datetime_changed)
+        self.global_map.datetime_changed.connect(self.player_list.on_datetime_changed)
         self.global_map.map_image_saved.connect(self.map_image_saved)
         self.map_settings.map_object_updated.connect(self.global_map.on_map_update)
 
         self.map.location_clicked.connect(self.location.on_location_selected)
-        self.map.map_image_saved.connect(self.map_image_saved)
         self.map.location_clicked.connect(self.items.set_location)
+        self.map.map_image_saved.connect(self.map_image_saved)
+        self.map.datetime_changed.connect(self.global_map.on_datetime_changed)
+        self.map.datetime_changed.connect(self.player_list.on_datetime_changed)
         self.map.map_changed.connect(self.map_settings.on_map_selected)
         self.location.map_object_updated.connect(self.map.on_map_update)
 
@@ -159,6 +166,9 @@ class MainWindow(QMainWindow):
         map_object.is_shown = not map_object.is_shown
         session.commit()
         self.maps_update.emit()
+
+    def update_connections(self):
+        self.player_list.update_connections()
 
     def on_checkbox_toggled(self, checked):
         global IS_EDITABLE
@@ -214,3 +224,31 @@ class MainWindow(QMainWindow):
             self.set_up()
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred: {e}")
+
+    def save_to_zip_file(self):
+        # Открываем файловый диалог для выбора места сохранения ZIP-архива
+        options = QFileDialog.Options()
+        output_zip, _ = QFileDialog.getSaveFileName(self, "Save ZIP File", "", "ZIP Files (*.zip);;All Files (*)", options=options)
+        
+        if not output_zip:
+            return 
+
+        # Проверяем, добавлено ли расширение .zip
+        if not output_zip.endswith('.zip'):
+            output_zip += '.zip'
+
+        try:
+            # Архивируем выбранную папку
+            with ZipFile(output_zip, 'w', ZIP_DEFLATED) as zipf:
+                for root, dirs, files in os.walk(DEFAULT_DIR):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        arcname = os.path.relpath(file_path, DEFAULT_DIR)
+                        zipf.write(file_path, arcname)
+
+            QMessageBox.information(self, "Success", f"Folder successfully archived to {output_zip}")
+        except PermissionError:
+            QMessageBox.critical(self, "Error", "Permission denied while accessing files.")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"An unexpected error occurred: {e}")
+

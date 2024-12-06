@@ -1,19 +1,5 @@
 <div class="scrollable-container">
     {% for note in notes %}
-    <iframe id="iframe-{{ loop.index }}"></iframe>
-    <script>
-        (function() {
-            const encodedString = `{{ note.xml_text | tojson | safe }}`;
-            const parser = new DOMParser();
-            const decodedDocument = parser.parseFromString(encodedString, 'text/html');
-            const decodedString = decodedDocument.documentElement.textContent;
-
-            const iframe = document.getElementById('iframe-{{ loop.index }}');
-            const doc = iframe.contentDocument || iframe.contentWindow.document;
-            doc.open();
-            doc.write(decodedString);
-            doc.close();
-        })();
-    </script>
+    <iframe id="iframe-{{ loop.index }}" src="/get_note/{{note.id}}"></iframe>
     {% endfor %}
 </div>

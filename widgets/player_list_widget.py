@@ -44,3 +44,17 @@ class PlayerListWidget(QWidget):
         self.session.add(player)
         self.session.commit()
         self.fill_players()
+
+    def update_connections(self):
+        for i in range(self.player_list.count()):
+            item = self.player_list.item(i)
+            widget = self.player_list.itemWidget(item)
+            if widget:
+                widget.set_icon()
+    
+    def on_datetime_changed(self):
+        for i in range(self.player_list.count()):
+            item = self.player_list.item(i)
+            widget = self.player_list.itemWidget(item)
+            if widget:
+                widget.update_datetime()

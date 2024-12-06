@@ -32,17 +32,7 @@ h1, h2 {
     margin: 0;
 }
 
-@media (max-width: 600px) {
-  .skill-item {
-      flex-direction: column; /* Переключаемся на колонку для узких экранов */
-      align-items: flex-start;
-  }
-  
-  .skill-item button,
-  .skill-item input {
-      margin-top: 5px; /* Добавляем отступы между элементами */
-  }
-}
+
   
 label, input[type="color"] {
     display: block;
@@ -55,23 +45,34 @@ label, input[type="color"] {
 }
 
 .scrollable-container {
-    width: 300px; /* Ширина контейнера */
-    height: 400px; /* Высота контейнера */
+    width: auto; /* Ширина контейнера */
+    height: auto; /* Высота контейнера */
     overflow-y: auto; /* Вертикальная прокрутка */
     border: 1px solid #ccc; /* Граница контейнера */
     padding: 10px; /* Внутренний отступ */
 }
 
+iframe {
+    width: 100%; /* Занимает всю ширину контейнера */
+    height: 100%; /* Занимает всю высоту контейнера */
+    border: none; /* Убираем рамку */
+    display: block; /* Убираем лишние отступы */
+}
+
 /* Стиль для боксов */
 .box {
-    width: 100px; /* Ширина бокса */
-    height: 100px; /* Высота бокса */
+    width: auto; /* Ширина контейнера */
+    height: auto; /* Высота контейнера */
     background-color: #f0f0f0; /* Цвет фона бокса */
     margin: 10px auto; /* Отступы между боксами и центрирование */
     display: flex;
     align-items: center;
     justify-content: center;
     border: 1px solid #999; /* Граница бокса */
+}
+
+.hidden {
+    display: none !important; /* Принудительно скрывает элемент */
 }
 
 .modal {
@@ -117,5 +118,3 @@ label, input[type="color"] {
   li:hover {
       background-color: #f1f1f1;
   }
-
-  

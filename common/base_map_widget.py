@@ -37,6 +37,8 @@ class BaseMapLabel(QLabel):
 
     def paintEvent(self, a0: typing.Optional[QPaintEvent]) -> None:
         super().paintEvent(a0)
+        if self.original.isNull():
+            return
         self.pix_map_for_save = self.original
         pix_map_painter = QPainter(self.pix_map_for_save)
         painter = QPainter(self)
@@ -99,7 +101,7 @@ class BaseMapLabel(QLabel):
         if self.map is not None and self.session is not None:
             file_name = os.path.basename(file_path)
             if os.path.isfile(os.path.join(IMGS_DIR, file_name)):
-                print(f"Warning: Файл c именем '{file_name}' уже существует в директории '{destination_directory}'.")
+                print(f"Warning: Файл c именем '{file_name}' уже существует в директории '{IMGS_DIR}'.")
 
             destination_path = os.path.join(IMGS_DIR, file_name)
             shutil.copy2(file_path, destination_path)
@@ -231,10 +233,10 @@ class BaseMapWidget(QWidget):
 
     
     def on_map_update(self):
-        print("!")
         self.mapLabel.set_map()
 
     def on_datetime_changed(self):
+        self.session = Session()
         g_map = self.session.query(GlobalMap).first()
         if g_map is None:
             return
@@ -243,24 +245,21 @@ class BaseMapWidget(QWidget):
         self.datetime_base_edit.setDateTime(dt)
     
     def on_base_timeeditor(self):
+        self.set_time(self.datetime_base_edit.dateTime().toPyDateTime())
+
+    def on_timeeditor(self):
+        self.set_time(self.datetime_edit.dateTime().toPyDateTime())
+
+    def set_time(self, dt):
         self.session = Session()
         g_map = self.session.query(GlobalMap).first()
         if g_map is None:
             return
-        dt = self.datetime_base_edit.dateTime().toPyDateTime()
         g_map.time = dt
         self.session.commit()
         for character in self.session.query(PlayerCharacter).all():
-            character.time = dt
-            self.session.commit()
-        
-        self.datetime_changed.emit()
-
-    def on_timeeditor(self):
-        g_map = self.session.query(GlobalMap).first()
-        if g_map is None:
-            return
-        g_map.time = self.datetime_edit.dateTime().toPyDateTime()
-        self.session.commit()
+            if character.time is None or character.time < dt:
+                character.time = dt
+                self.session.commit()
         
         self.datetime_changed.emit()
