@@ -15,6 +15,7 @@ class DateTimeEditWidget(QWidget):
         self.date_time_edit.setReadOnly(True)  # Устанавливаем режим только для чтения
         # self.date_time_edit.setDateTime(QDateTime.currentDateTime())  # Устанавливаем текущее время
         self.date_time_edit.dateTimeChanged.connect(self.dateTimeChanged)
+        self.date_time_edit.setDisplayFormat("dd/MM/yyyy HH:mm")
 
         # Кнопки управления
         self.add_hour_button = QPushButton("Добавить час")

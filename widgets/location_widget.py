@@ -133,7 +133,7 @@ class LocationWidget(BaseMapObject):
     def set_items(self):
         self.items_list.clear()
 
-        item_list = self.session.query(GameItem).all()
+        item_list = self.session.query(GameItem).join(WhereObject).filter(WhereObject.locationId == self.object.id).all()
         for game_item in item_list:
             item = QListWidgetItem(self.items_list)
             widget = LocationGameItemWidget(item=game_item)

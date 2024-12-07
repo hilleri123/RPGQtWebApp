@@ -36,19 +36,19 @@ class GameCondition(Base):
 class GameItem(Base):
     __tablename__ = 'GameItem'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String)
-    text = Column(String)
+    name = Column(String, default='')
+    text = Column(String, default='')
 
 
 class Location(Base):
     __tablename__ = 'Location'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String)
-    shape = Column(Integer)
-    offsetX = Column(Integer)
-    offsetY = Column(Integer)
-    width = Column(Integer)
-    height = Column(Integer)
+    name = Column(String, default='')
+    shape = Column(Integer, default=0)
+    offsetX = Column(Integer, default=0)
+    offsetY = Column(Integer, default=0)
+    width = Column(Integer, default=0)
+    height = Column(Integer, default=0)
     icon_file_path = Column(String)
     description = Column(String)
     is_shown = Column(Integer, default=0) #Как boolean, но 2 - это значит конст
@@ -61,7 +61,7 @@ class Mark(Base):
     name = Column(String)
     description = Column(String)
     isActivated = Column(Boolean)
-    status = Column(Integer)
+    status = Column(Integer, default=0)
 
 
 class NPC(Base):
@@ -88,7 +88,7 @@ class Note(Base):
     __tablename__ = 'Note'
     id = Column(Integer, primary_key=True, autoincrement=True)
     xml_text = Column(String)
-    player_shown_json = Column(String)
+    player_shown_json = Column(String, default='[]')
     action_id = Column(Integer, ForeignKey('PlayerAction.id'), default=None)
 
 
@@ -107,10 +107,10 @@ class SceneMap(Base):
     name = Column(String)
     filePath = Column(String)
     isCurrent = Column(Boolean)
-    offsetX = Column(Integer)
-    offsetY = Column(Integer)
-    width = Column(Integer)
-    height = Column(Integer)
+    offsetX = Column(Integer, default=0)
+    offsetY = Column(Integer, default=0)
+    width = Column(Integer, default=0)
+    height = Column(Integer, default=0)
     is_shown = Column(Integer, default=0) #Как boolean, но 2 - это значит конст
     icon_file_path = Column(String)
 
@@ -153,8 +153,8 @@ class Stat(Base):
     __tablename__ = 'Stats'
     characterId = Column(Integer, ForeignKey('PlayerCharacter.id', ondelete='CASCADE'), primary_key=True)
     skillId = Column(Integer, ForeignKey('Skills.id', ondelete='CASCADE'), primary_key=True)
-    initValue = Column(Integer)
-    value = Column(Integer)
+    initValue = Column(Integer, default=0)
+    value = Column(Integer, default=0)
 
 
 class WhereObject(Base):

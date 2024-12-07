@@ -4,7 +4,7 @@
   <label for="colorPicker">Выберите цвет:</label>
   <input type="color" id="colorPicker" value="{{ character.color }}" onchange="updateColor('{{ character.id }}')">
   <button id="selectAddress" onclick="saveAddress('{{ character.id }}')">Выбрать</button>
-  <p>{{ character.story }}</p>
+  <iframe src="/get_character_story/{{character.id}}"></iframe>
 
   <h2>Skills</h2>
   {% for group, skills in skills_by_group.items() %}

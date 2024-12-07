@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QWidget, QMenu, QMessageBox, QFileDialog, QHBoxLayout, QVBoxLayout, QTabWidget, QMenuBar, QAction, QPushButton
 from widgets import MapWidget, ItemListWidget, GlobalMapWidget, NoteListWidget, LocationWidget, NpcListWidget, PlayerListWidget, MapSettingsWidget
-from dialogs import SkillsDialog
+from dialogs import SkillsDialog, SkillHelpDialog
 from common import AutoResizingTextEdit, LogWidget, get_local_ip
 from PyQt5.QtCore import pyqtSignal, QSize
 import sys
@@ -48,6 +48,11 @@ class MainWindow(QMainWindow):
         self.skills.triggered.connect(self.show_skill_dialog)
         scenario_menu.addAction(self.skills)
 
+        help_menu = menu_bar.addMenu("Help")
+        self.skills_help = QAction("Skills", self)
+        self.skills_help.triggered.connect(self.show_help_skill_dialog)
+        help_menu.addAction(self.skills_help)
+
         self.map_objects_menu = menu_bar.addMenu("Map objects")
         self.fill_map_object()
 
@@ -63,6 +68,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(w)
 
         self.skill_dialog = SkillsDialog()
+        self.skill_help_dialog = SkillHelpDialog()
 
         self.map_tabs = QTabWidget()
         self.data_tabs = QTabWidget()
@@ -251,4 +257,8 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Error", "Permission denied while accessing files.")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An unexpected error occurred: {e}")
+
+    def show_help_skill_dialog(self):
+        self.skill_help_dialog.show()
+
 

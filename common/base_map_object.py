@@ -60,10 +60,10 @@ class BaseMapObject(QWidget):
         self.is_start_location.setChecked(tmp == 2) #
         self.is_shown.setChecked(tmp > 0) #
 
-        self.coords["x"].setValue(self.object.offsetX)
-        self.coords["y"].setValue(self.object.offsetY)
-        self.coords["w"].setValue(self.object.width)
-        self.coords["h"].setValue(self.object.height)
+        self.coords["x"].setValue(self.object.offsetX if self.object.offsetX else 0)
+        self.coords["y"].setValue(self.object.offsetY if self.object.offsetY else 0)
+        self.coords["w"].setValue(self.object.width if self.object.width else 0)
+        self.coords["h"].setValue(self.object.height if self.object.height else 0)
 
         self.connect_all()
 

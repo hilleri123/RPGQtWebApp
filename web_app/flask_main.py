@@ -194,7 +194,6 @@ def notes(player_id):
 @app.route('/get_note/<int:note_id>', methods=['GET'])
 def note(note_id):
     note = g.db_session.query(Note).get(note_id)
-    print(note.xml_text)
     return note.xml_text if note else ""
 
 @app.route('/get_characters', methods=['GET'])
@@ -202,6 +201,11 @@ def get_characters():
     characters = g.db_session.query(PlayerCharacter).all()
     character_data = [{'id': character.id, 'name': character.name} for character in characters]
     return character_data
+
+@app.route('/get_character_story/<int:player_id>', methods=['GET'])
+def get_character_story(player_id):
+    character = g.db_session.query(PlayerCharacter).get(player_id)
+    return character.story if character else ""
 
 @app.route('/process_choice', methods=['POST'])
 def process_choice():

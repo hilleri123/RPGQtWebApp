@@ -50,6 +50,9 @@ class BaseMapLabel(QLabel):
     def paint(self, painter: QPainter, paint_hidden = False, scale = True):
         for item in self.items:
             painter.save()
+            if item.is_shown is None:
+                continue
+
             if item.is_shown == 2:
                 painter.setPen(QColor(0, 0, 255))
             elif item.is_shown > 0:
@@ -87,6 +90,8 @@ class BaseMapLabel(QLabel):
 
     def item_rect(self, item, scale=True) -> QRect:
         if item is None or self.original.width() == 0 or self.original.height() == 0:
+            return QRect()
+        if item.offsetX is None or item.offsetY is None or item.width is None or item.height is None:
             return QRect()
         w_aspect = self.size().width() / self.original.width()
         h_aspect = self.size().height() / self.original.height()
@@ -185,6 +190,7 @@ class BaseMapWidget(QWidget):
         if IS_EDITABLE:
             self.button_layout.addWidget(self.add_item_button)
         self.datetime_base_edit = QDateTimeEdit()
+        self.datetime_base_edit.setDisplayFormat("dd/MM/yyyy HH:mm")
         self.datetime_base_edit.dateTimeChanged.connect(self.on_base_timeeditor)
         if IS_EDITABLE:
             self.button_layout.addWidget(self.datetime_base_edit)
@@ -192,6 +198,7 @@ class BaseMapWidget(QWidget):
         self.datetime_edit.dateTimeChanged.connect(self.on_timeeditor)
         self.button_layout.addWidget(self.datetime_edit)
 
+        self.on_datetime_changed()
         self.datetime_changed.connect(self.on_datetime_changed)
 
     def setup_label(self):
