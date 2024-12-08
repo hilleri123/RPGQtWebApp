@@ -5,7 +5,8 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSignal, QSize
 from scheme import *
 from repositories import *
-from common import AutoResizingTextEdit, AutoResizingListWidget
+from common import AutoResizingTextEdit, AutoResizingListWidget, icons
+from common.html_text_edit_widget import HtmlTextEdit
 from .action_widget import ActionWidget
 from dialogs import GameItemMoveDialog
 
@@ -27,12 +28,12 @@ class ItemWidget(QWidget):
         self.where_label = QLabel()
         tmp.addWidget(self.where_label)
         self.edit_item_button = QPushButton()
-        self.edit_item_button.setIcon(QIcon.fromTheme("preferences-system"))
+        self.edit_item_button.setIcon(icons.edit_icon())
         self.edit_item_button.setEnabled(IS_EDITABLE)
         self.edit_item_button.clicked.connect(self.on_edit_item)
         tmp.addWidget(self.edit_item_button)
         self.move_item_button = QPushButton()
-        self.move_item_button.setIcon(QIcon.fromTheme("document-send"))
+        self.move_item_button.setIcon(icons.move_icon())
         self.move_item_button.setEnabled(IS_EDITABLE)
         self.move_item_button.clicked.connect(self.on_move_item)
         tmp.addWidget(self.move_item_button)
@@ -42,6 +43,11 @@ class ItemWidget(QWidget):
         self.delete_button.clicked.connect(self.on_delete)
         tmp.addWidget(self.delete_button)
         self.base_layout.addLayout(tmp)
+
+        self.xml_text = HtmlTextEdit()
+        self.xml_text.setHtml(self.item.text)
+        self.xml_text.textChanged.connect(self.on_save)
+        self.base_layout.addWidget(self.xml_text)
 
         self.update_where()
 
@@ -62,13 +68,17 @@ class ItemWidget(QWidget):
         self.where_label.setPixmap(pixmap)
 
     def on_edit_item(self):
-        text, ok = QInputDialog.getMultiLineText(
-            None, "Введите HTML", "HTML код:", "<html><body></body></html>"
-        )
-        if ok:
-            self.item.text = text
-            self.session.commit()
+        pass
+    #     text, ok = QInputDialog.getMultiLineText(
+    #         None, "Введите HTML", "HTML код:", "<html><body></body></html>"
+    #     )
+    #     if ok:
+    #         self.item.text = text
+    #         self.session.commit()
 
+    def on_save(self):
+        self.item.text = self.xml_text.toHtml()
+        self.session.commit()
 
     def on_delete(self):
         self.session.delete(self.item)
