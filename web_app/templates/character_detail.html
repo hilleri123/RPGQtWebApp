@@ -14,10 +14,10 @@
       <div class="name">
         {{ skill_name }}:
       </div>
-        <button onclick="updateSkill('{{ character_id }}', '{{ skill_id }}', 'skill-{{ skill_id }}', 1)">+1</button>
+        <button onclick="updateSkill('{{ character_id }}', '{{ skill_id }}', 'skill-{{ skill_id }}', -1)">-1</button>
         <input type="number" id="skill-{{ skill_id }}" value="{{ stat_val }}" readonly/>
         <p>/ {{ stat_initValue }}</p>
-        <button onclick="updateSkill('{{ character_id }}', '{{ skill_id }}', 'skill-{{ skill_id }}', -1)">-1</button>
+        <button onclick="updateSkill('{{ character_id }}', '{{ skill_id }}', 'skill-{{ skill_id }}', 1)">+1</button>
     </div>
     {% endfor %}
   {% endfor %}

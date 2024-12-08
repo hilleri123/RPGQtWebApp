@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
     socket.on('map_reload', function(data) {
         console.log('Map reload event received.');
         console.log(data.message);
-        loadMapImage();
+        loadAllMapImage();
     });
     
     socket.on('notes_reload', function(data) {
