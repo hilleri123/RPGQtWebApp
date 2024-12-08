@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QSizePolicy, QListWidgetItem, QLineEdit, QTextEdit, QListWidget, QPushButton, QHBoxLayout, QLabel
+    QWidget, QVBoxLayout, QSizePolicy, QApplication, QCheckBox, QListWidgetItem, QLineEdit, QTextEdit, QListWidget, QPushButton, QHBoxLayout, QLabel
 )
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QPalette, QColor
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
@@ -32,12 +32,16 @@ class NpcWidget(QWidget):
             ).all()
         )
 
-        # Формы для полей
         tmp = QHBoxLayout()
-        self.npc_name_field = QLineEdit()  # Поле для имени NPC
+        self.npc_name_field = QLineEdit() 
         self.npc_name_field.setText(self.npc.name)
         self.npc_name_field.setReadOnly(True)
         tmp.addWidget(self.npc_name_field)
+        self.npc_is_alive = QCheckBox()
+        self.npc_is_alive.setChecked(not self.npc.isDead)
+        self.npc_is_alive.clicked.connect(self.set_alive)
+        self.set_alive()
+        tmp.addWidget(self.npc_is_alive)
         self.edit_npc_button = QPushButton()
         self.edit_npc_button.setIcon(QIcon.fromTheme("preferences-system"))
         self.edit_npc_button.setEnabled(IS_EDITABLE)
@@ -107,4 +111,12 @@ class NpcWidget(QWidget):
         self.session.commit()
 
         self.deleted.emit()
+
+    def set_alive(self):
+        palette = self.palette()
+        if not self.npc_is_alive.isChecked():
+            palette.setColor(QPalette.Background, QColor(255, 0, 0, 127))
+        else:
+            palette = QApplication.palette()
+        self.setPalette(palette)
 
