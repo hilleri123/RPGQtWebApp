@@ -5,7 +5,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
-from common import AutoResizingTextEdit, AutoResizingListWidget
+from common import AutoResizingListWidget
 from .action_widget import ActionWidget
 
 

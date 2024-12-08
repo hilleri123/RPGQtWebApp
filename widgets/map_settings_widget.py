@@ -2,10 +2,8 @@ from PyQt5.QtWidgets import QPushButton, QLabel, QComboBox, QGridLayout, QListWi
 from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent, QIcon
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
-from npc_model import NpcTreeModel
 from repositories import *
-from widgets.location_npc_widget import LocationNpcWidget
-from common import BaseMapObject, AutoResizingTextEdit, AutoResizingListWidget
+from common import BaseMapObject
 
 
 class MapSettingsWidget(BaseMapObject):

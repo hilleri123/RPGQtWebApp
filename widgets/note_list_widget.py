@@ -6,7 +6,7 @@ from npc_model import NpcTreeModel
 from repositories import *
 from widgets.location_npc_widget import LocationNpcWidget
 from widgets.note_widget import NoteWidget
-from common import BaseMapObject, AutoResizingTextEdit, AutoResizingListWidget
+from common import AutoResizingListWidget
 
 
 class NoteListWidget(QWidget):

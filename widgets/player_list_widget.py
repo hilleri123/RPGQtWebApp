@@ -5,7 +5,7 @@ from scheme import *
 from npc_model import NpcTreeModel
 from repositories import *
 from widgets.player_widget import PlayerWidget
-from common import BaseMapObject, AutoResizingTextEdit, AutoResizingListWidget
+from common import AutoResizingListWidget
 
 
 class PlayerListWidget(QWidget):

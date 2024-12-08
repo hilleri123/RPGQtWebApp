@@ -6,7 +6,7 @@ from npc_model import NpcTreeModel
 from repositories import *
 from widgets.location_npc_widget import LocationNpcWidget
 from widgets.location_item_widget import LocationGameItemWidget
-from common import BaseMapObject, AutoResizingTextEdit, AutoResizingListWidget
+from common import BaseMapObject, AutoResizingListWidget
 from .action_widget import ActionWidget
 
 
