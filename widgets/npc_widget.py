@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QFormLayout, QListWidgetItem, QLineEdit, QTextEdit, QListWidget, QPushButton, QHBoxLayout, QLabel
+    QWidget, QVBoxLayout, QSizePolicy, QListWidgetItem, QLineEdit, QTextEdit, QListWidget, QPushButton, QHBoxLayout, QLabel
 )
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSignal
@@ -17,6 +17,8 @@ class NpcWidget(QWidget):
         self.session = Session()
         self.npc = npc
         self.base_layout = QVBoxLayout(self)
+        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.labels = []
         self.setup(**args)
         self.add_lists(**args)
         
@@ -57,7 +59,8 @@ class NpcWidget(QWidget):
     def add_lists(self, **args):
         self.dialogs = []
         self.dialogs_list = AutoResizingListWidget()
-        self.base_layout.addWidget(QLabel("Общие диалоги:"))
+        self.labels.append(QLabel("Общие диалоги:"))
+        self.base_layout.addWidget(self.labels[-1])
         self.base_layout.addWidget(self.dialogs_list)
         self.dialogs_fill()
 

@@ -8,7 +8,7 @@
 
   <h2>Skills</h2>
   {% for group, skills in skills_by_group.items() %}
-    <p>{{ group }}</p>
+    <p><b>{{ group }}</b></p>
     {% for character_id, skill_id, skill_name, stat_val, stat_initValue in skills %}
     <div class="skill-item">
       <div class="name">

@@ -54,6 +54,7 @@ class ItemListWidget(QWidget):
             item = QListWidgetItem(self.item_list)
             widget = ItemWidget(item=game_item)
             widget.deleted.connect(self.fill_items)
+            widget.item_moved.connect(self.item_list_changed)
             self.item_list.setItemWidget(item, widget)
             item.setSizeHint(widget.sizeHint())
 

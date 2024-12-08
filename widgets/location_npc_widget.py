@@ -29,7 +29,8 @@ class LocationNpcWidget(NpcWidget):
 
         self.loc_dialogs_list = AutoResizingListWidget()  # Список локальных диалогов
         
-        self.base_layout.addWidget(QLabel("Локальные диалоги:"))
+        self.labels.append(QLabel("Локальные диалоги:"))
+        self.base_layout.addWidget(self.labels[-1])
         self.base_layout.addWidget(self.loc_dialogs_list)
 
         self.loc_dialogs_fill()
@@ -55,8 +56,17 @@ class LocationNpcWidget(NpcWidget):
             self.loc_dialogs_list.setItemWidget(item, widget)
             item.setSizeHint(widget.sizeHint())
 
-    # def on_edit_npc(self):
-    #     pass #TODO
+    def on_edit_npc(self):
+        if self.dialogs_list.isHidden() or self.loc_dialogs_list.isHidden():
+            self.dialogs_list.show()
+            self.loc_dialogs_list.show()
+            for l in self.labels:
+                l.show()
+        else:
+            self.dialogs_list.hide()
+            self.loc_dialogs_list.hide()
+            for l in self.labels:
+                l.hide()
 
 
     def on_add_dialog(self):

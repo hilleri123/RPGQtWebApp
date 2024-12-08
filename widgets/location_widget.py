@@ -11,6 +11,8 @@ from .action_widget import ActionWidget
 
 
 class LocationWidget(BaseMapObject):
+    item_list_changed = pyqtSignal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
         BaseMapObject.disconnect_all(self)
@@ -132,12 +134,15 @@ class LocationWidget(BaseMapObject):
 
     def set_items(self):
         self.items_list.clear()
+        if self.object is None:
+            return
 
         item_list = self.session.query(GameItem).join(WhereObject).filter(WhereObject.locationId == self.object.id).all()
         for game_item in item_list:
             item = QListWidgetItem(self.items_list)
             widget = LocationGameItemWidget(item=game_item)
             widget.deleted.connect(self.set_items)
+            widget.item_moved.connect(self.item_list_changed)
             self.items_list.setItemWidget(item, widget)
             item.setSizeHint(widget.sizeHint())
 

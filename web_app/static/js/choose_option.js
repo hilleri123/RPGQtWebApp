@@ -20,7 +20,7 @@ function openModal(character_id, item_id) {
             ['бросить'].forEach(option => {
                 const li = document.createElement('li');
                 li.textContent = option;
-                li.onclick = () => selectOption(option); // Обработка как строка
+                li.onclick = () => selectOption(character_id, item_id, option); // Обработка как строка
                 optionsList.appendChild(li);
             });
         })

@@ -93,6 +93,7 @@ class NoteWidget(QWidget):
         self.note.player_shown_json = ids.__repr__()
         self.note.xml_text = self.note_text.toHtml()
         self.session.commit()
+        self.noteschange.emit()
 
     def set_all(self):
         if self.shown_all.checkState() == Qt.Checked:
