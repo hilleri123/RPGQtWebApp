@@ -43,5 +43,5 @@ class SkillListWidget(QWidget):
                 if db_skill is None:
                     continue
                 txt = f'{db_skill.name} {skill[1]}'
-            self.skill_layout.addWidget(QLabel(txt))
+            self.skill_layout.addWidget(QLabel(f"<b>{txt}</b>"))
 

@@ -1,8 +1,9 @@
 from PyQt5.QtWidgets import QMainWindow, QWidget, QMenu, QMessageBox, QFileDialog, QHBoxLayout, QVBoxLayout, QTabWidget, QMenuBar, QAction, QPushButton
 from widgets import MapWidget, ItemListWidget, GlobalMapWidget, NoteListWidget, LocationWidget, NpcListWidget, PlayerListWidget, MapSettingsWidget
 from dialogs import SkillsDialog, SkillHelpDialog
-from common import AutoResizingTextEdit, LogWidget, get_local_ip
+from common import HtmlTextEdit, LogWidget, get_local_ip
 from PyQt5.QtCore import pyqtSignal, QSize
+from PyQt5.QtGui import QGuiApplication
 import sys
 import os
 import shutil
@@ -67,6 +68,13 @@ class MainWindow(QMainWindow):
         w.setLayout(self.main_layout)
         self.setCentralWidget(w)
 
+        screen = QGuiApplication.screenAt(self.geometry().center())  # Определяем экран, где находится окно
+        screen_height = None
+        if screen:
+            screen_geometry = screen.geometry()
+            screen_height = screen_geometry.height()
+
+
         self.skill_dialog = SkillsDialog()
         self.skill_help_dialog = SkillHelpDialog()
 
@@ -79,7 +87,7 @@ class MainWindow(QMainWindow):
 
         self.global_map = GlobalMapWidget()
         self.map = MapWidget()
-        self.intro = AutoResizingTextEdit()
+        self.intro = HtmlTextEdit(max_height=screen_height)
         self.map_tabs.addTab(self.global_map, "global map")
         self.map_tabs.addTab(self.map, "map")
         self.map_tabs.setMaximumSize(QSize(700, 700))

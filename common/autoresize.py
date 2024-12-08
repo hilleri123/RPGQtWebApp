@@ -6,8 +6,9 @@ from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QSize, Qt
 
 
 class AutoResizingTextEdit(QTextEdit):
-    def __init__(self, parent=None):
+    def __init__(self, max_height:int = None, parent=None):
         super().__init__(parent)
+        self.max_height = max_height
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.previous_width = 0
@@ -26,9 +27,12 @@ class AutoResizingTextEdit(QTextEdit):
         margins = self.contentsMargins()
         document.setTextWidth(self.viewport().width())
         height = margins.top() + document.size().height() + margins.bottom()
-        size = QSize(self.width(), int(height))
+        # size = QSize(self.width(), int(height))
         # self.setMaximumSize(size)
-        self.setMaximumHeight(int(height+1))
+        target_height = int(height+1)
+        if self.max_height is not None:
+            target_height = max(self.max_height, target_height)
+        self.setMaximumHeight(target_height)
     
 class AutoResizingListWidget(QListWidget):
     def __init__(self, parent=None):

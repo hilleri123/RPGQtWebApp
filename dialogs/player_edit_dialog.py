@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (
     QDateTimeEdit, QPushButton, QListWidget, QListWidgetItem, QSpinBox
 )
 from PyQt5.QtCore import Qt
+from common.html_text_edit_widget import HtmlTextEdit
 from scheme import *
 import sqlalchemy
 
@@ -16,7 +17,7 @@ class PlayerCharacterDialog(QDialog):
 
         self.name_edit = QLineEdit()
         self.short_desc_edit = QLineEdit()
-        self.story_edit = QTextEdit()
+        self.story_edit = HtmlTextEdit()
         self.time_edit = QDateTimeEdit()
 
         layout.addWidget(QLabel("Имя:"))

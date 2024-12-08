@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 from scheme import *
 from common import AutoResizingListWidget
+from common.html_text_edit_widget import HtmlTextEdit
 import sqlalchemy
 import json
 
@@ -18,7 +19,7 @@ class ActionEditDialog(QDialog):
 
         layout = QVBoxLayout(self)
 
-        self.description = QLineEdit()
+        self.description = HtmlTextEdit()
 
         layout.addWidget(QLabel("Описание:"))
         layout.addWidget(self.description)
@@ -62,7 +63,7 @@ class ActionEditDialog(QDialog):
         if not self.action:
             return
         
-        self.description.setText(self.action.description)
+        self.description.setHtml(self.action.description)
         self.load_stats()
 
     def load_stats(self):
@@ -125,5 +126,5 @@ class ActionEditDialog(QDialog):
         self.description.textChanged.disconnect(self.on_save)
         
     def on_save(self):
-        self.action.description = self.description.text()
+        self.action.description = self.description.toHtml()
         session.commit()

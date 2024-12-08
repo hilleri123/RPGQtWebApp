@@ -3,7 +3,7 @@ from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent, QIc
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
-from common import AutoResizingTextEdit, AutoResizingListWidget
+from .html_text_edit_widget import HtmlTextEdit
 
 
 class BaseMapObject(QWidget):
@@ -14,7 +14,7 @@ class BaseMapObject(QWidget):
         self.session = Session()
         self.name = QLineEdit()
         self.name.setReadOnly(not IS_EDITABLE)
-        self.description = AutoResizingTextEdit()
+        self.description = HtmlTextEdit()
         self.description.setReadOnly(not IS_EDITABLE)
         self.save = QPushButton()
         self.save.setEnabled(IS_EDITABLE)

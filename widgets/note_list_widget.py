@@ -39,6 +39,7 @@ class NoteListWidget(QWidget):
             item = QListWidgetItem(self.note_list)
             widget = NoteWidget(note=note)
             widget.deleted.connect(self.fill_notes)
+            widget.noteschange.connect(self.noteschange)
             self.note_list.setItemWidget(item, widget)
             item.setSizeHint(widget.sizeHint())
 

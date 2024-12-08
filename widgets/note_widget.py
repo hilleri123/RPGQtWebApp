@@ -6,7 +6,7 @@ from PyQt5.QtGui import QIcon, QStandardItem, QStandardItemModel
 from PyQt5.QtCore import pyqtSignal, Qt
 from scheme import *
 from repositories import *
-from common import AutoResizingTextEdit, DateTimeEditWidget, AutoResizingListWidget
+from common import HtmlTextEdit, DateTimeEditWidget, AutoResizingListWidget
 from dialogs import PlayerCharacterDialog
 import json
 
@@ -74,7 +74,7 @@ class NoteWidget(QWidget):
         self.delete_button.clicked.connect(self.on_delete)
         tmp.addWidget(self.delete_button)
         self.base_layout.addLayout(tmp)
-        self.note_text = AutoResizingTextEdit()
+        self.note_text = HtmlTextEdit()
         self.note_text.setHtml(note.xml_text)
         if not IS_EDITABLE:
             self.note_text.setReadOnly(True)

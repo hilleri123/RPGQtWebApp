@@ -6,7 +6,7 @@ from npc_model import NpcTreeModel
 from repositories import *
 from widgets.location_npc_widget import LocationNpcWidget
 from widgets.item_widget import ItemWidget
-from common import BaseMapObject, AutoResizingTextEdit, AutoResizingListWidget
+from common import BaseMapObject, HtmlTextEdit, AutoResizingListWidget
 
 
 class ItemListWidget(QWidget):
@@ -31,7 +31,7 @@ class ItemListWidget(QWidget):
         tmp_layout.addWidget(self.add_item_button)
         self.location_label = QLabel()
         tmp_layout.addWidget(self.location_label)
-        self.item_description = AutoResizingTextEdit()
+        self.item_description = HtmlTextEdit()
         self.base_layout.addWidget(self.item_description)
 
         self.item_list = AutoResizingListWidget()

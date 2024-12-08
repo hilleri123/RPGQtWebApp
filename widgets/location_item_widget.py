@@ -10,4 +10,8 @@ class LocationGameItemWidget(ItemWidget):
         pass
 
     def on_delete(self):
-        print("Create me!")
+        if self.item is not None:
+            for w in self.session.query(WhereObject).filter(WhereObject.gameItemId == self.item.id).all():
+                self.session.delete(w)
+            self.session.commit()
+        self.deleted.emit()
