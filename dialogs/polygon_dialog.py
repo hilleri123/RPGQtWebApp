@@ -5,13 +5,19 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import pyqtSignal, Qt, QModelIndex, QAbstractListModel
 from PyQt5.QtGui import QColor
+from scheme import *
+import json
 
 
 # Модель для списка точек
 class PointsModel(QAbstractListModel):
-    def __init__(self, points=None):
+    def __init__(self, polygon_id):
         super().__init__()
-        self.points = points or []  # Список точек (x, y)
+        self.session = Session()
+        self.polygon = self.session.query(MapObjectPolygon).get(polygon_id)
+        self.points = []  # Список точек (x, y)
+        if self.polygon:
+            self.points = json.loads(self.polygon.poygon_list_json)
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.points)
@@ -39,6 +45,8 @@ class PointsModel(QAbstractListModel):
             del self.points[row]
             self.endRemoveRows()
 
+    def on_save(self):
+        self.sess
 
 # Диалоговое окно
 class PolygonDialog(QDialog):
@@ -53,7 +61,7 @@ class PolygonDialog(QDialog):
         layout = QVBoxLayout()
 
         # Модель и вид списка
-        self.model = PointsModel()
+        self.model = PointsModel(polygon_id=1) #???
         self.list_view = QListView()
         self.list_view.setModel(self.model)
         layout.addWidget(self.list_view)
