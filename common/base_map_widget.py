@@ -7,6 +7,8 @@ import typing
 from scheme import *
 from .datetime_editor import DateTimeEditWidget
 from .base_map_label import BaseMapLabel
+from dialogs.polygon_dialog import PolygonDialog
+from common import icons
 
 class BaseMapWidget(QWidget):
     map_image_saved = pyqtSignal()
@@ -26,6 +28,10 @@ class BaseMapWidget(QWidget):
         self.select_file_button = QPushButton("select file")
         self.select_file_button.clicked.connect(self.open_file_dialog)
         self.button_layout.addWidget(self.select_file_button)
+        self.edit_polygon = QPushButton()
+        self.edit_polygon.setIcon(icons.move_icon())
+        self.edit_polygon.clicked.connect(self.show_point_dialog)
+        self.button_layout.addWidget(self.edit_polygon)
         self.name_edit = QLineEdit("Name")
         if IS_EDITABLE:
             self.button_layout.addWidget(self.name_edit)
@@ -41,6 +47,8 @@ class BaseMapWidget(QWidget):
         self.datetime_edit = DateTimeEditWidget()
         self.datetime_edit.dateTimeChanged.connect(self.on_timeeditor)
         self.button_layout.addWidget(self.datetime_edit)
+
+        self.polygon_dialog = PolygonDialog()
 
         self.on_datetime_changed()
         self.datetime_changed.connect(self.on_datetime_changed)
@@ -114,3 +122,7 @@ class BaseMapWidget(QWidget):
                 self.session.commit()
         
         self.datetime_changed.emit()
+
+
+    def show_point_dialog(self):
+        self.polygon_dialog.show()

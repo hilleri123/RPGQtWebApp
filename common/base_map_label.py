@@ -14,7 +14,7 @@ TRIANGLE_SIZE = 15
 class BaseMapLabel(QLabel):
     map_image_saved = pyqtSignal()
     item_clicked = pyqtSignal(int)
-    time_changed = pyqtSignal()
+    # time_changed = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)

@@ -1,0 +1,124 @@
+import sys
+from PyQt5.QtWidgets import (
+    QApplication, QDialog, QVBoxLayout, QHBoxLayout, QPushButton,
+    QListView, QAbstractListModel, QColorDialog, QCheckBox, QLabel, QLineEdit
+)
+from PyQt5.QtCore import Qt, QModelIndex
+from PyQt5.QtGui import QColor
+
+
+# Модель для списка точек
+class PointsModel(QAbstractListModel):
+    def __init__(self, points=None):
+        super().__init__()
+        self.points = points or []  # Список точек (x, y)
+
+    def rowCount(self, parent=QModelIndex()):
+        return len(self.points)
+
+    def data(self, index, role=Qt.DisplayRole):
+        if not index.isValid() or index.row() >= len(self.points):
+            return None
+
+        point = self.points[index.row()]
+        if role == Qt.DisplayRole:
+            return f"Point ({point['x']}, {point['y']})"
+        elif role == Qt.DecorationRole:
+            return point['color']  # Цвет точки
+
+        return None
+
+    def add_point(self, x, y, color=QColor("black")):
+        self.beginInsertRows(QModelIndex(), len(self.points), len(self.points))
+        self.points.append({"x": x, "y": y, "color": color})
+        self.endInsertRows()
+
+    def remove_point(self, row):
+        if 0 <= row < len(self.points):
+            self.beginRemoveRows(QModelIndex(), row, row)
+            del self.points[row]
+            self.endRemoveRows()
+
+
+# Диалоговое окно
+class PolygonDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Points Manager")
+
+        # Основной макет
+        layout = QVBoxLayout()
+
+        # Модель и вид списка
+        self.model = PointsModel()
+        self.list_view = QListView()
+        self.list_view.setModel(self.model)
+        layout.addWidget(self.list_view)
+
+        # Поля для добавления точки
+        input_layout = QHBoxLayout()
+        self.x_input = QLineEdit()
+        self.x_input.setPlaceholderText("X")
+        self.y_input = QLineEdit()
+        self.y_input.setPlaceholderText("Y")
+        input_layout.addWidget(QLabel("X:"))
+        input_layout.addWidget(self.x_input)
+        input_layout.addWidget(QLabel("Y:"))
+        input_layout.addWidget(self.y_input)
+
+        layout.addLayout(input_layout)
+
+        # Кнопка выбора цвета
+        color_layout = QHBoxLayout()
+        self.color_label = QLabel("Цвет: ")
+        self.color_button = QPushButton("Выбрать цвет")
+        self.color_button.clicked.connect(self.choose_color)
+        color_layout.addWidget(self.color_label)
+        color_layout.addWidget(self.color_button)
+
+        layout.addLayout(color_layout)
+
+        # Чекбокс
+        self.checkbox = QCheckBox("Активировать функцию")
+        layout.addWidget(self.checkbox)
+
+        # Кнопки управления
+        buttons_layout = QHBoxLayout()
+        
+        add_button = QPushButton("Добавить точку")
+        add_button.clicked.connect(self.add_point)
+        
+        remove_button = QPushButton("Удалить выбранную точку")
+        remove_button.clicked.connect(self.remove_selected_point)
+        
+        buttons_layout.addWidget(add_button)
+        buttons_layout.addWidget(remove_button)
+
+        layout.addLayout(buttons_layout)
+
+        # Установка основного макета
+        self.setLayout(layout)
+
+    def choose_color(self):
+        """Открыть диалог выбора цвета."""
+        color = QColorDialog.getColor()
+        if color.isValid():
+            self.selected_color = color
+            self.color_label.setText(f"Цвет: {color.name()}")
+            self.color_label.setStyleSheet(f"color: {color.name()};")
+    
+    def add_point(self):
+        x = int(self.x_input.text())
+        y = int (self.y_input.text())
+        
+        color=self.selected_color if hasattr (self,"selected_color") else QColor ("black")
+        
+        self.model.add_point(x,y,color)
+            
+            
+            
+            
+        
+        
+        
+        
