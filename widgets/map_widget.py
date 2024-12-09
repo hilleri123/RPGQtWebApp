@@ -43,6 +43,9 @@ class MapLabel(BaseMapLabel):
 
     def file_name(self):
         return CURR_MAP_PATH
+    
+    def polygons(self) -> list[MapObjectPolygon]:
+        return self.session.query(MapObjectPolygon).filter(MapObjectPolygon.map_id == self.map.id).all()
 
 
 class MapWidget(BaseMapWidget):

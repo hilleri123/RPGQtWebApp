@@ -16,10 +16,6 @@ class BaseMapObject(QWidget):
         self.name.setReadOnly(not IS_EDITABLE)
         self.description = HtmlTextEdit()
         self.description.setReadOnly(not IS_EDITABLE)
-        self.save = QPushButton()
-        self.save.setEnabled(IS_EDITABLE)
-        self.save.setIcon(QIcon.fromTheme("document-save"))
-        self.save.clicked.connect(self.on_save)
         self.is_start_location = QCheckBox("Start")
         self.is_start_location.setEnabled(IS_EDITABLE)
         self.is_shown = QCheckBox("Show")
@@ -32,10 +28,9 @@ class BaseMapObject(QWidget):
         self.row = 0 
         self.base_layout.addWidget(QLabel("Name:"), self.row, 0)
         self.base_layout.addWidget(self.name, self.row, 1)
-        self.base_layout.addWidget(self.save, self.row, 2)
         if self.is_start_location is not None:
-            self.base_layout.addWidget(self.is_start_location, self.row, 3)
-        self.base_layout.addWidget(self.is_shown, self.row, 4)
+            self.base_layout.addWidget(self.is_start_location, self.row, 2)
+        self.base_layout.addWidget(self.is_shown, self.row, 3)
 
         if IS_EDITABLE:
             self.row += 1

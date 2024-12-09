@@ -45,6 +45,9 @@ class GlobalMapLabel(BaseMapLabel):
     
     def file_name(self):
         return GLOBAL_MAP_PATH
+    
+    def polygons(self) -> list[MapObjectPolygon]:
+        return self.session.query(MapObjectPolygon).filter(MapObjectPolygon.global_map_id == self.map.id).all()
 
 
 class GlobalMapWidget(BaseMapWidget):

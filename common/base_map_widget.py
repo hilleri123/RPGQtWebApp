@@ -50,6 +50,9 @@ class BaseMapWidget(QWidget):
 
         self.polygon_dialog = PolygonDialog()
 
+        self.polygon_dialog.polygon_selected.connect(self.set_polygon_id)
+        self.polygon_dialog.polygon_changed.connect(self.mapLabel.repaint)
+
         self.on_datetime_changed()
         self.datetime_changed.connect(self.on_datetime_changed)
 
@@ -126,3 +129,6 @@ class BaseMapWidget(QWidget):
 
     def show_point_dialog(self):
         self.polygon_dialog.show()
+
+    def set_polygon_id(self, polygon_id):
+        self.mapLabel.set_polygon_id(polygon_id)

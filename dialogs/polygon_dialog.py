@@ -1,9 +1,9 @@
 import sys
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QVBoxLayout, QHBoxLayout, QPushButton,
-    QListView, QAbstractListModel, QColorDialog, QCheckBox, QLabel, QLineEdit
+    QListView, QColorDialog, QCheckBox, QLabel, QSpinBox
 )
-from PyQt5.QtCore import Qt, QModelIndex
+from PyQt5.QtCore import pyqtSignal, Qt, QModelIndex, QAbstractListModel
 from PyQt5.QtGui import QColor
 
 
@@ -42,6 +42,9 @@ class PointsModel(QAbstractListModel):
 
 # Диалоговое окно
 class PolygonDialog(QDialog):
+    polygon_selected = pyqtSignal(int)
+    polygon_changed = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Points Manager")
@@ -57,10 +60,10 @@ class PolygonDialog(QDialog):
 
         # Поля для добавления точки
         input_layout = QHBoxLayout()
-        self.x_input = QLineEdit()
-        self.x_input.setPlaceholderText("X")
-        self.y_input = QLineEdit()
-        self.y_input.setPlaceholderText("Y")
+        self.x_input = QSpinBox()
+        self.x_input.setMaximum(4000)
+        self.y_input = QSpinBox()
+        self.y_input.setMaximum(4000)
         input_layout.addWidget(QLabel("X:"))
         input_layout.addWidget(self.x_input)
         input_layout.addWidget(QLabel("Y:"))
@@ -108,13 +111,29 @@ class PolygonDialog(QDialog):
             self.color_label.setStyleSheet(f"color: {color.name()};")
     
     def add_point(self):
-        x = int(self.x_input.text())
-        y = int (self.y_input.text())
-        
-        color=self.selected_color if hasattr (self,"selected_color") else QColor ("black")
-        
-        self.model.add_point(x,y,color)
-            
+        """Добавить новую точку в список."""
+        try:
+            x = int(self.x_input.text())
+            y = int(self.y_input.text())
+            color = self.selected_color if hasattr(self, "selected_color") else QColor("black")
+            self.model.add_point(x, y, color)
+
+            # Очистить поля ввода после добавления точки
+            self.x_input.clear()
+            self.y_input.clear()
+        except ValueError:
+            print("Введите корректные координаты (целые числа).")
+
+    def remove_selected_point(self):
+        """Удалить выбранную точку из списка."""
+        selected_indexes = self.list_view.selectedIndexes()
+        if selected_indexes:
+            row = selected_indexes[0].row()
+            self.model.remove_point(row)
+        else:
+            print("Выберите точку для удаления.")
+
+
             
             
             

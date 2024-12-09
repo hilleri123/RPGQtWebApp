@@ -6,6 +6,7 @@ from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QPointF, QSize, Qt
 import typing
 from scheme import *
 from .datetime_editor import DateTimeEditWidget
+import json
 
 
 TRIANGLE_SIZE = 15
@@ -22,6 +23,7 @@ class BaseMapLabel(QLabel):
         self.pix_map_for_save = QPixmap()
         self.map = None
         self.items = []
+        self.polygon_id = None
 
     def mousePressEvent(self, ev: typing.Optional[QMouseEvent]) -> None:
         if ev is None:
@@ -83,6 +85,31 @@ class BaseMapLabel(QLabel):
                 x += TRIANGLE_SIZE
                 painter.drawPolygon(triangle)
             painter.restore()
+
+            for polygon in self.polygons():
+                painter.save()
+                alpha_level = 255
+                if paint_hidden and polygon.is_shown:
+                    alpha_level = 80
+                elif paint_hidden and not polygon.is_shown:
+                    alpha_level = 20
+                elif not paint_hidden and polygon.is_shown:
+                    alpha_level = 255
+                else:
+                    alpha_level = 0
+                color = QColor(polygon.color.hex)
+                color.setAlpha(alpha_level)
+                painter.setPen(color)
+                if polygon.is_filled:
+                    painter.setBrush(color)
+                points = json.loads(polygon.poygon_list_json)
+                polygon_to_paint = QPolygonF([QPointF(x, y) for x, y in points])
+                painter.drawPolygon(polygon_to_paint)
+
+                painter.restore()
+
+    def polygons(self) -> list[MapObjectPolygon]:
+        return []
 
     def saveImage(self):
         if not self.pix_map_for_save.isNull():
@@ -164,3 +191,8 @@ class BaseMapLabel(QLabel):
 
     def file_name(self):
         return 'tmp'
+
+    def set_polygon_id(self, polygon_id):
+        # TODO
+        self.polygon_id = polygon_id
+        self.repaint()

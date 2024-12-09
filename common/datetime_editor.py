@@ -18,18 +18,18 @@ class DateTimeEditWidget(QWidget):
         self.date_time_edit.setDisplayFormat("dd/MM/yyyy HH:mm")
 
         # Кнопки управления
-        self.add_hour_button = QPushButton("Добавить час")
-        self.subtract_hour_button = QPushButton("Отнять час")
-        self.add_day_button = QPushButton("Добавить день")
-        self.subtract_day_button = QPushButton("Отнять день")
-        self.sync_button = QPushButton("Sync")
+        self.add_hour_button = QPushButton("+h")
+        self.subtract_hour_button = QPushButton("-h")
+        self.add_day_button = QPushButton("+d")
+        self.subtract_day_button = QPushButton("-d")
+        # self.sync_button = QPushButton("Sync")
 
         # Подключаем кнопки к методам
         self.add_hour_button.clicked.connect(self.add_hour)
         self.subtract_hour_button.clicked.connect(self.subtract_hour)
         self.add_day_button.clicked.connect(self.add_day)
         self.subtract_day_button.clicked.connect(self.subtract_day)
-        self.sync_button.clicked.connect(self.emit_sync_signal)
+        # self.sync_button.clicked.connect(self.emit_sync_signal)
 
         # Расположение кнопок и виджета
         layout = QVBoxLayout()
@@ -42,7 +42,7 @@ class DateTimeEditWidget(QWidget):
         button_layout.addWidget(self.subtract_day_button)
         
         layout.addLayout(button_layout)
-        layout.addWidget(self.sync_button)
+        # layout.addWidget(self.sync_button)
 
         self.setLayout(layout)
 

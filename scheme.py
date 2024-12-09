@@ -122,10 +122,10 @@ class MapObjectPolygon(Base):
     global_map_id = Column(Integer, ForeignKey('GlobalMap.id'))
     map_id = Column(Integer, ForeignKey('SceneMap.id'))
     is_shown = Column(Boolean, default=False)
-    if_filled = Column(Boolean, default=False)
-    if_line = Column(Boolean, default=False)
+    is_filled = Column(Boolean, default=False)
+    is_line = Column(Boolean, default=False)
     color = Column(ColorType)
-    poygon_list_json = Column(String)
+    poygon_list_json = Column(String, default='[]')
 
 
 class PlayerCharacter(Base):
