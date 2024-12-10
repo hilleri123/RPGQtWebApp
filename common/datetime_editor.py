@@ -73,4 +73,5 @@ class DateTimeEditWidget(QWidget):
         return self.date_time_edit.dateTime()
 
     def setDateTime(self, dt):
-        return self.date_time_edit.setDateTime(dt)
+        if dt is not None:
+            return self.date_time_edit.setDateTime(dt)

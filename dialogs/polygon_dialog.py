@@ -46,7 +46,10 @@ class PointsModel(QAbstractListModel):
             self.endRemoveRows()
 
     def on_save(self):
-        self.sess
+        if self.polygon is None:
+            return
+        self.polygon.poygon_list_json = self.points.__repr__()
+        self.session.commit()
 
 # Диалоговое окно
 class PolygonDialog(QDialog):

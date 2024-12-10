@@ -20,6 +20,8 @@ class HtmlTextEdit(AutoResizingTextEdit):
         return updated_html
 
     def setHtml(self, html_content):
+        if html_content is None:
+            return
         updated_html = re.sub(
             r"font-size:(\d+)pt;",
             lambda match: f"font-size:{int(match.group(1)) - self.add_font_size}pt;",

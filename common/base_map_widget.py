@@ -103,8 +103,9 @@ class BaseMapWidget(QWidget):
         if g_map is None:
             return
         dt = g_map.time
-        self.datetime_edit.setDateTime(dt)
-        self.datetime_base_edit.setDateTime(dt)
+        if dt is not None:
+            self.datetime_edit.setDateTime(dt)
+            self.datetime_base_edit.setDateTime(dt)
     
     def on_base_timeeditor(self):
         self.set_time(self.datetime_base_edit.dateTime().toPyDateTime())

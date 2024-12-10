@@ -1,7 +1,7 @@
 import os
 import shutil
 from PyQt5.QtWidgets import QApplication, QMenu, QAction, QLineEdit, QDateTimeEdit, QVBoxLayout, QHBoxLayout, QFileDialog, QPushButton, QLabel, QWidget, QListWidget
-from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent, QPolygonF
+from PyQt5.QtGui import QPixmap, QPaintEvent, QIcon, QPainter, QColor, QMouseEvent, QPolygonF
 from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QPointF, QSize, Qt
 import typing
 from scheme import *
@@ -67,6 +67,9 @@ class BaseMapLabel(QLabel):
                     continue
             rect = self.item_rect(item, scale=scale)
             painter.drawRect(rect)
+            if item.icon_file_path:
+                icon = QIcon(f'{ICONS_DIR}/{item.icon_file_path}')
+                icon.paint(painter, rect, Qt.AlignCenter)
 
             x = rect.x()
             y = rect.y()
