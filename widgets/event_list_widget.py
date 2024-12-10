@@ -5,39 +5,32 @@ from scheme import *
 from npc_model import NpcTreeModel
 from repositories import *
 from widgets.location_npc_widget import LocationNpcWidget
-from widgets.npc_widget import NpcWidget
+from widgets.note_widget import NoteWidget
 from common import AutoResizingListWidget, BaseListWidget
 
 
-class NpcListWidget(BaseListWidget):
+class EventListWidget(BaseListWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
     def list_name(self) -> str:
-        return 'list'
-
+        return 'Event List'
+    
     def fill_first_line(self):
         super().fill_first_line()
-        self.npc_name = QLineEdit()
-        self.first_line_layout.addWidget(self.npc_name)
+        self.event_name = QLineEdit()
+        self.first_line_layout.addWidget(self.event_name)
 
     def fill_head(self):
-        super().fill_head()
-
+        pass
+    
     def query_list(self) -> list:
-        alive_npcs = []
-        dead_npcs = []
-        for npc in self.session.query(NPC).all():
-            if npc.isDead:
-                dead_npcs.append(npc)
-            else:
-                alive_npcs.append(npc)
-        return alive_npcs + dead_npcs
+        return self.session.query(Note).all()
 
     def widget_of(self, db_object) -> QWidget:
-        return NpcWidget(db_object)
-    
+        return NoteWidget(db_object)
+
     def add_default_element(self):
-        npc = NPC(name=self.npc_name.text())
+        npc = Note()
         self.session.add(npc)
         self.session.commit()
