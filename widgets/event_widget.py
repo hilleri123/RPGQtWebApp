@@ -26,40 +26,14 @@ class EventWidget(BaseListItemWidget):
         super().fill_first_line()
         self.players = self.session.query(PlayerCharacter).all()
 
-        self.shown_all = QCheckBox()
-        self.shown_all.clicked.connect(self.set_all)
-        self.first_line_layout.addWidget(self.shown_all)
-        self.shown_combobox = CheckableComboBox(
-            {p.id: p.name for p in self.players}, 
-            json.loads(self.db_object.player_shown_json)
-            )
-        self.shown_combobox.state_chenged.connect(self.update_shown)
-        self.first_line_layout.addWidget(self.shown_combobox)
+        self.happend = QCheckBox()
+        self.happend.clicked.connect(self.set_all)
+        self.first_line_layout.addWidget(self.happend)
 
     def on_save(self):
-        ids = self.shown_combobox.get_checked_items_ids()
-        self.db_object.player_shown_json = ids.__repr__()
+        self.db_object.happend = self.happend.isChecked()
         self.db_object.xml_text = self.note_text.toHtml()
         self.session.commit()
         super().on_save()
-
-    def set_all(self):
-        if self.shown_all.checkState() == Qt.Checked:
-            state = Qt.Checked
-        else:
-            state = Qt.Unchecked
-        self.shown_all.setCheckState(state)
-        self.shown_combobox.set_all(state)
-        self.on_save()
-
-    def update_shown(self):
-        ids = self.shown_combobox.get_checked_items_ids()
-        if len(ids) == 0:
-            self.shown_all.setCheckState(Qt.Unchecked)
-        elif len(ids) == len(self.players):
-            self.shown_all.setChecked(Qt.Checked)
-        else:
-            self.shown_all.setChecked(Qt.PartiallyChecked)
-        self.on_save()
 
 

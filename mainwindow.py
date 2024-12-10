@@ -8,6 +8,7 @@ import sys
 import os
 import shutil
 from zipfile import ZipFile, ZIP_DEFLATED
+from repositories import reset_scenario
 
 from scheme import *
 
@@ -48,6 +49,9 @@ class MainWindow(QMainWindow):
         self.skills = QAction("Skills", self)
         self.skills.triggered.connect(self.show_skill_dialog)
         scenario_menu.addAction(self.skills)
+        self.reset_scenario_action = QAction("Reset", self)
+        self.reset_scenario_action.triggered.connect(self.reset_scenario)
+        scenario_menu.addAction(self.reset_scenario_action)
 
         help_menu = menu_bar.addMenu("Help")
         self.skills_help = QAction("Skills", self)
@@ -272,4 +276,6 @@ class MainWindow(QMainWindow):
     def show_help_skill_dialog(self):
         self.skill_help_dialog.show()
 
+    def reset_scenario(self):
+        reset_scenario()
 

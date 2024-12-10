@@ -14,7 +14,7 @@ class NpcListWidget(BaseListWidget):
         super().__init__(parent)
 
     def list_name(self) -> str:
-        return 'list'
+        return 'Npc List'
 
     def fill_first_line(self):
         super().fill_first_line()

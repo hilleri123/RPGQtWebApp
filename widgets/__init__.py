@@ -7,3 +7,4 @@ from .map_widget import MapWidget
 from .map_settings_widget import MapSettingsWidget
 from .player_list_widget import PlayerListWidget
 from .note_list_widget import NoteListWidget
+from .event_list_widget import EventListWidget

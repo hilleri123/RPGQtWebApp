@@ -4,7 +4,7 @@ from scheme import *
 
 class LocationGameItemWidget(ItemWidget):
     def __init__(self, item: GameItem, parent=None):
-        super().__init__(item=item)
+        super().__init__(db_object=item, parent=parent)
         self.xml_text.setReadOnly(True)
 
     def on_edit_item(self):

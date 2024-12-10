@@ -35,15 +35,15 @@ class PlayerListWidget(BaseListWidget):
         self.session.commit()
 
     def update_connections(self):
-        for i in range(self.player_list.count()):
-            item = self.player_list.item(i)
-            widget = self.player_list.itemWidget(item)
+        for i in range(self.item_list.count()):
+            item = self.item_list.item(i)
+            widget = self.item_list.itemWidget(item)
             if widget:
                 widget.set_icon()
     
     def on_datetime_changed(self):
-        for i in range(self.player_list.count()):
-            item = self.player_list.item(i)
-            widget = self.player_list.itemWidget(item)
+        for i in range(self.item_list.count()):
+            item = self.item_list.item(i)
+            widget = self.item_list.itemWidget(item)
             if widget:
                 widget.update_datetime()
