@@ -74,7 +74,7 @@ class BaseMapLabel(QLabel):
             x = rect.x()
             y = rect.y()
             for character in self.characters_in_item(item):
-                color = QColor(100, 150, 100, 128)  # RGB + Alpha (128 из 255 — это 50%)
+                color = QColor(100, 150, 100, 128)
                 if character.color:
                     color = QColor(character.color.hex)
                     color.setAlpha(128)
@@ -133,15 +133,8 @@ class BaseMapLabel(QLabel):
                      QSize(int(item.width * w_aspect),
                      int(item.height * h_aspect)))
 
-    def set_file_path(self, file_path):
+    def set_file_path(self, file_name):
         if self.map is not None and self.session is not None:
-            file_name = os.path.basename(file_path)
-            if os.path.isfile(os.path.join(IMGS_DIR, file_name)):
-                print(f"Warning: Файл c именем '{file_name}' уже существует в директории '{IMGS_DIR}'.")
-
-            destination_path = os.path.join(IMGS_DIR, file_name)
-            shutil.copy2(file_path, destination_path)
-
             self.map.filePath = file_name
             self.session.commit()
             self.set_map()

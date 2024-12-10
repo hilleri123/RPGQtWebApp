@@ -6,6 +6,8 @@ from .datetime_editor import DateTimeEditWidget
 from .skill_label_list import SkillListWidget
 from .log_widget import LogWidget
 from .html_text_edit_widget import HtmlTextEdit
+from .base_list_item_widget import BaseListItemWidget
+from .base_list_widget import BaseListWidget
 import socket
 
 

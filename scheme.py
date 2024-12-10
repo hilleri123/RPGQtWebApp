@@ -99,6 +99,7 @@ class GlobalMap(Base):
     filePath = Column(String)
     intro = Column(String)
     time = Column(DateTime)
+    start_time = Column(DateTime)
 
 
 class SceneMap(Base):

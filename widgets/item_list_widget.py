@@ -6,37 +6,30 @@ from npc_model import NpcTreeModel
 from repositories import *
 from widgets.location_npc_widget import LocationNpcWidget
 from widgets.item_widget import ItemWidget
-from common import BaseMapObject, HtmlTextEdit, AutoResizingListWidget
+from common import BaseListWidget, HtmlTextEdit, AutoResizingListWidget
 
 
-class ItemListWidget(QWidget):
-    item_list_changed = pyqtSignal()
-
+class ItemListWidget(BaseListWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.session = Session()
         self.location_id = None
 
-        self.base_layout = QVBoxLayout()
-        self.setLayout(self.base_layout)
 
-        tmp_layout = QHBoxLayout()
-        self.base_layout.addLayout(tmp_layout)
-        tmp_layout.addWidget(QLabel("Item list:")) 
+    def list_name(self) -> str:
+        return 'Item list'
+
+    def fill_first_line(self):
+        super().fill_first_line()
         self.item_name = QLineEdit()
-        tmp_layout.addWidget(self.item_name)
-        self.add_item_button = QPushButton()
-        self.add_item_button.setIcon(QIcon.fromTheme("list-add"))
-        self.add_item_button.clicked.connect(self.on_add_item)
-        tmp_layout.addWidget(self.add_item_button)
+        self.first_line_layout.addWidget(self.item_name)
         self.location_label = QLabel()
-        tmp_layout.addWidget(self.location_label)
+        self.first_line_layout.addWidget(self.location_label)
+
+    def fill_head(self):
+        super().fill_head()
         self.item_description = HtmlTextEdit()
         self.base_layout.addWidget(self.item_description)
-
-        self.item_list = AutoResizingListWidget()
-        self.base_layout.addWidget(self.item_list)
-        self.fill_items()
 
     def set_location(self, location_id):
         location = self.session.query(Location).get(location_id)
@@ -44,21 +37,14 @@ class ItemListWidget(QWidget):
             return
         self.location_id = location_id
         self.location_label.setText(f"Location: {location.name}")
+    
+    def query_list(self) -> list:
+        return self.session.query(GameItem).all()
+    
+    def widget_of(self, db_object) -> QWidget:
+        return ItemWidget(db_object)
 
-    def fill_items(self):
-        self.item_list.clear()
-        self.session = Session()
-
-        item_list = self.session.query(GameItem).all()
-        for game_item in item_list:
-            item = QListWidgetItem(self.item_list)
-            widget = ItemWidget(item=game_item)
-            widget.deleted.connect(self.fill_items)
-            widget.item_moved.connect(self.item_list_changed)
-            self.item_list.setItemWidget(item, widget)
-            item.setSizeHint(widget.sizeHint())
-
-    def on_add_item(self):
+    def add_default_element(self):
         item = GameItem(name=self.item_name.text(), text=self.item_description.toHtml())
         self.session.add(item)
         self.session.commit()
@@ -71,5 +57,3 @@ class ItemListWidget(QWidget):
             where.playerId = None
             where.npcId = None
             self.session.commit()
-        self.fill_items()
-        self.item_list_changed.emit()

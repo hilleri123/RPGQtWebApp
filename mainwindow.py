@@ -145,10 +145,10 @@ class MainWindow(QMainWindow):
 
         self.intro.textChanged.connect(self.on_save)
 
-        self.items.item_list_changed.connect(self.location.set_items)
+        self.items.list_changed.connect(self.location.set_items)
         self.npcs.npc_list_changed.connect(self.location.set_npcs)
         
-        self.items.item_list_changed.connect(self.characters_updated)
+        self.items.list_changed.connect(self.characters_updated)
         self.location.item_list_changed.connect(self.characters_updated)
 
         self.notes.noteschange.connect(self.notes_updated)

@@ -36,9 +36,9 @@ class DateTimeEditWidget(QWidget):
         layout.addWidget(self.date_time_edit)
 
         button_layout = QHBoxLayout()
+        button_layout.addWidget(self.add_day_button)
         button_layout.addWidget(self.add_hour_button)
         button_layout.addWidget(self.subtract_hour_button)
-        button_layout.addWidget(self.add_day_button)
         button_layout.addWidget(self.subtract_day_button)
         
         layout.addLayout(button_layout)

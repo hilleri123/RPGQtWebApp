@@ -11,8 +11,8 @@ class LocationGameItemWidget(ItemWidget):
         pass
 
     def on_delete(self):
-        if self.item is not None:
-            for w in self.session.query(WhereObject).filter(WhereObject.gameItemId == self.item.id).all():
+        if self.db_object is not None:
+            for w in self.session.query(WhereObject).filter(WhereObject.gameItemId == self.db_object.id).all():
                 self.session.delete(w)
             self.session.commit()
         self.deleted.emit()

@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QPushButton, QLabel, QGridLayout, QListWidget, QListWidgetItem, QCheckBox, QSpinBox, QTreeView, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTextEdit
 from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent, QIcon
 from PyQt5.QtCore import pyqtSignal
+from .files import open_img
 from scheme import *
 from repositories import *
 from .html_text_edit_widget import HtmlTextEdit
@@ -16,6 +17,8 @@ class BaseMapObject(QWidget):
         self.name.setReadOnly(not IS_EDITABLE)
         self.description = HtmlTextEdit()
         self.description.setReadOnly(not IS_EDITABLE)
+        self.select_file_button = QPushButton("select file")
+        self.select_file_button.clicked.connect(self.open_file_dialog)
         self.is_start_location = QCheckBox("Start")
         self.is_start_location.setEnabled(IS_EDITABLE)
         self.is_shown = QCheckBox("Show")
@@ -28,9 +31,10 @@ class BaseMapObject(QWidget):
         self.row = 0 
         self.base_layout.addWidget(QLabel("Name:"), self.row, 0)
         self.base_layout.addWidget(self.name, self.row, 1)
+        self.base_layout.addWidget(self.select_file_button, self.row, 2)
         if self.is_start_location is not None:
-            self.base_layout.addWidget(self.is_start_location, self.row, 2)
-        self.base_layout.addWidget(self.is_shown, self.row, 3)
+            self.base_layout.addWidget(self.is_start_location, self.row, 3)
+        self.base_layout.addWidget(self.is_shown, self.row, 4)
 
         if IS_EDITABLE:
             self.row += 1
@@ -95,3 +99,9 @@ class BaseMapObject(QWidget):
             w.valueChanged.disconnect(self.on_save)
         
 
+    def open_file_dialog(self):
+        file_name = open_img(ICONS_DIR, self)
+        if file_name:
+            self.object.icon_file_path = file_name
+            self.session.commit()
+            self.map_object_updated.emit()

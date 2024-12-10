@@ -11,5 +11,6 @@
         <file alias="lost.png">icons/lost.png</file>  
         <file alias="npc.png">icons/npc.png</file>
         <file alias="player.png">icons/player.png</file>
+        <file alias="add.png">icons/add.png</file>
     </qresource>
 </RCC>

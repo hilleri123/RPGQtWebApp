@@ -6,28 +6,24 @@ function loadAllMapImage() {
 function loadMapImage(elementId, route) {
     const mapContainer = document.getElementById(elementId);
     if (mapContainer) {
-        mapContainer.innerHTML = ''; // Очищаем контейнер перед добавлением нового изображения
-        
         const timestamp = new Date().getTime();
+        const imgId = `image_${elementId}`;
 
-        const img_g = document.createElement('img');
-        img_g.src = `/${route}?t=${timestamp}`; // Используем маршрут для получения изображения
-        img_g.alt = 'Global Map Image';
-        // img_g.id = 'global_image'
-        // img_g.onclick = toggleImages
-        img_g.style.width = '100%'; // Устанавливаем ширину на 100% контейнера
-        img_g.style.height = 'auto'; // Автоматическая высота для сохранения пропорций
-        mapContainer.appendChild(img_g);
+        let img = document.getElementById(imgId); // Проверяем, существует ли уже изображение
 
-        // const img_c = document.createElement('img');
-        // img_c.src = `/get_curr_map_image?t=${timestamp}`; // Используем маршрут для получения изображения
-        // img_c.alt = 'Curr Map Image';
-        // img_c.id = 'curr_image'
-        // img_c.onclick = toggleImages
-        // img_c.classList = ['hidden']
-        // img_c.style.width = '100%'; // Устанавливаем ширину на 100% контейнера
-        // img_c.style.height = 'auto'; // Автоматическая высота для сохранения пропорций
-        // mapContainer.appendChild(img_c);
+        if (img) {
+            // Если изображение уже существует, обновляем только src
+            img.src = `/${route}?t=${timestamp}`;
+        } else {
+            // Если изображения нет, создаем его
+            img = document.createElement('img');
+            img.src = `/${route}?t=${timestamp}`; // Используем маршрут для получения изображения
+            img.alt = 'Map Image';
+            img.id = imgId;
+            img.style.width = '100%'; // Устанавливаем ширину на 100% контейнера
+            img.style.height = 'auto'; // Автоматическая высота для сохранения пропорций
+            mapContainer.appendChild(img);
+        }
     } else {
         console.error(`Element with id "${elementId}" not found.`);
     }

@@ -7,6 +7,7 @@ import typing
 from scheme import *
 from .datetime_editor import DateTimeEditWidget
 from .base_map_label import BaseMapLabel
+from .files import open_img
 from dialogs.polygon_dialog import PolygonDialog
 from common import icons
 
@@ -39,11 +40,11 @@ class BaseMapWidget(QWidget):
         self.add_item_button.clicked.connect(self.add_item)
         if IS_EDITABLE:
             self.button_layout.addWidget(self.add_item_button)
-        self.datetime_base_edit = QDateTimeEdit()
-        self.datetime_base_edit.setDisplayFormat("dd/MM/yyyy HH:mm")
-        self.datetime_base_edit.dateTimeChanged.connect(self.on_base_timeeditor)
+        self.datetime_start_edit = QDateTimeEdit()
+        self.datetime_start_edit.setDisplayFormat("dd/MM/yyyy HH:mm")
+        self.datetime_start_edit.dateTimeChanged.connect(self.on_start_timeeditor)
         if IS_EDITABLE:
-            self.button_layout.addWidget(self.datetime_base_edit)
+            self.button_layout.addWidget(self.datetime_start_edit)
         self.datetime_edit = DateTimeEditWidget()
         self.datetime_edit.dateTimeChanged.connect(self.on_timeeditor)
         self.button_layout.addWidget(self.datetime_edit)
@@ -60,17 +61,7 @@ class BaseMapWidget(QWidget):
         self.mapLabel = BaseMapLabel()
 
     def open_file_dialog(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.ReadOnly
-
-        # Открываем диалог выбора файла
-        file_name, _ = QFileDialog.getOpenFileName(
-            self,
-            "Выберите изображение",
-            "",
-            "Изображения (*.png *.jpg *.jpeg *.bmp);;Все файлы (*)",
-            options=options
-        )
+        file_name = open_img(IMGS_DIR, self)
         if file_name:
             self.mapLabel.set_file_path(file_name)
 
@@ -105,19 +96,23 @@ class BaseMapWidget(QWidget):
         dt = g_map.time
         if dt is not None:
             self.datetime_edit.setDateTime(dt)
-            self.datetime_base_edit.setDateTime(dt)
+        start_dt = g_map.start_time
+        if start_dt is not None:
+            self.datetime_start_edit.setDateTime(start_dt)
     
-    def on_base_timeeditor(self):
-        self.set_time(self.datetime_base_edit.dateTime().toPyDateTime())
+    def on_start_timeeditor(self):
+        self.set_time(self.datetime_start_edit.dateTime().toPyDateTime(), start_too=True)
 
     def on_timeeditor(self):
         self.set_time(self.datetime_edit.dateTime().toPyDateTime())
 
-    def set_time(self, dt):
+    def set_time(self, dt, start_too=False):
         self.session = Session()
         g_map = self.session.query(GlobalMap).first()
         if g_map is None:
             return
+        if start_too:
+            g_map.start_time = dt
         g_map.time = dt
         self.session.commit()
         for character in self.session.query(PlayerCharacter).all():
