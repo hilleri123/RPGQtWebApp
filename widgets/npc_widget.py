@@ -5,60 +5,40 @@ from PyQt5.QtGui import QIcon, QPalette, QColor
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
-from common import AutoResizingListWidget
+from common import AutoResizingListWidget, BaseListItemWidget
 from .action_widget import ActionWidget
 
 
-class NpcWidget(QWidget):
-    deleted = pyqtSignal()
-
+class NpcWidget(BaseListItemWidget):
     def __init__(self, npc: NPC, parent=None, **args):
-        super().__init__(parent)
-        self.session = Session()
-        self.npc = npc
-        self.base_layout = QVBoxLayout(self)
-        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        super().__init__(npc, parent)
         self.labels = []
         self.setup(**args)
         self.add_lists(**args)
         
-
-    def setup(self, **args):
-        dialogs = check_marks_in_condition(
-            self.session.query(GameCondition).filter(
-                GameCondition.playerActionId != None,
-                GameCondition.locationId == None,
-                GameCondition.npcId == self.npc.id
-            ).all()
-        )
-
-        tmp = QHBoxLayout()
-        self.npc_name_field = QLineEdit() 
-        self.npc_name_field.setText(self.npc.name)
-        self.npc_name_field.setReadOnly(True)
-        tmp.addWidget(self.npc_name_field)
+    def fill_first_line(self):
+        super().fill_first_line()
         self.npc_is_alive = QCheckBox()
-        self.npc_is_alive.setChecked(not self.npc.isDead)
+        self.npc_is_alive.setChecked(not self.db_object.isDead)
         self.npc_is_alive.clicked.connect(self.set_alive)
         self.set_alive()
-        tmp.addWidget(self.npc_is_alive)
+        self.first_line_layout.addWidget(self.npc_is_alive)
         self.edit_npc_button = QPushButton()
         self.edit_npc_button.setIcon(QIcon.fromTheme("preferences-system"))
         self.edit_npc_button.setEnabled(IS_EDITABLE)
         self.edit_npc_button.clicked.connect(self.on_edit_npc)
-        tmp.addWidget(self.edit_npc_button)
+        self.first_line_layout.addWidget(self.edit_npc_button)
         self.add_dialog_button = QPushButton()
         self.add_dialog_button.setIcon(QIcon.fromTheme("list-add"))
         self.add_dialog_button.setEnabled(IS_EDITABLE)
         self.add_dialog_button.clicked.connect(self.on_add_dialog)
-        tmp.addWidget(self.add_dialog_button)
-        self.delete_button = QPushButton()
-        self.delete_button.setIcon(QIcon.fromTheme("list-remove"))
-        self.delete_button.setEnabled(IS_EDITABLE)
-        self.delete_button.clicked.connect(self.on_delete)
-        tmp.addWidget(self.delete_button)
-        self.base_layout.addLayout(tmp)
+        self.first_line_layout.addWidget(self.add_dialog_button)
 
+    def name(self) -> str:
+        return self.db_object.name
+
+    def setup(self, **args):
+        pass
 
     def add_lists(self, **args):
         self.dialogs = []
@@ -76,7 +56,7 @@ class NpcWidget(QWidget):
             self.session.query(GameCondition).filter(
                 GameCondition.playerActionId != None,
                 GameCondition.locationId == None,
-                GameCondition.npcId == self.npc.id
+                GameCondition.npcId == self.db_object.id
             ).all()
         )
 
@@ -90,27 +70,18 @@ class NpcWidget(QWidget):
     def on_edit_npc(self):
         pass #TODO
 
-
     def on_add_dialog(self):
         a = PlayerAction()
         self.session.add(a)
         self.session.commit()
         c = GameCondition(
             playerActionId=a.id,
-            npcId = self.npc.id
+            npcId = self.db_object.id
             )
         self.session.add(c)
         self.session.commit()
         
         self.dialogs_fill()
-
-
-    def on_delete(self):
-        # TODO пофиксить
-        self.session.delete(self.npc)
-        self.session.commit()
-
-        self.deleted.emit()
 
     def set_alive(self):
         palette = self.palette()

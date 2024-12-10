@@ -45,7 +45,7 @@ class LocationNpcWidget(NpcWidget):
             self.session.query(GameCondition).filter(
                 GameCondition.playerActionId != None,
                 GameCondition.locationId == self.location.id,
-                GameCondition.npcId == self.npc.id
+                GameCondition.npcId == self.db_object.id
             ).all()
         )
 
@@ -76,7 +76,7 @@ class LocationNpcWidget(NpcWidget):
         c = GameCondition(
             playerActionId=a.id,
             locationId = self.location.id,
-            npcId = self.npc.id
+            npcId = self.db_object.id
             )
         self.session.add(c)
         self.session.commit()
@@ -88,7 +88,7 @@ class LocationNpcWidget(NpcWidget):
         # TODO пофиксить
         conditions = self.session.query(GameCondition).filter(
                 GameCondition.locationId == self.location.id,
-                GameCondition.npcId == self.npc.id
+                GameCondition.npcId == self.db_object.id
         ).all()
         for condition in conditions:
             self.session.delete(condition)

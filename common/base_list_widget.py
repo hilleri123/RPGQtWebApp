@@ -57,7 +57,7 @@ class BaseListWidget(QWidget):
             widget.deleted.connect(self.fill_list)
             widget.changed.connect(self.list_changed)
             self.item_list.setItemWidget(item, widget)
-            # item.setSizeHint(widget.sizeHint())
+            item.setSizeHint(widget.sizeHint())
 
     def on_add(self):
         self.add_default_element()

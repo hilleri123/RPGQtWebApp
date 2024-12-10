@@ -18,11 +18,10 @@ class BaseListItemWidget(QWidget):
         super().__init__(parent)
         self.session = Session()
         self.db_object = db_object
-        self.players = self.session.query(PlayerCharacter).all()
         self.base_layout = QVBoxLayout(self)
         self.first_line_layout = QHBoxLayout()
         self.base_layout.addLayout(self.first_line_layout)
-        self.item_name_field = QLineEdit()  # Поле для имени NPC
+        self.item_name_field = QLineEdit()
         self.item_name_field.setText(self.name())
         self.item_name_field.setReadOnly(True)
         self.first_line_layout.addWidget(self.item_name_field)

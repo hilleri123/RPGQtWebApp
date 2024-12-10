@@ -146,12 +146,12 @@ class MainWindow(QMainWindow):
         self.intro.textChanged.connect(self.on_save)
 
         self.items.list_changed.connect(self.location.set_items)
-        self.npcs.npc_list_changed.connect(self.location.set_npcs)
+        self.npcs.list_changed.connect(self.location.set_npcs)
         
         self.items.list_changed.connect(self.characters_updated)
         self.location.item_list_changed.connect(self.characters_updated)
 
-        self.notes.noteschange.connect(self.notes_updated)
+        self.notes.list_changed.connect(self.notes_updated)
 
     def fill_map_object(self):
         session = Session()
