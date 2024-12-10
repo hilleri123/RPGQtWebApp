@@ -24,7 +24,12 @@ class EventWidget(BaseListItemWidget):
         
     def fill_first_line(self):
         super().fill_first_line()
-        self.players = self.session.query(PlayerCharacter).all()
+        self.start = DateTimeEditWidget()
+        self.start.dateTimeChanged.connect(self.on_save)
+        self.first_line_layout.addWidget(self.start)
+        self.end = DateTimeEditWidget()
+        self.end.dateTimeChanged.connect(self.on_save)
+        self.first_line_layout.addWidget(self.end)
 
         self.happend = QCheckBox()
         self.happend.clicked.connect(self.on_save)
