@@ -11,7 +11,7 @@ def open_img(directory, parent=None):
         parent,
         "Выберите изображение",
         "",
-        "Изображения (*.png *.jpg *.jpeg *.bmp);;Все файлы (*)",
+        "Изображения (*.png *.jpg *.jpeg *.bmp);; All files (*)",
         options=options
     )
     if not file_path:

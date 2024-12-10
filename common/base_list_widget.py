@@ -38,6 +38,15 @@ class BaseListWidget(QWidget):
     def fill_head(self):
         pass
 
+    def query_list(self) -> list:
+        return []
+
+    def widget_of(self, db_object) -> QWidget:
+        return QWidget()
+
+    def add_default_element(self):
+        pass
+
     def fill_list(self):
         self.item_list.clear()
         self.session = Session()
@@ -50,16 +59,7 @@ class BaseListWidget(QWidget):
             self.item_list.setItemWidget(item, widget)
             # item.setSizeHint(widget.sizeHint())
 
-    def query_list(self) -> list:
-        return []
-
-    def widget_of(self, db_object) -> QWidget:
-        return QWidget()
-
     def on_add(self):
         self.add_default_element()
         self.fill_list()
         self.list_changed.emit()
-
-    def add_default_element(self):
-        pass
