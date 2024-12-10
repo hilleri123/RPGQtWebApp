@@ -27,7 +27,7 @@ class EventWidget(BaseListItemWidget):
         self.players = self.session.query(PlayerCharacter).all()
 
         self.happend = QCheckBox()
-        self.happend.clicked.connect(self.set_all)
+        self.happend.clicked.connect(self.on_save)
         self.first_line_layout.addWidget(self.happend)
 
     def on_save(self):

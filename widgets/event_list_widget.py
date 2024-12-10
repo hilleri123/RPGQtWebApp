@@ -20,6 +20,7 @@ class EventListWidget(BaseListWidget):
         if g_map is None:
             return
         self.time = g_map.time
+        self.fill_list()
 
     def list_name(self) -> str:
         return 'Event List'
@@ -31,18 +32,22 @@ class EventListWidget(BaseListWidget):
         pass
     
     def query_list(self) -> list:
+        try:
+            if self.time is None:
+                return []
+        except AttributeError:
+            return []
+        
         active_events = []
         future_events = []
         past_events = []
         for event in self.session.query(GameEvent).all():
-            if event.happend:
-                past_events.append(event)
-                continue
-            
-            s_left, e_left = False, False
-            if event.start_time is not None:
-                pass
-                # s_left = 
+            if (event.start_time is None or event.start_time <= self.time) and (event.end_time is None or event.end_time >= self.time):
+                active_events.append(event)   # Действующие события
+            elif event.start_time is not None and event.start_time > self.time:
+                future_events.append(event)   # Будущие события
+            else:
+                past_events.append(event)     
 
         return active_events + future_events + past_events
 

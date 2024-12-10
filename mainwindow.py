@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QWidget, QMenu, QMessageBox, QFileDialog, QHBoxLayout, QVBoxLayout, QTabWidget, QMenuBar, QAction, QPushButton
-from widgets import MapWidget, ItemListWidget, GlobalMapWidget, NoteListWidget, LocationWidget, NpcListWidget, PlayerListWidget, MapSettingsWidget
+from widgets import MapWidget, ItemListWidget, GlobalMapWidget, NoteListWidget, LocationWidget, NpcListWidget, PlayerListWidget, MapSettingsWidget, EventListWidget
 from dialogs import SkillsDialog, SkillHelpDialog
 from common import HtmlTextEdit, LogWidget, get_local_ip
 from PyQt5.QtCore import pyqtSignal, QSize
@@ -102,12 +102,14 @@ class MainWindow(QMainWindow):
         self.items = ItemListWidget()
         self.marks = QWidget()
         self.notes = NoteListWidget()
+        self.game_events = EventListWidget()
         self.data_tabs.addTab(self.map_settings, "map settings")
         self.data_tabs.addTab(self.location, "location")
         self.data_tabs.addTab(self.npcs, "npcs")
         self.data_tabs.addTab(self.items, "items")
         self.data_tabs.addTab(self.marks, "marks")
         self.data_tabs.addTab(self.notes, "notes")
+        self.data_tabs.addTab(self.game_events, "events")
 
         self.player_list = PlayerListWidget()
         self.logs = LogWidget()
@@ -133,6 +135,7 @@ class MainWindow(QMainWindow):
         self.global_map.map_changed.connect(self.map.set_current_map)
         self.global_map.datetime_changed.connect(self.map.on_datetime_changed)
         self.global_map.datetime_changed.connect(self.player_list.on_datetime_changed)
+        self.global_map.datetime_changed.connect(self.game_events.set_time)
         self.global_map.map_image_saved.connect(self.map_image_saved)
         self.map_settings.map_object_updated.connect(self.global_map.on_map_update)
 
@@ -141,6 +144,7 @@ class MainWindow(QMainWindow):
         self.map.map_image_saved.connect(self.map_image_saved)
         self.map.datetime_changed.connect(self.global_map.on_datetime_changed)
         self.map.datetime_changed.connect(self.player_list.on_datetime_changed)
+        self.map.datetime_changed.connect(self.game_events.set_time)
         self.map.map_changed.connect(self.map_settings.on_map_selected)
         self.location.map_object_updated.connect(self.map.on_map_update)
 
