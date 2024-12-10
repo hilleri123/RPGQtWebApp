@@ -90,4 +90,8 @@ class NpcWidget(BaseListItemWidget):
         else:
             palette = QApplication.palette()
         self.setPalette(palette)
+        self.on_save()
 
+    def on_save(self):
+        self.db_object.isDead = not self.npc_is_alive.isChecked()
+        super().on_save()

@@ -170,6 +170,15 @@ class WhereObject(Base):
     )
 
 
+class GameEvent(Base):
+    __tablename__ = 'GameEvent'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    xml_text = Column(String)
+    happend = Column(Boolean, default=False)
+    start_time = Column(DateTime)
+    end_time = Column(DateTime)
+
+
 engine = create_engine(f'sqlite:///{DB_URL}')
 Base.metadata.create_all(engine)
 SessionMaker = sessionmaker(bind=engine)

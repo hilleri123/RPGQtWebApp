@@ -11,8 +11,6 @@ from .action_widget import ActionWidget
 
 
 class LocationNpcWidget(NpcWidget):
-    deleted = pyqtSignal()
-
     def __init__(self, npc: NPC, appearance: list[str] = None, location: Location = None, parent=None):
         super().__init__(npc, parent, appearance=appearance, location=location)
 

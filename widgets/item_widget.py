@@ -12,9 +12,6 @@ from dialogs import GameItemMoveDialog
 
 
 class ItemWidget(BaseListItemWidget):
-    item_moved = pyqtSignal()
-    deleted = pyqtSignal()
-
     def __init__(self, db_object: GameItem, parent=None):
         super().__init__(db_object, parent)
 
@@ -58,7 +55,7 @@ class ItemWidget(BaseListItemWidget):
         
         pixmap = icon.pixmap(QSize(16,16))  
         self.where_label.setPixmap(pixmap)
-        self.item_moved.emit()
+        self.changed.emit()
 
     def on_edit_item(self):
         pass
