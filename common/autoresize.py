@@ -14,6 +14,7 @@ class AutoResizingTextEdit(QTextEdit):
         self.previous_width = 0
 
         self.textChanged.connect(self.auto_resize)
+        self.auto_resize()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

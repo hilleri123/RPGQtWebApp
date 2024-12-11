@@ -55,6 +55,7 @@ class BaseListWidget(QWidget):
             item = QListWidgetItem(self.item_list)
             widget = self.widget_of(db_object)
             widget.deleted.connect(self.fill_list)
+            widget.changed.connect(self.fill_list)
             widget.changed.connect(self.list_changed)
             self.item_list.setItemWidget(item, widget)
             item.setSizeHint(widget.sizeHint())

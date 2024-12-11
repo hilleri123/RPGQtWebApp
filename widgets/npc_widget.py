@@ -5,8 +5,9 @@ from PyQt5.QtGui import QIcon, QPalette, QColor
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
-from common import AutoResizingListWidget, AutoResizingTextEdit, BaseListItemWidget, SkillListWidget
+from common import AutoResizingListWidget, HtmlTextEdit, BaseListItemWidget, SkillListWidget
 from .action_widget import ActionWidget
+from dialogs import NPCEditDialog
 
 
 class NpcWidget(BaseListItemWidget):
@@ -16,15 +17,17 @@ class NpcWidget(BaseListItemWidget):
         if self.db_object.skillIdsJson is not None:
             self.skill_list = SkillListWidget(json.loads(self.db_object.skillIdsJson))
             self.base_layout.addWidget(self.skill_list)
-        
-        self.description = AutoResizingTextEdit()
-        self.description.setReadOnly(True)
-        self.base_layout.addWidget(self.description)
-
         if self.db_object.description is not None:
+            self.description = HtmlTextEdit()
+            self.description.setReadOnly(True)
+            self.base_layout.addWidget(self.description)
             self.description.setHtml(self.db_object.description)
+            self.labels.append(self.description)
+
         self.setup(**args)
         self.add_lists(**args)
+
+        self.edit_dialog = NPCEditDialog(npc_id=self.db_object.id)
         
     def fill_first_line(self):
         super().fill_first_line()
@@ -84,7 +87,8 @@ class NpcWidget(BaseListItemWidget):
             item.setSizeHint(widget.sizeHint())
 
     def on_edit_npc(self):
-        pass #TODO
+        self.edit_dialog.exec_()
+        self.changed.emit()
 
     def on_add_dialog(self):
         a = PlayerAction()

@@ -50,27 +50,27 @@ class NPCEditDialog(QDialog):
         layout.addLayout(button_layout)
 
         self.json_skills = []
-        self.action_id = npc_id
-        self.action = None
+        self.npc_id = npc_id
+        self.npc = None
         if npc_id is not None:
-            self.load_character()
+            self.load_npc()
         
         self.connect_all()
 
-    def load_character(self):
-        self.action = session.query(PlayerAction).get(self.action_id)
+    def load_npc(self):
+        self.npc = session.query(NPC).get(self.npc_id)
         
-        if not self.action:
+        if not self.npc:
             return
         
-        self.description.setHtml(self.action.description)
+        self.description.setHtml(self.npc.description)
         self.load_stats()
 
     def load_stats(self):
         self.skills_list_widget.clear()
 
 
-        skills = self.action.needSkillIdsConditionsJson
+        skills = self.npc.skillIdsJson
         if skills is None:
             return
         self.json_skills = json.loads(skills)
@@ -97,7 +97,7 @@ class NPCEditDialog(QDialog):
             self.json_skills.append(skill_id)
         else:
             self.json_skills.append((skill_id, skill_value))
-        self.action.needSkillIdsConditionsJson = json.dumps(self.json_skills)
+        self.npc.skillIdsJson = json.dumps(self.json_skills)
         session.commit()
 
         self.load_stats()
@@ -114,7 +114,7 @@ class NPCEditDialog(QDialog):
         pos_to_del = sorted(pos_to_del)
         for pos in pos_to_del[::-1]:
             self.json_skills.pop(pos.row())
-        self.action.needSkillIdsConditionsJson = json.dumps(self.json_skills)
+        self.npc.skillIdsJson = json.dumps(self.json_skills)
         session.commit()
         
         self.load_stats()
@@ -126,5 +126,5 @@ class NPCEditDialog(QDialog):
         self.description.textChanged.disconnect(self.on_save)
         
     def on_save(self):
-        self.action.description = self.description.toHtml()
+        self.npc.description = self.description.toHtml()
         session.commit()

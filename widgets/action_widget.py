@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QIcon
-from common import SkillListWidget, AutoResizingTextEdit
+from common import SkillListWidget, HtmlTextEdit
 from scheme import *
 from dialogs import ActionEditDialog
 import json
@@ -36,7 +36,7 @@ class ActionWidget(QWidget):
         remove_button.clicked.connect(self.delete_action)
         tmp.addWidget(remove_button)
 
-        self.description = AutoResizingTextEdit()
+        self.description = HtmlTextEdit()
         self.description.setReadOnly(True)
         layout.addWidget(self.description)
 
