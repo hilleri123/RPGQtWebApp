@@ -21,23 +21,41 @@ class EventWidget(BaseListItemWidget):
             self.note_text.setReadOnly(True)
         self.note_text.textChanged.connect(self.on_save)
         self.base_layout.addWidget(self.note_text)
+
+        self.on_save()
         
     def fill_first_line(self):
         super().fill_first_line()
         self.start = DateTimeEditWidget()
-        self.start.dateTimeChanged.connect(self.on_save)
+        self.start.setDateTime(self.db_object.start_time)
         self.first_line_layout.addWidget(self.start)
         self.end = DateTimeEditWidget()
-        self.end.dateTimeChanged.connect(self.on_save)
+        self.end.setDateTime(self.db_object.end_time)
         self.first_line_layout.addWidget(self.end)
 
         self.happend = QCheckBox()
-        self.happend.clicked.connect(self.on_save)
         self.first_line_layout.addWidget(self.happend)
+
+        g_map = self.session.query(GlobalMap).first()
+        if g_map is None:
+            return
+        if g_map.start_time is None:
+            return
+        if self.db_object.start_time is None:
+            self.start.setDateTime(g_map.start_time)
+        if self.db_object.end_time is None:
+            self.end.setDateTime(g_map.start_time)
+
+        self.start.dateTimeChanged.connect(self.on_save)
+        self.end.dateTimeChanged.connect(self.on_save)
+        self.happend.clicked.connect(self.on_save)
+
 
     def on_save(self):
         self.db_object.happend = self.happend.isChecked()
         self.db_object.xml_text = self.note_text.toHtml()
+        self.db_object.start_time = self.start.dateTime().toPyDateTime()
+        self.db_object.end_time = self.end.dateTime().toPyDateTime()
         self.session.commit()
         super().on_save()
 

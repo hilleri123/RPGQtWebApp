@@ -68,6 +68,9 @@ class NPC(Base):
     __tablename__ = 'NPC'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
+    path_to_img = Column(String)
+    is_enemy = Column(String)
+    skillIdsJson = Column(String, default='[]')
     descriptionText = Column(String)
     isDead = Column(Boolean)
 
@@ -76,7 +79,7 @@ class PlayerAction(Base):
     __tablename__ = 'PlayerAction'
     id = Column(Integer, primary_key=True, autoincrement=True)
     description = Column(String)
-    needSkillIdsConditionsJson = Column(String, default=None, )
+    needSkillIdsConditionsJson = Column(String, default='[]', )
     changeMarkId = Column(Integer, ForeignKey('Mark.id'), default=None)
     getGameItemId = Column(Integer, ForeignKey('GameItem.id'), default=None, )
     is_activated = Column(Boolean, default=False)
@@ -133,6 +136,7 @@ class PlayerCharacter(Base):
     __tablename__ = 'PlayerCharacter'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
+    path_to_img = Column(String)
     shortDesc = Column(String)
     story = Column(String)
     time = Column(DateTime)

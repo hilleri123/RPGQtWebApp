@@ -40,6 +40,7 @@ class AutoResizingListWidget(QListWidget):
         self.previous_width = 0
 
         self.itemChanged.connect(self.auto_resize)
+        self.auto_resize()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
