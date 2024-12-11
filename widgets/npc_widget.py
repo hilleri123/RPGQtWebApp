@@ -5,7 +5,7 @@ from PyQt5.QtGui import QIcon, QPalette, QColor
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
-from common import AutoResizingListWidget, BaseListItemWidget
+from common import AutoResizingListWidget, AutoResizingTextEdit, BaseListItemWidget, SkillListWidget
 from .action_widget import ActionWidget
 
 
@@ -13,6 +13,16 @@ class NpcWidget(BaseListItemWidget):
     def __init__(self, npc: NPC, parent=None, **args):
         super().__init__(npc, parent)
         self.labels = []
+        if self.db_object.skillIdsJson is not None:
+            self.skill_list = SkillListWidget(json.loads(self.db_object.skillIdsJson))
+            self.base_layout.addWidget(self.skill_list)
+        
+        self.description = AutoResizingTextEdit()
+        self.description.setReadOnly(True)
+        self.base_layout.addWidget(self.description)
+
+        if self.db_object.description is not None:
+            self.description.setHtml(self.db_object.description)
         self.setup(**args)
         self.add_lists(**args)
         
@@ -33,6 +43,12 @@ class NpcWidget(BaseListItemWidget):
         self.add_dialog_button.setEnabled(IS_EDITABLE)
         self.add_dialog_button.clicked.connect(self.on_add_dialog)
         self.first_line_layout.addWidget(self.add_dialog_button)
+
+        self.icon = QLabel()
+        if self.db_object.path_to_img:
+            i = QIcon(f'{NPC_ICONS_DIR}/{self.db_object.path_to_img}')
+            self.icon.setPixmap(i.pixmap(16, 16))
+        self.first_line_layout.insertWidget(0, self.icon)
 
     def name(self) -> str:
         return self.db_object.name

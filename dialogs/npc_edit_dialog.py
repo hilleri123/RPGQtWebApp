@@ -11,11 +11,11 @@ import json
 
 
 
-class ActionEditDialog(QDialog):
-    def __init__(self, action_id=None):
+class NPCEditDialog(QDialog):
+    def __init__(self, npc_id=None):
         super().__init__()
 
-        self.setWindowTitle("Редактирование действия")
+        self.setWindowTitle("Редактирование персонажа")
 
         layout = QVBoxLayout(self)
 
@@ -50,14 +50,14 @@ class ActionEditDialog(QDialog):
         layout.addLayout(button_layout)
 
         self.json_skills = []
-        self.action_id = action_id
+        self.action_id = npc_id
         self.action = None
-        if action_id is not None:
-            self.load_action()
+        if npc_id is not None:
+            self.load_character()
         
         self.connect_all()
 
-    def load_action(self):
+    def load_character(self):
         self.action = session.query(PlayerAction).get(self.action_id)
         
         if not self.action:

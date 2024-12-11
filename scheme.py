@@ -10,12 +10,13 @@ SKILL_GROUP = ("Научные", "Технические", "Межличност
 DEFAULT_DIR = 'data'
 IMGS_DIR = f'{DEFAULT_DIR}/imgs'
 ICONS_DIR = f'{DEFAULT_DIR}/icons'
+NPC_ICONS_DIR = f'{DEFAULT_DIR}/npc_icons'
 TMP_DIR = f'{DEFAULT_DIR}/tmp'
 GLOBAL_MAP_PATH = f'{TMP_DIR}/global_map.png'
 CURR_MAP_PATH = f'{TMP_DIR}/curr_map.png'
 DB_URL = f'{DEFAULT_DIR}/rpgtool.db'
 
-for d in [DEFAULT_DIR, IMGS_DIR, ICONS_DIR, TMP_DIR]:
+for d in [DEFAULT_DIR, IMGS_DIR, ICONS_DIR, TMP_DIR, NPC_ICONS_DIR]:
     if not os.path.exists(d):
         os.mkdir(d)
 
@@ -69,9 +70,9 @@ class NPC(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     path_to_img = Column(String)
-    is_enemy = Column(String)
+    is_enemy = Column(String, default=False)
     skillIdsJson = Column(String, default='[]')
-    descriptionText = Column(String)
+    description = Column(String)
     isDead = Column(Boolean)
 
 
