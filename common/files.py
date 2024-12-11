@@ -1,6 +1,7 @@
 import os
 import shutil
 from PyQt5.QtWidgets import QFileDialog
+from scheme import IMGS_DIR
 
 def open_img(directory, parent=None):
     options = QFileDialog.Options()

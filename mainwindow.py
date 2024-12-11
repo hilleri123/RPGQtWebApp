@@ -133,14 +133,16 @@ class MainWindow(QMainWindow):
 
         self.global_map.map_changed.connect(self.map_settings.on_map_selected)
         self.global_map.map_changed.connect(self.map.set_current_map)
+        self.global_map.map_object_clicked.connect(self.set_scenemap_focus)
         self.global_map.datetime_changed.connect(self.map.on_datetime_changed)
         self.global_map.datetime_changed.connect(self.player_list.on_datetime_changed)
         self.global_map.datetime_changed.connect(self.game_events.set_time)
         self.global_map.map_image_saved.connect(self.map_image_saved)
         self.map_settings.map_object_updated.connect(self.global_map.on_map_update)
 
-        self.map.location_clicked.connect(self.location.on_location_selected)
-        self.map.location_clicked.connect(self.items.set_location)
+        self.map.map_object_clicked.connect(self.location.on_location_selected)
+        self.map.map_object_clicked.connect(self.set_location_focus)
+        self.map.map_object_clicked.connect(self.items.set_location)
         self.map.map_image_saved.connect(self.map_image_saved)
         self.map.datetime_changed.connect(self.global_map.on_datetime_changed)
         self.map.datetime_changed.connect(self.player_list.on_datetime_changed)
@@ -282,4 +284,10 @@ class MainWindow(QMainWindow):
 
     def reset_scenario(self):
         reset_scenario()
+
+    def set_location_focus(self):
+        self.data_tabs.setCurrentWidget(self.location)
+    
+    def set_scenemap_focus(self):
+        self.map_tabs.setCurrentWidget(self.map)
 

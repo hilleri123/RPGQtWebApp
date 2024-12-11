@@ -11,7 +11,7 @@ from common import AutoResizingListWidget, BaseListWidget
 
 class NpcListWidget(BaseListWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__(auto_reload=True, parent=parent)
 
     def list_name(self) -> str:
         return 'Npc List'

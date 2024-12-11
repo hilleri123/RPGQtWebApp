@@ -53,9 +53,8 @@ class GlobalMapLabel(BaseMapLabel):
 class GlobalMapWidget(BaseMapWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.map_object_clicked.connect(self.set_current_map)
     
-    def setup_label(self):
-        self.mapLabel = GlobalMapLabel()
-        self.mapLabel.item_clicked.connect(self.set_current_map)
-
+    def construct_label(self):
+        return GlobalMapLabel()
 

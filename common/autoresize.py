@@ -2,7 +2,7 @@ import os
 import shutil
 from PyQt5.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QHBoxLayout, QFileDialog, QPushButton, QLabel, QWidget, QListWidget
 from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent
-from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QSize, Qt
+from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QSize, Qt, QTimer
 
 
 class AutoResizingTextEdit(QTextEdit):
@@ -26,14 +26,16 @@ class AutoResizingTextEdit(QTextEdit):
     def auto_resize(self):
         document = self.document()
         margins = self.contentsMargins()
-        document.setTextWidth(self.viewport().width())
+        document.setTextWidth(self.viewport().width()-margins.left()-margins.right())
         height = margins.top() + document.size().height() + margins.bottom()
         # size = QSize(self.width(), int(height))
         # self.setMaximumSize(size)
         target_height = int(height+1)
         if self.max_height is not None:
-            target_height = max(self.max_height, target_height)
+            target_height = min(self.max_height, target_height)
+        self.setMinimumHeight(target_height)
         self.setMaximumHeight(target_height)
+        self.repaint()
     
 class AutoResizingListWidget(QListWidget):
     def __init__(self, parent=None):

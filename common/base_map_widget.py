@@ -15,6 +15,7 @@ class BaseMapWidget(QWidget):
     map_image_saved = pyqtSignal()
     map_changed = pyqtSignal(int)
     datetime_changed = pyqtSignal()
+    map_object_clicked = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -58,7 +59,11 @@ class BaseMapWidget(QWidget):
         self.datetime_changed.connect(self.on_datetime_changed)
 
     def setup_label(self):
-        self.mapLabel = BaseMapLabel()
+        self.mapLabel = self.construct_label()
+        self.mapLabel.item_clicked.connect(self.map_object_clicked)
+
+    def construct_label(self):
+        return BaseMapLabel()
 
     def open_file_dialog(self):
         file_name = open_img(IMGS_DIR, self)

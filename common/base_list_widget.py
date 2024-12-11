@@ -9,8 +9,9 @@ from .icons import add_icon
 class BaseListWidget(QWidget):
     list_changed = pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(self, auto_reload=False, parent=None):
         super().__init__(parent)
+        self.auto_reload = auto_reload
         self.base_layout = QVBoxLayout()
         self.setLayout(self.base_layout)
 
@@ -58,7 +59,8 @@ class BaseListWidget(QWidget):
             item = QListWidgetItem(self.item_list)
             widget = self.widget_of(db_object)
             widget.deleted.connect(self.fill_list)
-            widget.changed.connect(self.fill_list)
+            if self.auto_reload:
+                widget.changed.connect(self.fill_list)
             widget.changed.connect(self.list_changed)
             self.item_list.setItemWidget(item, widget)
             item.setSizeHint(widget.sizeHint())

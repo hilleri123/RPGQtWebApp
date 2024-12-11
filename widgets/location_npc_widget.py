@@ -65,7 +65,7 @@ class LocationNpcWidget(NpcWidget):
             self.loc_dialogs_list.hide()
             for l in self.labels:
                 l.hide()
-
+        #TODO minimaze
 
     def on_add_dialog(self):
         a = PlayerAction()

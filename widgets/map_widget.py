@@ -49,7 +49,6 @@ class MapLabel(BaseMapLabel):
 
 
 class MapWidget(BaseMapWidget):
-    location_clicked = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -57,9 +56,8 @@ class MapWidget(BaseMapWidget):
         self.button_layout.addWidget(self.mapSelector)
         self.resetup()
 
-    def setup_label(self):
-        self.mapLabel = MapLabel()
-        self.mapLabel.item_clicked.connect(self.location_clicked)
+    def construct_label(self):
+        return MapLabel()
         
     def on_select(self, idx):
         map_id = self.mapSelector.itemData(idx)
