@@ -31,6 +31,10 @@ class PlayerListWidget(BaseListWidget):
 
     def add_default_element(self):
         player = PlayerCharacter(name=self.player_name.text())
+        g_map = self.session.query(GlobalMap).first()
+        if g_map is None:
+            return
+        player.time = g_map.start_time
         self.session.add(player)
         self.session.commit()
 

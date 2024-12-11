@@ -26,6 +26,8 @@ class BaseListWidget(QWidget):
         self.fill_head()
 
         self.item_list = AutoResizingListWidget()
+        self.item_list.setVerticalScrollMode(self.item_list.ScrollPerPixel)
+        self.item_list.verticalScrollBar().setSingleStep(15)
         self.base_layout.addWidget(self.item_list)
         self.fill_list()
 
@@ -48,6 +50,7 @@ class BaseListWidget(QWidget):
         pass
 
     def fill_list(self):
+        scroll_position = self.item_list.verticalScrollBar().value()
         self.item_list.clear()
         self.session = Session()
 
@@ -59,6 +62,8 @@ class BaseListWidget(QWidget):
             widget.changed.connect(self.list_changed)
             self.item_list.setItemWidget(item, widget)
             item.setSizeHint(widget.sizeHint())
+        
+        self.item_list.verticalScrollBar().setValue(scroll_position)
 
     def on_add(self):
         self.add_default_element()
