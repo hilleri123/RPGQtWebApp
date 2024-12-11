@@ -7,6 +7,8 @@ from repositories import *
 from widgets.location_npc_widget import LocationNpcWidget
 from widgets.event_widget import EventWidget
 from common import AutoResizingListWidget, BaseListWidget
+from sqlalchemy import and_
+from pyqttoast import Toast, ToastPreset
 
 
 class EventListWidget(BaseListWidget):
@@ -19,6 +21,7 @@ class EventListWidget(BaseListWidget):
         g_map = self.session.query(GlobalMap).first()
         if g_map is None:
             return
+        self.toast(self.time, g_map.time)
         self.time = g_map.time
         self.fill_list()
 
@@ -58,3 +61,22 @@ class EventListWidget(BaseListWidget):
         event = GameEvent()
         self.session.add(event)
         self.session.commit()
+
+    def toast(self, from_dt, to_dt):
+        events = self.session.query(GameEvent).filter(
+            and_(GameEvent.start_time > from_dt, GameEvent.start_time <= to_dt)
+            ).all()
+        
+        toast = Toast(self)
+        toast.setDuration(5000)
+        toast.setTitle(f"Событий {len(events)}") 
+        toast.setText('\n'.join([self.to_plain_text(event.xml_text) for event in events]))
+        toast.applyPreset(ToastPreset.SUCCESS)
+        toast.show()
+
+    def to_plain_text(self, xml):
+        tmp = QTextEdit()
+        tmp.setHtml(xml)
+        txt = tmp.toPlainText()
+        tmp.deleteLater()
+        return txt
