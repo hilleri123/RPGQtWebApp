@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QHBoxLayout, Q
 from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent
 from PyQt5.QtCore import pyqtSignal, QRect, QPoint, QSize, Qt, QTimer
 
+from .base_list_item_widget import BaseListItemWidget
 
 class AutoResizingTextEdit(QTextEdit):
     def __init__(self, max_height:int = None, parent=None):
@@ -33,13 +34,15 @@ class AutoResizingTextEdit(QTextEdit):
         target_height = int(height+1)
         if self.max_height is not None:
             target_height = min(self.max_height, target_height)
-        self.setMinimumHeight(target_height)
-        self.setMaximumHeight(target_height)
+        self.setFixedHeight(target_height)
+        # self.setMaximumHeight(target_height)
         self.repaint()
     
 class AutoResizingListWidget(QListWidget):
-    def __init__(self, parent=None):
+    def __init__(self, shown_elemets:int = 1, max_height:int = 2000, parent=None):
         super().__init__(parent)
+        self.max_height = max_height
+        self.shown_elemets = shown_elemets
         self.previous_width = 0
 
         self.itemChanged.connect(self.auto_resize)
@@ -53,18 +56,36 @@ class AutoResizingListWidget(QListWidget):
             self.auto_resize()
 
     def auto_resize(self):
+        self.updateGeometries()
         margins = self.contentsMargins()
         frame_width = self.frameWidth()
         total_height = 0
+        min_height = 0
         for index in range(self.count()):
             item = self.item(index)
             total_height += self.visualItemRect(item).height()
+            if index < self.shown_elemets:
+                min_height += self.visualItemRect(item).height()
         total_height += margins.top() + margins.bottom() + frame_width * 2
+        min_height += margins.top() + margins.bottom() + frame_width * 2
         # width = self.sizeHintForColumn(0) + margins.left() + margins.right() + frame_width * 2
         # size = QSize(width, total_height)
         # self.setMaximumSize(size)
-        self.setMaximumHeight(int(total_height+1))
+        target_height = int(total_height+1)
+        if self.max_height is not None:
+            target_height = min(self.max_height, target_height)
+        # self.setFixedHeight(target_height)
+        self.setMinimumHeight(min_height)
+        self.setMaximumHeight(target_height)
+        # if self.parent():
+        #     self.parent().updateGeometry()
+        #     if self.parent().parent():
+        #         self.parent().parent().updateGeometry()
+        # print('?', target_height)
+        self.repaint()
 
     def setItemWidget(self, item, widget):
         super().setItemWidget(item, widget)
+        if issubclass(type(widget), BaseListItemWidget):
+            widget.set_hint.connect(item.setSizeHint)
         self.auto_resize()

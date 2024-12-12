@@ -2,8 +2,8 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QFormLayout, QDateTimeEdit, QLineEdit, QTextEdit, 
     QListWidget, QPushButton, QHBoxLayout, QLabel, QComboBox, QCheckBox
 )
-from PyQt5.QtGui import QIcon, QStandardItem, QStandardItemModel
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtGui import QIcon, QStandardItem,  QStandardItemModel
+from PyQt5.QtCore import pyqtSignal, Qt, QSize
 from scheme import *
 from .icons import delete_icon
 import json
@@ -13,6 +13,7 @@ import json
 class BaseListItemWidget(QWidget):
     changed = pyqtSignal()
     deleted = pyqtSignal()
+    set_hint = pyqtSignal(QSize)
 
     def __init__(self, db_object, parent=None):
         super().__init__(parent)

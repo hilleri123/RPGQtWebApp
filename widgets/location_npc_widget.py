@@ -66,14 +66,19 @@ class LocationNpcWidget(NpcWidget):
             self.loc_dialogs_list.hide()
             for l in self.labels:
                 l.hide()
-        self.updateGeometry()
-        if self.parent():
-            w0 = self.parent()
-            if w0:
-                list_w = w0.parent()
-                if list_w and issubclass(AutoResizingListWidget, type(list_w)):
-                    list_w.auto_resize()
-                    print('!')
+        self.setMinimumWidth(self.width())
+        self.adjustSize()
+        self.setMinimumWidth(10)
+
+        self.set_hint.emit(self.sizeHint())
+        # if self.parent():
+        #     w0 = self.parent()
+        #     w0.setSizeHint()
+        #     if w0:
+        #         list_w = w0.parent()
+        #         if list_w and issubclass(AutoResizingListWidget, type(list_w)):
+        #             list_w.auto_resize()
+                    # print('!')
             # self.parent.auto_resize()
         #TODO minimaze
 
