@@ -50,6 +50,8 @@ class EventWidget(BaseListItemWidget):
         self.end.dateTimeChanged.connect(self.on_save)
         self.happend.clicked.connect(self.on_save)
 
+    def name(self):
+        return self.db_object.name
 
     def on_save(self):
         self.db_object.happend = self.happend.isChecked()

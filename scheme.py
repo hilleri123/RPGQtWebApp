@@ -178,6 +178,7 @@ class WhereObject(Base):
 class GameEvent(Base):
     __tablename__ = 'GameEvent'
     id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
     xml_text = Column(String)
     happend = Column(Boolean, default=False)
     start_time = Column(DateTime)

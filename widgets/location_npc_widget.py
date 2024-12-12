@@ -13,6 +13,7 @@ from .action_widget import ActionWidget
 class LocationNpcWidget(NpcWidget):
     def __init__(self, npc: NPC, appearance: list[str] = None, location: Location = None, parent=None):
         super().__init__(npc, parent, appearance=appearance, location=location)
+        self.on_edit_npc()
 
     def setup(self, appearance, location):
         super().setup()
@@ -65,6 +66,15 @@ class LocationNpcWidget(NpcWidget):
             self.loc_dialogs_list.hide()
             for l in self.labels:
                 l.hide()
+        self.updateGeometry()
+        if self.parent():
+            w0 = self.parent()
+            if w0:
+                list_w = w0.parent()
+                if list_w and issubclass(AutoResizingListWidget, type(list_w)):
+                    list_w.auto_resize()
+                    print('!')
+            # self.parent.auto_resize()
         #TODO minimaze
 
     def on_add_dialog(self):
