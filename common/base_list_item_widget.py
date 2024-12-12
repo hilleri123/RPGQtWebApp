@@ -46,5 +46,6 @@ class BaseListItemWidget(QWidget):
 
     def on_save(self):
         self.changed.emit()
+        self.set_hint.emit(self.sizeHint())
 
 

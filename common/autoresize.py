@@ -86,6 +86,8 @@ class AutoResizingListWidget(QListWidget):
 
     def setItemWidget(self, item, widget):
         super().setItemWidget(item, widget)
+        if self.count() % 2:
+            item.setBackground(QColor(100,100,100,30))
         if issubclass(type(widget), BaseListItemWidget):
             widget.set_hint.connect(item.setSizeHint)
         self.auto_resize()
