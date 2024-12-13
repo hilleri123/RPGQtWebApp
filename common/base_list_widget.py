@@ -71,3 +71,4 @@ class BaseListWidget(QWidget):
         self.add_default_element()
         self.fill_list()
         self.list_changed.emit()
+        self.item_list.setFocus()

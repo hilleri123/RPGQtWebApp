@@ -47,7 +47,7 @@ class ActionWidget(QWidget):
         dialog = ActionEditDialog(self.action_id)
         dialog.exec()
         action = session.query(PlayerAction).get(self.action_id)
-        self.description.setText(action.description)
+        self.description.setHtml(action.description)
         self.skill_list.load_skills()
 
     def delete_action(self):

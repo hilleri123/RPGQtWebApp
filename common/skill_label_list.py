@@ -1,17 +1,20 @@
 from PyQt5.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QComboBox, QHBoxLayout, QListWidget, QPushButton, QLineEdit, QLabel
+    QApplication, QWidget, QVBoxLayout, QComboBox, QGridLayout, QListWidget, QPushButton, QLineEdit, QLabel
 )
 from scheme import *
 from PyQt5.QtGui import QIcon
 from dialogs.action_edit_dialog import ActionEditDialog
 import json
 
+COUNT_IN_ONE_LINE = 4
+
+
 class SkillListWidget(QWidget):
     def __init__(self, skill_list=None):
         super().__init__()
         self.skill_list = skill_list
         # Основной макет
-        self.skill_layout = QHBoxLayout(self)
+        self.skill_layout = QGridLayout(self)
 
         self.load_skills()
 
@@ -31,7 +34,9 @@ class SkillListWidget(QWidget):
             return
         
         session = Session()
-        for skill in self.skill_list:
+        for idx, skill in enumerate(self.skill_list):
+            row = idx // COUNT_IN_ONE_LINE
+            clm = idx % COUNT_IN_ONE_LINE
             txt = ""
             if type(skill) is int:
                 db_skill = session.query(Skill).get(skill)
@@ -43,5 +48,5 @@ class SkillListWidget(QWidget):
                 if db_skill is None:
                     continue
                 txt = f'{db_skill.name} {skill[1]}'
-            self.skill_layout.addWidget(QLabel(f"<b>{txt}</b>"))
+            self.skill_layout.addWidget(QLabel(f"<b>{txt}</b>"), row, clm)
 

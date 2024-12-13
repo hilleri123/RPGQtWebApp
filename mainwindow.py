@@ -91,7 +91,7 @@ class MainWindow(QMainWindow):
 
         self.global_map = GlobalMapWidget()
         self.map = MapWidget()
-        self.intro = HtmlTextEdit(max_height=screen_height)
+        self.intro = HtmlTextEdit(is_fixed=False, max_height=screen_height//4)
         self.map_tabs.addTab(self.global_map, "global map")
         self.map_tabs.addTab(self.map, "map")
         self.map_tabs.setMaximumSize(QSize(700, 700))

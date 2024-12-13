@@ -51,7 +51,7 @@ def reset_scenario():
         PlayerCharacter.location_id: None, 
         PlayerCharacter.address: None, 
         PlayerCharacter.player_locked: None,
-        PlayerCharacter.time: None,
+        PlayerCharacter.time: first_start_time or None,
         })
     session.commit()
     

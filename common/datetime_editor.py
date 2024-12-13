@@ -2,6 +2,14 @@ from PyQt5.QtWidgets import QApplication, QDateTimeEdit, QHBoxLayout, QWidget, Q
 from PyQt5.QtCore import QDateTime, Qt, pyqtSignal
 
 
+class MyReadOnlyDateTimeEdit(QDateTimeEdit):
+    def __init__(self):
+        super().__init__()
+        self.setReadOnly(True)
+
+    def wheelEvent(self, event):
+        event.ignore()
+
 class DateTimeEditWidget(QWidget):
     # Сигнал для кнопки "sync"
     need_to_sync = pyqtSignal()
@@ -11,8 +19,7 @@ class DateTimeEditWidget(QWidget):
         super().__init__()
 
         # Основной виджет QDateTimeEdit
-        self.date_time_edit = QDateTimeEdit()
-        self.date_time_edit.setReadOnly(True)  # Устанавливаем режим только для чтения
+        self.date_time_edit = MyReadOnlyDateTimeEdit()
         self.date_time_edit.dateTimeChanged.connect(self.dateTimeChanged)
         self.date_time_edit.setDisplayFormat("dd/MM/yyyy HH:mm")
         self.date_time_edit.setMinimumSize(150, 30)  # Минимальный размер для QDateTimeEdit

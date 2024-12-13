@@ -53,10 +53,10 @@ class PlayerCharacterDialog(QDialog):
         remove_skill_button = QPushButton("Удалить навык")
         remove_skill_button.clicked.connect(self.remove_stat)
 
-        button_layout.addWidget(add_skill_button)
         button_layout.addWidget(self.group_combobox)
         button_layout.addWidget(self.skill_combobox)
         button_layout.addWidget(self.skill_value)
+        button_layout.addWidget(add_skill_button)
         button_layout.addWidget(remove_skill_button)
         
         layout.addLayout(button_layout)
@@ -135,6 +135,7 @@ class PlayerCharacterDialog(QDialog):
                 session.commit()
         
         self.load_stats()
+        self.fill_combobox()
 
     def connect_all(self):
         self.name_edit.textChanged.connect(self.on_save)

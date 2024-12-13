@@ -6,9 +6,9 @@ from .autoresize import AutoResizingTextEdit
 
 
 class HtmlTextEdit(AutoResizingTextEdit):
-    def __init__(self, add_font_size=4, max_height=None, parent=None):
+    def __init__(self, add_font_size=4, is_fixed=False, max_height=None, parent=None):
         self.add_font_size = add_font_size
-        super().__init__(max_height=max_height, parent=parent)
+        super().__init__(max_height=max_height, is_fixed=is_fixed, parent=parent)
 
     def toHtml(self):
         html_content = super().toHtml()

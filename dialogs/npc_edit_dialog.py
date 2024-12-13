@@ -34,17 +34,20 @@ class NPCEditDialog(QDialog):
         add_skill_button = QPushButton("Добавить навык")
         add_skill_button.clicked.connect(self.add_skill)
 
+        self.group_combobox = QComboBox()
+        self.group_combobox.addItems(SKILL_GROUP)
+        self.group_combobox.currentIndexChanged.connect(self.on_group_selected)
+        self.group_name = SKILL_GROUP[0]
         self.skill_combobox = QComboBox()
-        for skill in session.query(Skill).all():
-            self.skill_combobox.addItem(skill.name, skill.id)
         self.skill_value = QSpinBox()
 
         remove_skill_button = QPushButton("Удалить навык")
         remove_skill_button.clicked.connect(self.remove_skill)
 
-        button_layout.addWidget(add_skill_button)
+        button_layout.addWidget(self.group_combobox)
         button_layout.addWidget(self.skill_combobox)
         button_layout.addWidget(self.skill_value)
+        button_layout.addWidget(add_skill_button)
         button_layout.addWidget(remove_skill_button)
         
         layout.addLayout(button_layout)
@@ -55,6 +58,8 @@ class NPCEditDialog(QDialog):
         if npc_id is not None:
             self.load_npc()
         
+        self.fill_combobox()
+
         self.connect_all()
 
     def load_npc(self):
@@ -90,6 +95,17 @@ class NPCEditDialog(QDialog):
             widget = QLabel(txt)
             self.skills_list_widget.setItemWidget(item_widget, widget)
 
+    def fill_combobox(self):
+        self.skill_combobox.clear()
+        skills = session.query(Skill).filter(Skill.groupName == self.group_name).all()
+
+        for skill in skills:
+            self.skill_combobox.addItem(skill.name, skill.id)
+
+    def on_group_selected(self, item):
+        self.group_name = SKILL_GROUP[item]
+        self.fill_combobox()
+
     def add_skill(self):
         skill_id = self.skill_combobox.currentData()
         skill_value = self.skill_value.value()
@@ -101,6 +117,7 @@ class NPCEditDialog(QDialog):
         session.commit()
 
         self.load_stats()
+        self.fill_combobox()
 
     def remove_skill(self):
         selected_items = self.skills_list_widget.selectedItems()
@@ -118,6 +135,7 @@ class NPCEditDialog(QDialog):
         session.commit()
         
         self.load_stats()
+        self.fill_combobox()
 
     def connect_all(self):
         self.description.textChanged.connect(self.on_save)
