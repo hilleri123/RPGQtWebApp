@@ -14,6 +14,7 @@ class PlayerWidget(BaseListItemWidget):
         super().__init__(player, parent)
 
         self.datetime_edit = DateTimeEditWidget()
+        self.datetime_edit.setDateTime(self.db_object.time)
         self.datetime_edit.dateTimeChanged.connect(self.on_save)
         self.datetime_edit.need_to_sync.connect(self.on_sync)
         self.base_layout.addWidget(self.datetime_edit)

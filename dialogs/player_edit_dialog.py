@@ -29,9 +29,12 @@ class PlayerCharacterDialog(QDialog):
         layout.addWidget(QLabel("История:"))
         layout.addWidget(self.story_edit)
 
-        # Список навыков и их значений
+        tmp_layout = QHBoxLayout()
         self.stats_list_widget = QListWidget()
-        layout.addWidget(QLabel("Навыки:"))
+        self.count_label = QLabel()
+        tmp_layout.addWidget(QLabel("Навыки:"))
+        tmp_layout.addWidget(self.count_label)
+        layout.addLayout(tmp_layout)
         layout.addWidget(self.stats_list_widget)
 
         # Кнопки добавления и удаления навыков
@@ -40,15 +43,18 @@ class PlayerCharacterDialog(QDialog):
         add_skill_button = QPushButton("Добавить навык")
         add_skill_button.clicked.connect(self.add_stat)
 
+        self.group_combobox = QComboBox()
+        self.group_combobox.addItems(SKILL_GROUP)
+        self.group_combobox.currentIndexChanged.connect(self.on_group_selected)
+        self.group_name = SKILL_GROUP[0]
         self.skill_combobox = QComboBox()
-        for skill in session.query(Skill).all():
-            self.skill_combobox.addItem(skill.name, skill.id)
         self.skill_value = QSpinBox()
 
         remove_skill_button = QPushButton("Удалить навык")
         remove_skill_button.clicked.connect(self.remove_stat)
 
         button_layout.addWidget(add_skill_button)
+        button_layout.addWidget(self.group_combobox)
         button_layout.addWidget(self.skill_combobox)
         button_layout.addWidget(self.skill_value)
         button_layout.addWidget(remove_skill_button)
@@ -60,6 +66,8 @@ class PlayerCharacterDialog(QDialog):
         if character_id is not None:
             self.load_character()
         
+        self.fill_combobox()
+
         self.connect_all()
 
     def load_character(self):
@@ -74,12 +82,32 @@ class PlayerCharacterDialog(QDialog):
         self.load_stats()
 
     def load_stats(self):
+        count_stats = 0
         self.stats_list_widget.clear()
         for stat, skill in session.query(Stat, Skill).join(Skill).filter(Stat.characterId == self.character_id).all():
             item_text = f"{skill.name}: {stat.initValue}"
+            count_stats += stat.initValue
             item_widget = QListWidgetItem(item_text)
             item_widget.setData(Qt.UserRole, stat)  # Сохраняем объект Stat в элементе списка
             self.stats_list_widget.addItem(item_widget)
+        self.count_label.setText(str(count_stats))
+
+    def fill_combobox(self):
+        self.skill_combobox.clear()
+        subquery = sqlalchemy.select(1).where(
+                (Stat.skillId == Skill.id) &  # Предположим, что есть связь между Skill и Stat через skill_id
+                (Stat.characterId == self.character_id)
+            )
+        skills = session.query(Skill).filter(~sqlalchemy.exists(subquery))\
+            .filter(Skill.groupName == self.group_name)\
+            .all()
+
+        for skill in skills:
+            self.skill_combobox.addItem(skill.name, skill.id)
+
+    def on_group_selected(self, item):
+        self.group_name = SKILL_GROUP[item]
+        self.fill_combobox()
 
     def add_stat(self):
         try:
@@ -91,6 +119,7 @@ class PlayerCharacterDialog(QDialog):
             self.load_stats()
         except sqlalchemy.exc.IntegrityError:
             session.rollback()
+        self.fill_combobox()
 
     def remove_stat(self):
         selected_items = self.stats_list_widget.selectedItems()
