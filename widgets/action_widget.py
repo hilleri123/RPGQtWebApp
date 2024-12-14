@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QIcon
-from common import SkillListWidget, HtmlTextEdit
+from common import SkillListWidget, HtmlTextEdit, icons
 from scheme import *
 from dialogs import ActionEditDialog
 import json
@@ -27,12 +27,12 @@ class ActionWidget(QWidget):
         tmp.addStretch()
 
         add_button = QPushButton()
-        add_button.setIcon(QIcon.fromTheme("preferences-system"))
+        add_button.setIcon(icons.edit_icon())
         add_button.clicked.connect(self.edit_action)
         tmp.addWidget(add_button)
 
         remove_button = QPushButton()
-        remove_button.setIcon(QIcon.fromTheme("list-remove"))
+        remove_button.setIcon(icons.delete_icon())
         remove_button.clicked.connect(self.delete_action)
         tmp.addWidget(remove_button)
 

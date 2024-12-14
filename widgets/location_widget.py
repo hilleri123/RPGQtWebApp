@@ -6,7 +6,7 @@ from npc_model import NpcTreeModel
 from repositories import *
 from widgets.location_npc_widget import LocationNpcWidget
 from widgets.location_item_widget import LocationGameItemWidget
-from common import BaseMapObject, AutoResizingListWidget
+from common import BaseMapObject, AutoResizingListWidget, icons
 from .action_widget import ActionWidget
 from .item_list_widget import ItemListWidget
 from .npc_list_widget import NpcListWidget
@@ -135,7 +135,7 @@ class LocationWidget(BaseMapObject):
         tmp_layout.addStretch()
 
         self.add_action_button = QPushButton()
-        self.add_action_button.setIcon(QIcon.fromTheme("list-add"))
+        self.add_action_button.setIcon(icons.add_icon())
         self.add_action_button.clicked.connect(self.on_add_action)
         if IS_EDITABLE:
             tmp_layout.addWidget(self.add_action_button)

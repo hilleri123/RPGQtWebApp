@@ -43,15 +43,15 @@ class ItemWidget(BaseListItemWidget):
     def update_where(self):
         where = self.session.query(WhereObject).filter(WhereObject.gameItemId == self.db_object.id).first()
         if where is None:
-            icon = QIcon.fromTheme("dialog-error")
+            icon = icons.error_icon()
         elif where.locationId is not None:
-            icon = QIcon.fromTheme("go-home")
+            icon = icons.location_icon()
         elif where.playerId is not None:
-            icon = QIcon.fromTheme("user-available")
+            icon = icons.player_icon()
         elif where.npcId is not None:
-            icon = QIcon.fromTheme("user-offline")
+            icon = icons.npc_icon()
         else:
-            icon = QIcon.fromTheme("dialog-error")
+            icon = icons.error_icon()
         
         pixmap = icon.pixmap(QSize(16,16))  
         self.where_label.setPixmap(pixmap)

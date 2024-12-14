@@ -5,7 +5,7 @@ from PyQt5.QtGui import QIcon, QPalette, QColor
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
-from common import AutoResizingListWidget, HtmlTextEdit, BaseListItemWidget, SkillListWidget
+from common import AutoResizingListWidget, HtmlTextEdit, BaseListItemWidget, SkillListWidget, icons
 from .action_widget import ActionWidget
 from dialogs import NPCEditDialog
 
@@ -37,12 +37,12 @@ class NpcWidget(BaseListItemWidget):
         self.set_alive()
         self.first_line_layout.addWidget(self.npc_is_alive)
         self.edit_npc_button = QPushButton()
-        self.edit_npc_button.setIcon(QIcon.fromTheme("preferences-system"))
+        self.edit_npc_button.setIcon(icons.edit_icon())
         self.edit_npc_button.setEnabled(IS_EDITABLE)
         self.edit_npc_button.clicked.connect(self.on_edit_npc)
         self.first_line_layout.addWidget(self.edit_npc_button)
         self.add_dialog_button = QPushButton()
-        self.add_dialog_button.setIcon(QIcon.fromTheme("list-add"))
+        self.add_dialog_button.setIcon(icons.add_icon())
         self.add_dialog_button.setEnabled(IS_EDITABLE)
         self.add_dialog_button.clicked.connect(self.on_add_dialog)
         self.first_line_layout.addWidget(self.add_dialog_button)
