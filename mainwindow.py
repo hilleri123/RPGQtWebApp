@@ -94,7 +94,8 @@ class MainWindow(QMainWindow):
         self.intro = HtmlTextEdit(is_fixed=False, max_height=screen_height//4)
         self.map_tabs.addTab(self.global_map, "global map")
         self.map_tabs.addTab(self.map, "map")
-        self.map_tabs.setMaximumSize(QSize(700, 700))
+        # self.map_tabs.setMaximumSize(QSize(700, 700))
+        self.map_tabs.setMaximumHeight(screen_height * 2 // 3 if screen_height else 700)
 
         self.map_settings = MapSettingsWidget()
         self.location = LocationWidget()
