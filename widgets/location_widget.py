@@ -92,6 +92,7 @@ class LocationNPCListWidget(NpcListWidget):
             npc = self.session.query(NPC).filter(NPC.id == npc_id).first()
             if npc is not None:
                 res.append({"npc":npc, "appearance":appearance[npc.id]})
+        res = sorted(res, key=lambda x: x["npc"].isDead)
         return res
     
     def widget_of(self, item) -> QWidget:

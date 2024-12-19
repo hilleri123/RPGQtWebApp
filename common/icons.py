@@ -37,3 +37,6 @@ def player_icon() -> QIcon:
 
 def add_icon() -> QIcon:
     return get_icon("add")
+
+def error_icon() -> QIcon:
+    return lost_icon()
