@@ -54,6 +54,7 @@ class ActionWidget(BaseListItemWidget):
             for player in players:
                 player.time += timedelta(seconds=self.db_object.add_time_secs)
         self.session.commit()
+        changed_manager.players_changed.emit()
         # TODO изменения
         print('!')
 

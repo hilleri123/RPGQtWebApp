@@ -163,6 +163,12 @@ class MainWindow(QMainWindow):
         self.location.item_list_changed.connect(self.characters_updated)
 
         self.notes.list_changed.connect(self.notes_updated)
+        
+        changed_manager.players_changed.connect(self.player_list.fill_list)
+        changed_manager.notes_changed.connect(self.notes.fill_list)
+
+        changed_manager.players_changed.connect(self.characters_updated)
+        changed_manager.notes_changed.connect(self.notes_updated)
 
     def fill_map_object(self):
         session = Session()

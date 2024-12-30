@@ -3,6 +3,14 @@ from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 from sqlalchemy_utils import ColorType
 from colour import Color
 import os
+from PyQt5.QtCore import QObject, pyqtSignal
+
+class ChangedSignals(QObject):
+    notes_changed = pyqtSignal()
+    players_changed = pyqtSignal()
+
+
+changed_manager = ChangedSignals()
 
 
 SKILL_GROUP = ("Научные", "Технические", "Межличностные", "Основные")
