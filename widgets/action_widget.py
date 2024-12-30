@@ -6,6 +6,7 @@ from PyQt5.QtGui import QIcon
 from common import SkillListWidget, HtmlTextEdit, BaseListItemWidget, icons
 from scheme import *
 from dialogs import ActionEditDialog
+from datetime import datetime, time, timedelta
 import json
 
 
@@ -49,8 +50,13 @@ class ActionWidget(BaseListItemWidget):
 
     def on_activate(self, players):
         self.db_object.is_activated = True
+        if self.db_object.add_time_secs is not None:
+            for player in players:
+                player.time += timedelta(seconds=self.db_object.add_time_secs)
         self.session.commit()
         print('!')
+
+        self.changed.emit()
         # TODO сделать на активацию две кнопки
 
     def on_activate_all(self):

@@ -85,7 +85,7 @@ class PlayerAction(Base):
     getGameItemId = Column(Integer, ForeignKey('GameItem.id'), default=None, )
     is_activated = Column(Boolean, default=False)
     needGameItemIdsJson = Column(String, default=None)
-    add_time = Column(DateTime, default=None)
+    add_time_secs = Column(Integer, default=None)
 
 
 class Note(Base):

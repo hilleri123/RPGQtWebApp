@@ -1,12 +1,12 @@
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QComboBox, QSpinBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QTextEdit,
-    QDateTimeEdit, QPushButton, QListWidget, QListWidgetItem, QSpinBox
+    QDateTimeEdit, QPushButton, QListWidget, QTimeEdit, QListWidgetItem, QSpinBox
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTime
 from scheme import *
 from common import AutoResizingListWidget
 from common.html_text_edit_widget import HtmlTextEdit
-import sqlalchemy
+import datetime
 import json
 
 
@@ -20,9 +20,12 @@ class ActionEditDialog(QDialog):
         layout = QVBoxLayout(self)
 
         self.description = HtmlTextEdit()
-
         layout.addWidget(QLabel("Описание:"))
         layout.addWidget(self.description)
+
+        self.add_time = QTimeEdit(self)
+        layout.addWidget(QLabel("Время на выполнение:"))
+        layout.addWidget(self.add_time)
 
         self.skills_list_widget = AutoResizingListWidget()
         layout.addWidget(QLabel("Навыки:"))
@@ -68,6 +71,7 @@ class ActionEditDialog(QDialog):
             return
         
         self.description.setHtml(self.action.description)
+        self.add_time.setTime(QTime(0,0,0).addSecs(self.action.add_time_secs))
         self.load_stats()
 
     def load_stats(self):
@@ -136,10 +140,13 @@ class ActionEditDialog(QDialog):
 
     def connect_all(self):
         self.description.textChanged.connect(self.on_save)
+        self.add_time.timeChanged.connect(self.on_save)
 
     def disconnect_all(self):
         self.description.textChanged.disconnect(self.on_save)
+        self.add_time.timeChanged.disconnect(self.on_save)
         
     def on_save(self):
         self.action.description = self.description.toHtml()
+        self.action.add_time_secs = int(self.add_time.time().msecsSinceStartOfDay()/1000)
         session.commit()
