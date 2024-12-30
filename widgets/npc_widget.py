@@ -5,9 +5,46 @@ from PyQt5.QtGui import QIcon, QPalette, QColor
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
-from common import AutoResizingListWidget, HtmlTextEdit, BaseListItemWidget, SkillListWidget, icons
+from common import AutoResizingListWidget, BaseListWidget, HtmlTextEdit, BaseListItemWidget, SkillListWidget, icons
 from .action_widget import ActionWidget
 from dialogs import NPCEditDialog
+
+
+class NpcDialogList(BaseListWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def list_name(self):
+        return 'Общие диалоги:'
+
+    def set_npc_id(self, npc_id):
+        self.npc_id = npc_id
+        self.fill_list()
+
+    def query_list(self) -> list:
+        try:
+            if self.npc_id is None:
+                return []
+        except AttributeError:
+            return []
+        
+        return self.session.query(PlayerAction).join(GameCondition).filter(
+                GameCondition.playerActionId != None,
+                GameCondition.locationId == None,
+                GameCondition.npcId == self.npc_id
+            ).all()
+
+    def widget_of(self, db_object) -> QWidget:
+        return ActionWidget(db_object)
+    
+    def add_default_element(self):
+        action = PlayerAction()
+        self.session.add(action)
+        self.session.commit()
+        # TODO Mark
+        c = GameCondition(npcId=self.npc_id, playerActionId=action.id)
+        self.session.add(c)
+        self.session.commit()
 
 
 class NpcWidget(BaseListItemWidget):
@@ -41,11 +78,6 @@ class NpcWidget(BaseListItemWidget):
         self.edit_npc_button.setEnabled(IS_EDITABLE)
         self.edit_npc_button.clicked.connect(self.on_edit_npc)
         self.first_line_layout.addWidget(self.edit_npc_button)
-        self.add_dialog_button = QPushButton()
-        self.add_dialog_button.setIcon(icons.add_icon())
-        self.add_dialog_button.setEnabled(IS_EDITABLE)
-        self.add_dialog_button.clicked.connect(self.on_add_dialog)
-        self.first_line_layout.addWidget(self.add_dialog_button)
 
         self.icon = QLabel()
         if self.db_object.path_to_img:
@@ -61,47 +93,13 @@ class NpcWidget(BaseListItemWidget):
 
     def add_lists(self, **args):
         self.dialogs = []
-        self.dialogs_list = AutoResizingListWidget()
-        self.labels.append(QLabel("Общие диалоги:"))
-        self.base_layout.addWidget(self.labels[-1])
+        self.dialogs_list = NpcDialogList()
+        self.dialogs_list.set_npc_id(self.db_object.id)
         self.base_layout.addWidget(self.dialogs_list)
-        self.dialogs_fill()
-
-
-    def dialogs_fill(self):
-        self.dialogs_list.clear()
-
-        self.dialogs = check_marks_in_condition(
-            self.session.query(GameCondition).filter(
-                GameCondition.playerActionId != None,
-                GameCondition.locationId == None,
-                GameCondition.npcId == self.db_object.id
-            ).all()
-        )
-
-        for dialog in self.dialogs:
-            item = QListWidgetItem(self.dialogs_list)
-            widget = ActionWidget(action_id=dialog.playerActionId)
-            widget.deleted.connect(self.dialogs_fill)
-            self.dialogs_list.setItemWidget(item, widget)
-            item.setSizeHint(widget.sizeHint())
 
     def on_edit_npc(self):
         self.edit_dialog.exec_()
         self.changed.emit()
-
-    def on_add_dialog(self):
-        a = PlayerAction()
-        self.session.add(a)
-        self.session.commit()
-        c = GameCondition(
-            playerActionId=a.id,
-            npcId = self.db_object.id
-            )
-        self.session.add(c)
-        self.session.commit()
-        
-        self.dialogs_fill()
 
     def set_alive(self):
         palette = self.palette()

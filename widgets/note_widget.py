@@ -98,4 +98,6 @@ class NoteWidget(BaseListItemWidget):
             self.shown_all.setChecked(Qt.PartiallyChecked)
         self.on_save()
 
+    def name(self):
+        return None
 

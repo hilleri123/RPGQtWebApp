@@ -5,10 +5,48 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from repositories import *
-from common import AutoResizingTextEdit, AutoResizingListWidget
+from common import AutoResizingTextEdit, BaseListWidget, AutoResizingListWidget
 from .npc_widget import NpcWidget
 from .action_widget import ActionWidget
 
+
+
+class LocationNpcDialogList(BaseListWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def list_name(self):
+        return 'Локальные диалоги:'
+
+    def set_npc_location_id(self, npc_id, location_id):
+        self.npc_id = npc_id
+        self.location_id = location_id
+        self.fill_list()
+
+    def query_list(self) -> list:
+        try:
+            if self.npc_id is None or self.location_id is None:
+                return []
+        except AttributeError:
+            return []
+        
+        return self.session.query(PlayerAction).join(GameCondition).filter(
+                GameCondition.playerActionId != None,
+                GameCondition.locationId == self.location_id,
+                GameCondition.npcId == self.npc_id
+            ).all()
+
+    def widget_of(self, db_object) -> QWidget:
+        return ActionWidget(db_object)
+    
+    def add_default_element(self):
+        action = PlayerAction()
+        self.session.add(action)
+        self.session.commit()
+        # TODO Mark
+        c = GameCondition(npcId=self.npc_id, locationId=self.location_id, playerActionId=action.id)
+        self.session.add(c)
+        self.session.commit()
 
 class LocationNpcWidget(NpcWidget):
     def __init__(self, npc: NPC, appearance: list[str] = None, location: Location = None, parent=None):
@@ -26,34 +64,9 @@ class LocationNpcWidget(NpcWidget):
             self.appearance_field.setReadOnly(True)
             self.base_layout.addWidget(self.appearance_field)
 
-        self.loc_dialogs_list = AutoResizingListWidget()  # Список локальных диалогов
-        
-        self.labels.append(QLabel("Локальные диалоги:"))
-        self.base_layout.addWidget(self.labels[-1])
+        self.loc_dialogs_list = LocationNpcDialogList()  # Список локальных диалогов
+        self.loc_dialogs_list.set_npc_location_id(self.db_object.id, location.id)
         self.base_layout.addWidget(self.loc_dialogs_list)
-
-        self.loc_dialogs_fill()
-
-
-    def loc_dialogs_fill(self):
-        self.loc_dialogs_list.clear()
-
-        if self.location is None:
-            return
-        self.loc_dialogs = check_marks_in_condition(
-            self.session.query(GameCondition).filter(
-                GameCondition.playerActionId != None,
-                GameCondition.locationId == self.location.id,
-                GameCondition.npcId == self.db_object.id
-            ).all()
-        )
-
-        for loc_dialog in self.loc_dialogs:
-            item = QListWidgetItem(self.loc_dialogs_list)
-            widget = ActionWidget(action_id=loc_dialog.playerActionId)
-            widget.deleted.connect(self.loc_dialogs_fill)
-            self.loc_dialogs_list.setItemWidget(item, widget)
-            item.setSizeHint(widget.sizeHint())
 
     def on_edit_npc(self):
         if self.dialogs_list.isHidden() or self.loc_dialogs_list.isHidden():
@@ -81,20 +94,6 @@ class LocationNpcWidget(NpcWidget):
                     # print('!')
             # self.parent.auto_resize()
         #TODO minimaze
-
-    def on_add_dialog(self):
-        a = PlayerAction()
-        self.session.add(a)
-        self.session.commit()
-        c = GameCondition(
-            playerActionId=a.id,
-            locationId = self.location.id,
-            npcId = self.db_object.id
-            )
-        self.session.add(c)
-        self.session.commit()
-        
-        self.loc_dialogs_fill()
 
 
     def on_delete(self):

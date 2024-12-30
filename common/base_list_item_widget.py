@@ -25,7 +25,8 @@ class BaseListItemWidget(QWidget):
         self.item_name_field = QLineEdit()
         self.item_name_field.setText(self.name())
         self.item_name_field.setReadOnly(True)
-        self.first_line_layout.addWidget(self.item_name_field)
+        if self.name() is not None:
+            self.first_line_layout.addWidget(self.item_name_field)
         self.fill_first_line()
         self.delete_button = QPushButton()
         self.delete_button.setIcon(delete_icon())
@@ -48,4 +49,5 @@ class BaseListItemWidget(QWidget):
         self.set_hint.emit(self.sizeHint())
         self.changed.emit()
 
-
+    def is_hidden(self):
+        return False

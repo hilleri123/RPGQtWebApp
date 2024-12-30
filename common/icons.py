@@ -40,3 +40,9 @@ def add_icon() -> QIcon:
 
 def error_icon() -> QIcon:
     return lost_icon()
+
+def all_players() -> QIcon:
+    return get_icon("all_players")
+
+def select_players() -> QIcon:
+    return get_icon("select_players")

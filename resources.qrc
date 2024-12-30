@@ -12,5 +12,7 @@
         <file alias="npc.png">icons/npc.png</file>
         <file alias="player.png">icons/player.png</file>
         <file alias="add.png">icons/add.png</file>
+        <file alias="all_players.png">icons/all_players.png</file>
+        <file alias="select_players.png">icons/select_players.png</file>
     </qresource>
 </RCC>

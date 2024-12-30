@@ -3,56 +3,64 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QIcon
-from common import SkillListWidget, HtmlTextEdit, icons
+from common import SkillListWidget, HtmlTextEdit, BaseListItemWidget, icons
 from scheme import *
 from dialogs import ActionEditDialog
 import json
 
 
-class ActionWidget(QWidget):
-    deleted = pyqtSignal()
+class ActionWidget(BaseListItemWidget):
+    def __init__(self, db_object=None, parent=None):
+        super().__init__(db_object=db_object, parent=parent)
 
-    def __init__(self, action_id, parent=None):
-        super().__init__(parent)
-        self.action_id = action_id
-        action = session.query(PlayerAction).get(self.action_id)
+        self.skill_list = SkillListWidget([] if self.db_object is None else json.loads(self.db_object.needSkillIdsConditionsJson))
+        self.first_line_layout.insertWidget(0, self.skill_list)
 
-        layout = QVBoxLayout(self)
-        tmp = QHBoxLayout()
-        layout.addLayout(tmp)
+        self.first_line_layout.insertStretch(1)
 
-        self.skill_list = SkillListWidget([] if action is None else json.loads(action.needSkillIdsConditionsJson))
-        tmp.addWidget(self.skill_list)
+        activate_all = QPushButton()
+        activate_all.setIcon(icons.all_players())
+        activate_all.clicked.connect(self.on_activate_all)
+        self.first_line_layout.addWidget(activate_all)
 
-        tmp.addStretch()
+        activate_select = QPushButton()
+        activate_select.setIcon(icons.select_players())
+        activate_select.clicked.connect(self.on_activate_select)
+        self.first_line_layout.addWidget(activate_select)
 
         add_button = QPushButton()
         add_button.setIcon(icons.edit_icon())
         add_button.clicked.connect(self.edit_action)
-        tmp.addWidget(add_button)
-
-        remove_button = QPushButton()
-        remove_button.setIcon(icons.delete_icon())
-        remove_button.clicked.connect(self.delete_action)
-        tmp.addWidget(remove_button)
+        self.first_line_layout.addWidget(add_button)
 
         self.description = HtmlTextEdit()
         self.description.setReadOnly(True)
-        layout.addWidget(self.description)
+        self.base_layout.addWidget(self.description)
 
-        if action is not None:
-            self.description.setHtml(action.description)
+        if self.db_object is not None:
+            self.description.setHtml(self.db_object.description)
 
     def edit_action(self):
-        dialog = ActionEditDialog(self.action_id)
+        dialog = ActionEditDialog(self.db_object.id)
         dialog.exec()
-        action = session.query(PlayerAction).get(self.action_id)
+        action = session.query(PlayerAction).get(self.db_object.id)
         self.description.setHtml(action.description)
         self.skill_list.load_skills()
 
-    def delete_action(self):
-        action = session.query(PlayerAction).get(self.action_id)
-        session.delete(action)
-        session.commit()
+    def on_activate(self, players):
+        self.db_object.is_activated = True
+        self.session.commit()
+        print('!')
+        # TODO сделать на активацию две кнопки
 
-        self.deleted.emit()
+    def on_activate_all(self):
+        self.on_activate(session.query(PlayerCharacter).all())
+
+    def on_activate_select(self):
+        pass
+
+    def name(self):
+        return None
+    
+    def is_hidden(self):
+        return self.db_object.is_activated

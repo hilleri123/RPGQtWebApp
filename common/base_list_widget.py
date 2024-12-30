@@ -19,6 +19,9 @@ class BaseListWidget(QWidget):
         self.base_layout.addLayout(self.first_line_layout)
         self.first_line_layout.addWidget(QLabel(f"{self.list_name()}:")) 
         self.fill_first_line()
+        self.show_hidden = QCheckBox()
+        self.show_hidden.stateChanged.connect(self.fill_list)
+        self.first_line_layout.addWidget(self.show_hidden)
         self.add_button = QPushButton()
         self.add_button.setIcon(add_icon())
         self.add_button.clicked.connect(self.on_add)
@@ -58,6 +61,8 @@ class BaseListWidget(QWidget):
         for db_object in self.query_list():
             item = QListWidgetItem(self.item_list)
             widget = self.widget_of(db_object)
+            if self.show_hidden.isChecked() and widget.is_hidden():
+                continue
             widget.deleted.connect(self.fill_list)
             if self.auto_reload:
                 widget.changed.connect(self.fill_list)
@@ -72,3 +77,5 @@ class BaseListWidget(QWidget):
         self.fill_list()
         self.list_changed.emit()
         self.item_list.setFocus()
+
+
