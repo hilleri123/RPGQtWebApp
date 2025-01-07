@@ -74,9 +74,11 @@ class MainWindow(QMainWindow):
 
         screen = QGuiApplication.screenAt(self.geometry().center())  # Определяем экран, где находится окно
         screen_height = None
+        screen_width = None
         if screen:
             screen_geometry = screen.geometry()
             screen_height = screen_geometry.height()
+            screen_width = screen_geometry.width()
 
 
         self.skill_dialog = SkillsDialog()
@@ -96,6 +98,7 @@ class MainWindow(QMainWindow):
         self.map_tabs.addTab(self.map, "map")
         # self.map_tabs.setMaximumSize(QSize(700, 700))
         self.map_tabs.setMaximumHeight(screen_height * 2 // 3 if screen_height else 700)
+        self.map_tabs.setMaximumWidth(screen_width // 3 if screen_width else 400)
 
         self.map_settings = MapSettingsWidget()
         self.location = LocationWidget()

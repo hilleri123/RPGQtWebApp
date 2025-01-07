@@ -71,7 +71,7 @@ class ActionEditDialog(QDialog):
             return
         
         self.description.setHtml(self.action.description)
-        self.add_time.setTime(QTime(0,0,0).addSecs(self.action.add_time_secs))
+        self.add_time.setTime(QTime(0,0,0).addSecs(self.action.add_time_secs or 0))
         self.load_stats()
 
     def load_stats(self):
