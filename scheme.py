@@ -99,8 +99,10 @@ class PlayerAction(Base):
 class Note(Base):
     __tablename__ = 'Note'
     id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, default='')
     xml_text = Column(String)
     player_shown_json = Column(String, default='[]')
+    target_player_shown_json = Column(String, default='[]')
     action_id = Column(Integer, ForeignKey('PlayerAction.id'), default=None)
 
 

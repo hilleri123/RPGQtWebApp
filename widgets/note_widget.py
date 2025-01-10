@@ -69,12 +69,23 @@ class NoteWidget(BaseListItemWidget):
             {p.id: p.name for p in self.players}, 
             json.loads(self.db_object.player_shown_json)
             )
+        self.target_combobox = CheckableComboBox(
+            {p.id: p.name for p in self.players}, 
+            json.loads(self.db_object.player_shown_json)
+            )
         self.shown_combobox.state_chenged.connect(self.update_shown)
         self.first_line_layout.addWidget(self.shown_combobox)
+        self.first_line_layout.addWidget(self.target_combobox)
 
-    def on_save(self):
+    # TODO убрать target и пофиксить
+    def on_save(self, target=False):
         ids = self.shown_combobox.get_checked_items_ids()
+        target_ids = self.target_combobox.get_checked_items_ids()
         self.db_object.player_shown_json = ids.__repr__()
+        if target:
+            self.db_object.target_player_shown_json = self.db_object.player_shown_json
+        else:
+            self.db_object.target_player_shown_json = target_ids.__repr__()
         self.db_object.xml_text = self.note_text.toHtml()
         self.session.commit()
         super().on_save()
@@ -86,7 +97,7 @@ class NoteWidget(BaseListItemWidget):
             state = Qt.Unchecked
         self.shown_all.setCheckState(state)
         self.shown_combobox.set_all(state)
-        self.on_save()
+        self.on_save(target=True)
 
     def update_shown(self):
         ids = self.shown_combobox.get_checked_items_ids()
@@ -99,5 +110,5 @@ class NoteWidget(BaseListItemWidget):
         self.on_save()
 
     def name(self):
-        return None
+        return self.db_object.name
 

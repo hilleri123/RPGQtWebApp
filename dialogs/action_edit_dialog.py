@@ -27,6 +27,16 @@ class ActionEditDialog(QDialog):
         layout.addWidget(QLabel("Время на выполнение:"))
         layout.addWidget(self.add_time)
 
+        self.note = QComboBox()
+        self.note.addItem("", None)
+        for n in session.query(Note).all():
+            self.note.addItem(n.name, n.id)
+        layout.addWidget(self.note)
+
+        curr_note = session.query(Note).filter(Note.action_id == action_id).first()
+        if curr_note:
+            self.note.setCurrentText(curr_note.name)
+
         self.skills_list_widget = AutoResizingListWidget()
         layout.addWidget(QLabel("Навыки:"))
         layout.addWidget(self.skills_list_widget)
@@ -140,13 +150,22 @@ class ActionEditDialog(QDialog):
 
     def connect_all(self):
         self.description.textChanged.connect(self.on_save)
+        self.note.currentIndexChanged.connect(self.on_save)
         self.add_time.timeChanged.connect(self.on_save)
 
     def disconnect_all(self):
         self.description.textChanged.disconnect(self.on_save)
+        self.note.currentIndexChanged.disconnect(self.on_save)
         self.add_time.timeChanged.disconnect(self.on_save)
         
     def on_save(self):
         self.action.description = self.description.toHtml()
         self.action.add_time_secs = int(self.add_time.time().msecsSinceStartOfDay()/1000)
+        if self.note.currentData() is not None:
+            note = session.query(Note).get(self.note.currentData())
+            if note:
+                note.action_id = self.action.id
+        else:
+            for n in session.query(Note).filter(Note.action_id == self.action.id).all():
+                n.action_id = None
         session.commit()

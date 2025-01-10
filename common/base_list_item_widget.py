@@ -24,7 +24,7 @@ class BaseListItemWidget(QWidget):
         self.base_layout.addLayout(self.first_line_layout)
         self.item_name_field = QLineEdit()
         self.item_name_field.setText(self.name())
-        self.item_name_field.setReadOnly(True)
+        self.item_name_field.textChanged.connect(self.on_save)
         if self.name() is not None:
             self.first_line_layout.addWidget(self.item_name_field)
         self.fill_first_line()
@@ -46,6 +46,11 @@ class BaseListItemWidget(QWidget):
         self.deleted.emit()
 
     def on_save(self):
+        try:
+            self.db_object.name = self.item_name_field.text()
+        except:
+            pass
+        self.session.commit()
         self.set_hint.emit(self.sizeHint())
         self.changed.emit()
 
