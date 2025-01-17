@@ -5,9 +5,26 @@ from colour import Color
 import os
 from PyQt5.QtCore import QObject, pyqtSignal
 
+IS_EDITABLE = True
+
+
 class ChangedSignals(QObject):
+    def __init__(self):
+        super().__init__()
+
     notes_changed = pyqtSignal()
     players_changed = pyqtSignal()
+
+    editable_changed = pyqtSignal(bool)
+
+    def change_editable(self):
+        global IS_EDITABLE
+        IS_EDITABLE = not IS_EDITABLE
+        self.editable_changed.emit(IS_EDITABLE)
+
+    def everything_editalbe(self):
+        global IS_EDITABLE
+        return IS_EDITABLE
 
 
 changed_manager = ChangedSignals()
@@ -206,5 +223,4 @@ def Session():
     return session
 
 
-IS_EDITABLE = True
 

@@ -35,17 +35,14 @@ class BaseMapWidget(QWidget):
         self.edit_polygon.clicked.connect(self.show_point_dialog)
         self.button_layout.addWidget(self.edit_polygon)
         self.name_edit = QLineEdit("Name")
-        if IS_EDITABLE:
-            self.button_layout.addWidget(self.name_edit)
+        self.button_layout.addWidget(self.name_edit)
         self.add_item_button = QPushButton("add item")
         self.add_item_button.clicked.connect(self.add_item)
-        if IS_EDITABLE:
-            self.button_layout.addWidget(self.add_item_button)
+        self.button_layout.addWidget(self.add_item_button)
         self.datetime_start_edit = QDateTimeEdit()
         self.datetime_start_edit.setDisplayFormat("dd/MM/yyyy HH:mm")
         self.datetime_start_edit.dateTimeChanged.connect(self.on_start_timeeditor)
-        if IS_EDITABLE:
-            self.button_layout.addWidget(self.datetime_start_edit)
+        self.button_layout.addWidget(self.datetime_start_edit)
         self.datetime_edit = DateTimeEditWidget()
         self.datetime_edit.dateTimeChanged.connect(self.on_timeeditor)
         self.button_layout.addWidget(self.datetime_edit)
@@ -57,6 +54,19 @@ class BaseMapWidget(QWidget):
 
         self.on_datetime_changed()
         self.datetime_changed.connect(self.on_datetime_changed)
+
+        self.on_editable_changed(changed_manager.everything_editalbe())
+        changed_manager.editable_changed.connect(self.on_editable_changed)
+
+    def on_editable_changed(self, is_editable):
+        if is_editable:
+            self.add_item_button.show()
+            self.datetime_start_edit.show()
+            self.name_edit.show()
+        else:
+            self.add_item_button.hide()
+            self.datetime_start_edit.hide()
+            self.name_edit.hide()
 
     def setup_label(self):
         self.mapLabel = self.construct_label()

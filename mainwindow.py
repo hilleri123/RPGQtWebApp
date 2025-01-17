@@ -33,7 +33,7 @@ class MainWindow(QMainWindow):
         self.checkbox_action = QAction("Editable", self)
         self.checkbox_action.setCheckable(True)
         self.checkbox_action.setChecked(IS_EDITABLE)  
-        self.checkbox_action.triggered.connect(self.on_checkbox_toggled)
+        self.checkbox_action.triggered.connect(changed_manager.change_editable)
         settings_menu.addAction(self.checkbox_action)
         self.open_action = QAction("Open", self)
         self.open_action.triggered.connect(self.open_zip_file)

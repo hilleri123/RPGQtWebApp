@@ -35,6 +35,15 @@ class BaseListWidget(QWidget):
         self.base_layout.addWidget(self.item_list)
         self.fill_list()
 
+        self.on_editable_changed(changed_manager.everything_editalbe())
+        changed_manager.editable_changed.connect(self.on_editable_changed)
+
+    def on_editable_changed(self, is_editable):
+        if is_editable:
+            self.add_button.show()
+        else:
+            self.add_button.hide()
+
     def list_name(self) -> str:
         return 'list'
 
