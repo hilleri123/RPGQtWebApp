@@ -114,6 +114,8 @@ class GlobalMap(Base):
     intro = Column(String)
     time = Column(DateTime)
     start_time = Column(DateTime)
+    scenario_name = Column(String)
+    scenario_file_path = Column(String)
 
 
 class SceneMap(Base):

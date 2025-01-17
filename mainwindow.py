@@ -38,9 +38,14 @@ class MainWindow(QMainWindow):
         self.open_action = QAction("Open", self)
         self.open_action.triggered.connect(self.open_zip_file)
         settings_menu.addAction(self.open_action)
-        self.open_action = QAction("Save", self)
-        self.open_action.triggered.connect(self.save_to_zip_file)
-        settings_menu.addAction(self.open_action)
+        self.save_action = QAction("Save", self)
+        self.save_action.triggered.connect(self.save_default)
+        self.save_action.setDisabled(True)
+        self.check_scenario_name()
+        settings_menu.addAction(self.save_action)
+        self.save_as_action = QAction("Save As", self)
+        self.save_as_action.triggered.connect(self.save_as)
+        settings_menu.addAction(self.save_as_action)
         self.reset_action = QAction("Reset", self)
         self.reset_action.triggered.connect(self.set_up)
         settings_menu.addAction(self.reset_action)
@@ -262,18 +267,31 @@ class MainWindow(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred: {e}")
 
-    def save_to_zip_file(self):
-        # Открываем файловый диалог для выбора места сохранения ZIP-архива
+    def save_as(self):
         options = QFileDialog.Options()
         output_zip, _ = QFileDialog.getSaveFileName(self, "Save ZIP File", "", "ZIP Files (*.zip);;All Files (*)", options=options)
-        
         if not output_zip:
             return 
 
-        # Проверяем, добавлено ли расширение .zip
         if not output_zip.endswith('.zip'):
             output_zip += '.zip'
+        if self.save_to_zip_file(output_zip):
+            globla_map = session.query(GlobalMap).first()
+            if globla_map is None:
+                return
+            globla_map.scenario_name = output_zip.split('/')[-1][:-4]
+            globla_map.scenario_file_path = output_zip
+            session.commit()
+            self.check_scenario_name()
+        
 
+    def save_default(self):
+        globla_map = session.query(GlobalMap).first()
+        if globla_map is None or globla_map.scenario_file_path is None:
+            return
+        self.save_to_zip_file(globla_map.scenario_file_path)
+
+    def save_to_zip_file(self, output_zip):
         try:
             # Архивируем выбранную папку
             with ZipFile(output_zip, 'w', ZIP_DEFLATED) as zipf:
@@ -284,10 +302,20 @@ class MainWindow(QMainWindow):
                         zipf.write(file_path, arcname)
 
             QMessageBox.information(self, "Success", f"Folder successfully archived to {output_zip}")
+            return True
         except PermissionError:
             QMessageBox.critical(self, "Error", "Permission denied while accessing files.")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An unexpected error occurred: {e}")
+        return False
+
+    def check_scenario_name(self):
+        globla_map = session.query(GlobalMap).first()
+        if globla_map is None:
+            return
+        self.save_action.setDisabled(globla_map.scenario_name is None)
+        if globla_map.scenario_name is not None:
+            self.setWindowTitle(f"{globla_map.scenario_name} ({get_local_ip()})")
 
     def show_help_skill_dialog(self):
         self.skill_help_dialog.show()
