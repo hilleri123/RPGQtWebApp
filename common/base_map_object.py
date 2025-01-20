@@ -7,6 +7,12 @@ from repositories import *
 from .html_text_edit_widget import HtmlTextEdit
 
 
+class FastSpinBox(QSpinBox):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setSingleStep(5)  # Устанавливаем шаг изменения значения
+
+
 class BaseMapObject(QWidget):
     map_object_updated = pyqtSignal()
 
@@ -22,8 +28,9 @@ class BaseMapObject(QWidget):
         self.is_start_location = QCheckBox("Start")
         self.is_start_location.setEnabled(IS_EDITABLE)
         self.is_shown = QCheckBox("Show")
-        self.coords = {"x": QSpinBox(), "y": QSpinBox(), "w": QSpinBox(), "h": QSpinBox()}
-        
+        self.coords = {"x": FastSpinBox(), "y": FastSpinBox(), "w": FastSpinBox(), "h": FastSpinBox()}
+        self.coords_labels = {}
+
         self.object = None
 
         self.base_layout = QGridLayout(self)
@@ -36,18 +43,35 @@ class BaseMapObject(QWidget):
             self.base_layout.addWidget(self.is_start_location, self.row, 3)
         self.base_layout.addWidget(self.is_shown, self.row, 4)
 
-        if IS_EDITABLE:
-            self.row += 1
-            col = 0
-            for key, val in self.coords.items():
-                self.base_layout.addWidget(QLabel(key), self.row, col)  # Метка координаты
-                col += 1
-                val.setMinimum(0)
-                val.setMaximum(10000)
-                self.base_layout.addWidget(val, self.row, col)  # Поле ввода координаты
-                col += 1
+        self.row += 1
+        col = 0
+        for key, val in self.coords.items():
+            self.coords_labels[key] = QLabel(key)
+            self.base_layout.addWidget(self.coords_labels[key], self.row, col)  # Метка координаты
+            col += 1
+            val.setMinimum(0)
+            val.setMaximum(10000)
+            self.base_layout.addWidget(val, self.row, col)  # Поле ввода координаты
+            col += 1
         
         BaseMapObject.connect_all(self)
+
+        self.on_editable_changed(changed_manager.everything_editalbe())
+        changed_manager.editable_changed.connect(self.on_editable_changed)
+
+    def on_editable_changed(self, is_editable):
+        if is_editable:
+            self.name.setReadOnly(False)
+            self.description.setReadOnly(False)
+            for key, coord_spinbox in self.coords.items():
+                self.coords_labels[key].show()
+                coord_spinbox.show()
+        else:
+            self.name.setReadOnly(True)
+            self.description.setReadOnly(True)
+            for key, coord_spinbox in self.coords.items():
+                self.coords_labels[key].hide()
+                coord_spinbox.hide()
 
 
     def setup_map_object(self) -> None:
