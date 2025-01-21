@@ -38,6 +38,11 @@ class SkillsDialog(QDialog):
         
         layout.addLayout(button_layout)
 
+        default_button = QPushButton("Заполнить стандартными")
+        default_button.clicked.connect(self.fill_default)
+
+        layout.addWidget(default_button)
+
         # Загрузка данных из базы данных
         self.load_skills()
 
@@ -78,3 +83,70 @@ class SkillsDialog(QDialog):
                 session.commit()
         
         self.load_skills()
+
+    def fill_default(self):
+        skills = {
+            "Анализ текста": SKILL_GROUP[0],
+            "Антропология": SKILL_GROUP[0],
+            "Археология": SKILL_GROUP[0],
+            "Архитектура": SKILL_GROUP[0],
+            "Аудит": SKILL_GROUP[0],
+            "Естествознание": SKILL_GROUP[0],
+            "Знание языков": SKILL_GROUP[0],
+            "Искусствоведение": SKILL_GROUP[0],
+            "Исследовательская работа": SKILL_GROUP[0],
+            "История": SKILL_GROUP[0],
+            "Лингвистика": SKILL_GROUP[0],
+            "Оккультные науки": SKILL_GROUP[0],
+            "Судебная психология": SKILL_GROUP[0],
+            "Юриспруденция": SKILL_GROUP[0],
+            "Эрудиция": SKILL_GROUP[0],
+            "Анализ документов": SKILL_GROUP[1],
+            "Астрономия": SKILL_GROUP[1],
+            "Баллистика": SKILL_GROUP[1],
+            "Дактилоскопия": SKILL_GROUP[1],
+            "Извлечение данных": SKILL_GROUP[1],
+            "Криптография": SKILL_GROUP[1],
+            "Патология": SKILL_GROUP[1],
+            "Прикладная физика": SKILL_GROUP[1],
+            "Сапёрное дело": SKILL_GROUP[1],
+            "Сбор улик": SKILL_GROUP[1],
+            "Судебная антропология": SKILL_GROUP[1],
+            "Фотография": SKILL_GROUP[1],
+            "Химия": SKILL_GROUP[1],
+            "Электронная слежка": SKILL_GROUP[1],
+            "Бюрократия": SKILL_GROUP[2],
+            "Ведение допроса": SKILL_GROUP[2],
+            "Ведение переговоров": SKILL_GROUP[2],
+            "Запугивание": SKILL_GROUP[2],
+            "Лесть": SKILL_GROUP[2],
+            "Полицейский жаргон": SKILL_GROUP[2],
+            "Притворство": SKILL_GROUP[2],
+            "Проницательность": SKILL_GROUP[2],
+            "Уличное чутьё": SKILL_GROUP[2],
+            "Успокаивание": SKILL_GROUP[2],
+            "Флирт": SKILL_GROUP[2],
+            "Атлетика": SKILL_GROUP[3],
+            "Вождение": SKILL_GROUP[3],
+            "Воровство": SKILL_GROUP[3],
+            "Ободрение": SKILL_GROUP[3],
+            "Драка": SKILL_GROUP[3],
+            "Здоровье": SKILL_GROUP[3],
+            "Механика": SKILL_GROUP[3],
+            "Первая помощь": SKILL_GROUP[3],
+            "Предусмотрительность": SKILL_GROUP[3],
+            "Проникновение": SKILL_GROUP[3],
+            "Самообладание": SKILL_GROUP[3],
+            "Слежка": SKILL_GROUP[3],
+            "Стрельба": SKILL_GROUP[3],
+        }
+        for skill_name, group in skills.items():
+            try:
+                new_skill = Skill(name=skill_name, groupName=group)
+                session.add(new_skill)
+                session.commit()
+            except:
+                pass
+
+        self.load_skills()
+
