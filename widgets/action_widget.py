@@ -47,6 +47,8 @@ class ActionWidget(BaseListItemWidget):
         action = session.query(PlayerAction).get(self.db_object.id)
         self.description.setHtml(action.description)
         self.skill_list.load_skills()
+        # TODO
+        # self.on_save()
 
     def on_activate(self, players):
         self.db_object.is_activated = True
