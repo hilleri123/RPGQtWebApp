@@ -3,88 +3,82 @@ from PyQt5.QtGui import QPixmap, QPaintEvent, QPainter, QColor, QMouseEvent, QIc
 from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from .autoresize import AutoResizingListWidget
-from .icons import add_icon
+from .icons import add_icon, delete_icon, edit_icon
 
 
-class BaseListWidget(QWidget):
-    list_changed = pyqtSignal()
 
-    def __init__(self, auto_reload=False, parent=None):
-        super().__init__(parent)
-        self.auto_reload = auto_reload
-        self.base_layout = QVBoxLayout()
-        self.setLayout(self.base_layout)
+class ElementWidget(QWidget):
+    def __init__(self, element_id, element_cls, dialog_cls):
+        super().__init__()
 
-        self.first_line_layout = QHBoxLayout()
-        self.base_layout.addLayout(self.first_line_layout)
-        self.first_line_layout.addWidget(QLabel(f"{self.list_name()}:")) 
-        self.fill_first_line()
-        self.show_hidden = QCheckBox()
-        self.show_hidden.stateChanged.connect(self.fill_list)
-        self.first_line_layout.addWidget(self.show_hidden)
-        self.add_button = QPushButton()
-        self.add_button.setIcon(add_icon())
-        self.add_button.clicked.connect(self.on_add)
-        self.first_line_layout.addWidget(self.add_button)
+        self.element_id = element_id
+        self.element_cls = element_cls
+        self.dialog_cls = dialog_cls
 
-        self.fill_head()
+        layout = QHBoxLayout()
+        self.setLayout(layout)
 
-        self.item_list = AutoResizingListWidget()
-        self.item_list.setVerticalScrollMode(self.item_list.ScrollPerPixel)
-        self.item_list.verticalScrollBar().setSingleStep(15)
-        self.base_layout.addWidget(self.item_list)
-        self.fill_list()
+        try:
+            with Session() as session:
+                element = session.query(self.element_cls).get(self.element_id)
+                layout.addWidget(QLabel(element.name))
+        except:
+            pass
 
-        self.on_editable_changed(changed_manager.everything_editalbe())
-        changed_manager.editable_changed.connect(self.on_editable_changed)
+        edit_button = QPushButton(edit_icon(), None)
+        edit_button.clicked.connect(self.edit_element)
+        layout.addWidget(edit_button)
 
-    def on_editable_changed(self, is_editable):
-        if is_editable:
-            self.add_button.show()
-        else:
-            self.add_button.hide()
+        delete_button = QPushButton(delete_icon(), None)
+        delete_button.clicked.connect(self.delete_element)
+        layout.addWidget(delete_button)
 
-    def list_name(self) -> str:
-        return 'list'
+    def edit_element(self):
+        dialog = self.dialog_cls(self.element_id)
+        dialog.exec_()
 
-    def fill_first_line(self):
-        pass
-
-    def fill_head(self):
-        pass
-
-    def query_list(self) -> list:
-        return []
-
-    def widget_of(self, db_object) -> QWidget:
-        return QWidget()
-
-    def add_default_element(self):
-        pass
-
-    def fill_list(self):
-        scroll_position = self.item_list.verticalScrollBar().value()
-        self.item_list.clear()
-        self.session = Session()
-
-        for db_object in self.query_list():
-            item = QListWidgetItem(self.item_list)
-            widget = self.widget_of(db_object)
-            if self.show_hidden.isChecked() and widget.is_hidden():
-                continue
-            widget.deleted.connect(self.fill_list)
-            if self.auto_reload:
-                widget.changed.connect(self.fill_list)
-            widget.changed.connect(self.list_changed)
-            self.item_list.setItemWidget(item, widget)
-            item.setSizeHint(widget.sizeHint())
-        
-        self.item_list.verticalScrollBar().setValue(scroll_position)
-
-    def on_add(self):
-        self.add_default_element()
-        self.fill_list()
-        self.list_changed.emit()
-        self.item_list.setFocus()
+    def delete_element(self):
+        with Session() as session:
+            element = session.query(self.element_cls).get(self.element_id)
+            if element:
+                session.delete(element)
+                session.commit()
+                self.parent().update_elements()
 
 
+class TableWidget(QWidget):
+    def __init__(self, element_cls, dialog_cls):
+        super().__init__()
+
+        self.element_cls = element_cls
+        self.dialog_cls = dialog_cls
+
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        self.elements_layout = QVBoxLayout()
+        layout.addLayout(self.elements_layout)
+
+        self.add_button = QPushButton(add_icon(), None)
+        self.add_button.clicked.connect(self.add_element)
+        layout.addWidget(self.add_button)
+
+        self.update_elements()
+
+    def update_elements(self):
+        while self.elements_layout.count():
+            child = self.elements_layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+
+        with Session() as session:
+            for element in session.query(self.element_cls).all():
+                widget = ElementWidget(element.id, self.element_cls, self.dialog_cls)
+                self.elements_layout.addWidget(widget)
+
+    def add_element(self):
+        with Session() as session:
+            new_element = self.element_cls(name="Новый элемент")
+            session.add(new_element)
+            session.commit()
+            self.update_elements()

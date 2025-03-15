@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (
 )
 from scheme import *
 from PyQt5.QtGui import QIcon
-from dialogs.action_edit_dialog import ActionEditDialog
+# from src.dialogs.action_edit_dialog import ActionEditDialog
 import json
 
 COUNT_IN_ONE_LINE = 4

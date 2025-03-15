@@ -1,17 +1,17 @@
 from PyQt5.QtWidgets import QMainWindow, QWidget, QMenu, QMessageBox, QFileDialog, QHBoxLayout, QVBoxLayout, QTabWidget, QMenuBar, QAction, QPushButton
-from widgets import MapWidget, ItemListWidget, GlobalMapWidget, NoteListWidget, LocationWidget, NpcListWidget, PlayerListWidget, MapSettingsWidget, EventListWidget
-from dialogs import SkillsDialog, SkillHelpDialog
-from common import HtmlTextEdit, LogWidget, get_local_ip
+from src.widgets import MapEditor
+# from src.dialogs import SkillsDialog
+from src.common import HtmlTextEdit, TableWidget
 from PyQt5.QtCore import pyqtSignal, QSize
 from PyQt5.QtGui import QGuiApplication
 import sys
 import os
 import shutil
 from zipfile import ZipFile, ZIP_DEFLATED
-from repositories import reset_scenario
 
 from scheme import *
 
+DEFAULT_DIR = ''
 
 class MainWindow(QMainWindow):
     maps_update = pyqtSignal()
@@ -26,15 +26,9 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         global IS_EDITABLE
-        self.setWindowTitle(get_local_ip())
         
         menu_bar = self.menuBar()
         settings_menu = menu_bar.addMenu("Settings")
-        self.checkbox_action = QAction("Editable", self)
-        self.checkbox_action.setCheckable(True)
-        self.checkbox_action.setChecked(IS_EDITABLE)  
-        self.checkbox_action.triggered.connect(changed_manager.change_editable)
-        settings_menu.addAction(self.checkbox_action)
         self.open_action = QAction("Open", self)
         self.open_action.triggered.connect(self.open_zip_file)
         settings_menu.addAction(self.open_action)
@@ -86,122 +80,75 @@ class MainWindow(QMainWindow):
             screen_width = screen_geometry.width()
 
 
-        self.skill_dialog = SkillsDialog()
-        self.skill_help_dialog = SkillHelpDialog()
+        # self.skill_dialog = SkillsDialog()
+        # self.skill_help_dialog = SkillHelpDialog()
 
-        self.map_tabs = QTabWidget()
         self.data_tabs = QTabWidget()
         self.button = QPushButton("reload")
         self.button.clicked.connect(self.need_to_reload)
         self.button_char = QPushButton("reload char")
         self.button_char.clicked.connect(self.characters_updated)
 
-        self.global_map = GlobalMapWidget()
-        self.map = MapWidget()
-        self.intro = HtmlTextEdit(is_fixed=False, max_height=screen_height//4)
-        self.map_tabs.addTab(self.global_map, "global map")
-        self.map_tabs.addTab(self.map, "map")
-        # self.map_tabs.setMaximumSize(QSize(700, 700))
-        self.map_tabs.setMaximumHeight(screen_height * 2 // 3 if screen_height else 700)
-        self.map_tabs.setMaximumWidth(screen_width // 3 if screen_width else 400)
-
-        self.map_settings = MapSettingsWidget()
-        self.location = LocationWidget()
-        self.npcs = NpcListWidget()
-        self.items = ItemListWidget()
-        self.marks = QWidget()
-        self.notes = NoteListWidget()
-        self.game_events = EventListWidget()
+        self.map_settings = MapEditor()
+        # self.location = LocationWidget()
+        # self.npcs = NpcListWidget()
+        # self.items = ItemListWidget()
+        # self.marks = QWidget()
+        # self.notes = NoteListWidget()
+        # self.game_events = EventListWidget()
         self.data_tabs.addTab(self.map_settings, "map settings")
-        self.data_tabs.addTab(self.location, "location")
-        self.data_tabs.addTab(self.npcs, "npcs")
-        self.data_tabs.addTab(self.items, "items")
-        self.data_tabs.addTab(self.marks, "marks")
-        self.data_tabs.addTab(self.notes, "notes")
-        self.data_tabs.addTab(self.game_events, "events")
+        # self.data_tabs.addTab(self.location, "location")
+        self.data_tabs.addTab(TableWidget(NPC, QFileDialog), "npcs")
+        self.data_tabs.addTab(TableWidget(GameItem, QFileDialog), "items")
+        # self.data_tabs.addTab(self.marks, "marks")
+        self.data_tabs.addTab(TableWidget(Note, QFileDialog), "notes")
+        self.data_tabs.addTab(TableWidget(GameEvent, QFileDialog), "events")
 
-        self.player_list = PlayerListWidget()
-        self.logs = LogWidget()
 
         tmp_layout = QHBoxLayout()
         self.main_layout.addLayout(tmp_layout)
         tmp_tmp_layout = QVBoxLayout()
         tmp_layout.addLayout(tmp_tmp_layout)
-        tmp_tmp_layout.addWidget(self.map_tabs)
-        tmp_tmp_layout.addWidget(self.intro)
+        # tmp_tmp_layout.addWidget(self.map_tabs)
+        # tmp_tmp_layout.addWidget(self.intro)
         tmp_layout.addWidget(self.data_tabs)
         self.main_layout.addLayout(tmp_layout)
         tmp_tmp_layout = QVBoxLayout()
         tmp_layout.addLayout(tmp_tmp_layout)
-        tmp_tmp_layout.addWidget(self.player_list)
-        tmp_tmp_layout.addWidget(self.logs)
-        self.main_layout.addWidget(self.button)
-        self.main_layout.addWidget(self.button_char)
+        # tmp_tmp_layout.addWidget(self.player_list)
+        # tmp_tmp_layout.addWidget(self.logs)
+        # self.main_layout.addWidget(self.button)
+        # self.main_layout.addWidget(self.button_char)
         
         self.fill()
 
-        self.global_map.map_changed.connect(self.map_settings.on_map_selected)
-        self.global_map.map_changed.connect(self.map.set_current_map)
-        self.global_map.map_object_clicked.connect(self.set_scenemap_focus)
-        self.global_map.datetime_changed.connect(self.map.on_datetime_changed)
-        self.global_map.datetime_changed.connect(self.player_list.on_datetime_changed)
-        self.global_map.datetime_changed.connect(self.game_events.set_time)
-        self.global_map.map_image_saved.connect(self.map_image_saved)
-        self.map_settings.map_object_updated.connect(self.global_map.on_map_update)
+        # self.intro.textChanged.connect(self.on_save)
 
-        self.map.map_object_clicked.connect(self.location.on_location_selected)
-        self.map.map_object_clicked.connect(self.set_location_focus)
-        self.map.map_object_clicked.connect(self.items.set_location)
-        self.map.map_image_saved.connect(self.map_image_saved)
-        self.map.datetime_changed.connect(self.global_map.on_datetime_changed)
-        self.map.datetime_changed.connect(self.player_list.on_datetime_changed)
-        self.map.datetime_changed.connect(self.game_events.set_time)
-        self.map.map_changed.connect(self.map_settings.on_map_selected)
-        self.location.map_object_updated.connect(self.map.on_map_update)
-
-        self.maps_update.connect(self.global_map.on_map_update)
-        self.maps_update.connect(self.map.on_map_update)
-
-        self.intro.textChanged.connect(self.on_save)
-
-        self.items.list_changed.connect(self.location.items_list.fill_list)
-        self.npcs.list_changed.connect(self.location.npc_list.fill_list)
-        
-        self.items.list_changed.connect(self.characters_updated)
-        self.location.item_list_changed.connect(self.characters_updated)
-
-        self.notes.list_changed.connect(self.notes_updated)
-        
-        changed_manager.players_changed.connect(self.player_list.fill_list)
-        changed_manager.notes_changed.connect(self.notes.fill_list)
-
-        changed_manager.players_changed.connect(self.characters_updated)
-        changed_manager.notes_changed.connect(self.notes_updated)
 
     def fill_map_object(self):
-        session = Session()
-        global_map = session.query(GlobalMap).first()
-        if global_map is None:
-            return
-        def add_actions_to_menu(menu: QMenu, map_objects: list[MapObjectPolygon]):
-            for map_object in map_objects:
-                action = QAction(map_object.name, self)
-                action.setCheckable(True)
-                action.setChecked(map_object.is_shown)
-                action.triggered.connect(lambda checked, mo=map_object: self.toggle_map_object(mo))
-                menu.addAction(action)
+        with Session() as session:
+            global_map = session.query(GlobalSession).first()
+            if global_map is None:
+                return
+            def add_actions_to_menu(menu: QMenu, map_objects: list[MapObjectPolygon]):
+                for map_object in map_objects:
+                    action = QAction(map_object.name, self)
+                    action.setCheckable(True)
+                    action.setChecked(map_object.is_shown)
+                    action.triggered.connect(lambda checked, mo=map_object: self.toggle_map_object(mo))
+                    menu.addAction(action)
 
-        global_menu = self.map_objects_menu.addMenu(f"G: {global_map.name}")
-        add_actions_to_menu(
-            global_menu, 
-            session.query(MapObjectPolygon).filter(MapObjectPolygon.global_map_id == global_map.id).all(),
-            )
-        for scene_map in session.query(SceneMap).all():
-            scene_map_menu = self.map_objects_menu.addMenu(scene_map.name)
+            global_menu = self.map_objects_menu.addMenu(f"G: {global_map.name}")
             add_actions_to_menu(
-                scene_map_menu, 
-                session.query(MapObjectPolygon).filter(MapObjectPolygon.map_id == scene_map.id).all(),
+                global_menu, 
+                session.query(MapObjectPolygon).filter(MapObjectPolygon.global_map_id == global_map.id).all(),
                 )
+            for scene_map in session.query(SceneMap).all():
+                scene_map_menu = self.map_objects_menu.addMenu(scene_map.name)
+                add_actions_to_menu(
+                    scene_map_menu, 
+                    session.query(MapObjectPolygon).filter(MapObjectPolygon.map_id == scene_map.id).all(),
+                    )
 
     def toggle_map_object(self, map_object: MapObjectPolygon):
         session = Session()
@@ -231,19 +178,19 @@ class MainWindow(QMainWindow):
         self.characters_updated.emit()
 
     def fill(self):
-        session = Session()
-        global_map = session.query(GlobalMap).first()
-        if global_map is None:
-            return
-        self.intro.setHtml(global_map.intro)
+        with Session() as session:
+            global_map = session.query(GlobalSession).first()
+            if global_map is None:
+                return
+            self.intro.setHtml(global_map.intro)
 
     def on_save(self):
-        session = Session()
-        global_map = session.query(GlobalMap).first()
-        if global_map is None:
-            return
-        global_map.intro = self.intro.toHtml()
-        session.commit()
+        with Session() as session:
+            global_map = session.query(GlobalSession).first()
+            if global_map is None:
+                return
+            global_map.intro = self.intro.toHtml()
+            session.commit()
     
     def open_zip_file(self):
         # Открываем файловый диалог для выбора ZIP-архива
@@ -268,28 +215,30 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Error", f"An error occurred: {e}")
 
     def save_as(self):
-        options = QFileDialog.Options()
-        output_zip, _ = QFileDialog.getSaveFileName(self, "Save ZIP File", "", "ZIP Files (*.zip);;All Files (*)", options=options)
-        if not output_zip:
-            return 
+        with Session() as session:
+            options = QFileDialog.Options()
+            output_zip, _ = QFileDialog.getSaveFileName(self, "Save ZIP File", "", "ZIP Files (*.zip);;All Files (*)", options=options)
+            if not output_zip:
+                return 
 
-        if not output_zip.endswith('.zip'):
-            output_zip += '.zip'
-        if self.save_to_zip_file(output_zip):
-            globla_map = session.query(GlobalMap).first()
-            if globla_map is None:
-                return
-            globla_map.scenario_name = output_zip.split('/')[-1][:-4]
-            globla_map.scenario_file_path = output_zip
-            session.commit()
-            self.check_scenario_name()
+            if not output_zip.endswith('.zip'):
+                output_zip += '.zip'
+            if self.save_to_zip_file(output_zip):
+                globla_map = session.query(GlobalSession).first()
+                if globla_map is None:
+                    return
+                globla_map.scenario_name = output_zip.split('/')[-1][:-4]
+                globla_map.scenario_file_path = output_zip
+                session.commit()
+                self.check_scenario_name()
         
 
     def save_default(self):
-        globla_map = session.query(GlobalMap).first()
-        if globla_map is None or globla_map.scenario_file_path is None:
-            return
-        self.save_to_zip_file(globla_map.scenario_file_path)
+        with Session() as session:
+            globla_map = session.query(GlobalSession).first()
+            if globla_map is None or globla_map.scenario_file_path is None:
+                return
+            self.save_to_zip_file(globla_map.scenario_file_path)
 
     def save_to_zip_file(self, output_zip):
         try:
@@ -310,22 +259,26 @@ class MainWindow(QMainWindow):
         return False
 
     def check_scenario_name(self):
-        globla_map = session.query(GlobalMap).first()
-        if globla_map is None:
-            return
-        self.save_action.setDisabled(globla_map.scenario_name is None)
-        if globla_map.scenario_name is not None:
-            self.setWindowTitle(f"{globla_map.scenario_name} ({get_local_ip()})")
+        with Session() as session:
+            globla_map = session.query(GlobalSession).first()
+            if globla_map is None:
+                return
+            self.save_action.setDisabled(globla_map.scenario_name is None)
+            if globla_map.scenario_name is not None:
+                self.setWindowTitle(f"{globla_map.scenario_name}")
 
     def show_help_skill_dialog(self):
-        self.skill_help_dialog.show()
+        # self.skill_help_dialog.show()
+        pass
 
     def reset_scenario(self):
-        reset_scenario()
+        pass
+        # reset_scenario()
 
     def set_location_focus(self):
         self.data_tabs.setCurrentWidget(self.location)
     
     def set_scenemap_focus(self):
-        self.map_tabs.setCurrentWidget(self.map)
+        # self.map_tabs.setCurrentWidget(self.map)
+        pass
 

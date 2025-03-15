@@ -1,13 +1,13 @@
 from .autoresize import AutoResizingListWidget, AutoResizingTextEdit
-from .base_map_widget import BaseMapWidget
-from .base_map_label import BaseMapLabel
-from .base_map_object import BaseMapObject
-from .datetime_editor import DateTimeEditWidget
+# from .base_map_widget import BaseMapWidget
+# from .base_map_label import BaseMapLabel
+# from .base_map_object import BaseMapObject
+# from .datetime_editor import DateTimeEditWidget
 from .skill_label_list import SkillListWidget
-from .log_widget import LogWidget
+# from .log_widget import LogWidget
 from .html_text_edit_widget import HtmlTextEdit
 from .base_list_item_widget import BaseListItemWidget
-from .base_list_widget import BaseListWidget
+from .base_list_widget import TableWidget
 import socket
 
 

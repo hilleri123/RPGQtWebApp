@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QIcon
-import resources_rc
+import src.resources_rc
 
 
 def get_icon(name: str) -> QIcon:
