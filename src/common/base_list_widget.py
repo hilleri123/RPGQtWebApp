@@ -4,24 +4,21 @@ from PyQt5.QtCore import pyqtSignal
 from scheme import *
 from .autoresize import AutoResizingListWidget
 from .icons import add_icon, delete_icon, edit_icon
-
+from src.common.editdialog import ModelEditor
 
 
 class ElementWidget(QWidget):
-    def __init__(self, element_id, element_cls, dialog_cls):
+    def __init__(self, element):
         super().__init__()
 
-        self.element_id = element_id
-        self.element_cls = element_cls
-        self.dialog_cls = dialog_cls
+        self.element = element
 
         layout = QHBoxLayout()
         self.setLayout(layout)
 
         try:
             with Session() as session:
-                element = session.query(self.element_cls).get(self.element_id)
-                layout.addWidget(QLabel(element.name))
+                layout.addWidget(QLabel(self.element.name))
         except:
             pass
 
@@ -34,14 +31,15 @@ class ElementWidget(QWidget):
         layout.addWidget(delete_button)
 
     def edit_element(self):
-        dialog = self.dialog_cls(self.element_id)
+        dialog = ModelEditor(self.element)
         dialog.exec_()
 
     def delete_element(self):
         with Session() as session:
-            element = session.query(self.element_cls).get(self.element_id)
-            if element:
-                session.delete(element)
+            session.refresh(self.element)
+            # element = session.query(self.element_cls).get(self.element_id)
+            if self.element:
+                session.delete(self.element)
                 session.commit()
                 self.parent().update_elements()
 
@@ -73,7 +71,7 @@ class TableWidget(QWidget):
 
         with Session() as session:
             for element in session.query(self.element_cls).all():
-                widget = ElementWidget(element.id, self.element_cls, self.dialog_cls)
+                widget = ElementWidget(element)
                 self.elements_layout.addWidget(widget)
 
     def add_element(self):
