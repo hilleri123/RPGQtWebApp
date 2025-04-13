@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog, QLabel, QLineEdit, QTextEdit
+from PyQt5.QtWidgets import QScrollArea, QFormLayout, QCheckBox, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog, QLabel, QLineEdit, QTextEdit
 from PyQt5.QtGui import QPixmap, QPainter, QPen, QBrush, QColor
 from PyQt5.QtCore import Qt, QPoint
 from scheme import *
@@ -12,26 +12,26 @@ class MapEditor(QWidget):
         self.polygon_points = []
         self.map_image = None
 
-        self.layout = QVBoxLayout()
-        self.setLayout(self.layout)
+        self.layoutt = QVBoxLayout()
+        self.setLayout(self.layoutt)
 
         self.image_label = QLabel()  
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidget(self.image_label)
         self.scroll_area.setWidgetResizable(True)
-        self.layout.addWidget(self.scroll_area)
+        self.layoutt.addWidget(self.scroll_area)
 
         self.load_button = QPushButton("Загрузить карту")
         self.load_button.clicked.connect(self.load_map_image)
-        self.layout.addWidget(self.load_button)
+        self.layoutt.addWidget(self.load_button)
 
         self.create_polygon_button = QPushButton("Создать полигон")
         self.create_polygon_button.clicked.connect(self.start_creating_polygon)
-        self.layout.addWidget(self.create_polygon_button)
+        self.layoutt.addWidget(self.create_polygon_button)
 
         self.add_location_button = QPushButton("Добавить локацию")
         self.add_location_button.clicked.connect(self.add_location)
-        self.layout.addWidget(self.add_location_button)
+        self.layoutt.addWidget(self.add_location_button)
 
         self.location_layout = QVBoxLayout()
         self.location_name_input = QLineEdit()
@@ -47,8 +47,27 @@ class MapEditor(QWidget):
         self.location_widget = QWidget()
         self.location_widget.setLayout(self.location_layout)
 
+        self.polygon_layout = QFormLayout()
+        self.polygon_name_input = QLineEdit()
+        self.polygon_color_input = QLineEdit()
+        self.polygon_is_shown_checkbox = QCheckBox()
+        self.polygon_is_filled_checkbox = QCheckBox()
+        self.polygon_is_line_checkbox = QCheckBox()
 
-        self.layout.addWidget(self.location_widget)
+        self.polygon_layout.addRow(QLabel("Имя полигона"), self.polygon_name_input)
+        self.polygon_layout.addRow(QLabel("Цвет полигона"), self.polygon_color_input)
+        self.polygon_layout.addRow(QLabel("Отображать"), self.polygon_is_shown_checkbox)
+        self.polygon_layout.addRow(QLabel("Заливка"), self.polygon_is_filled_checkbox)
+        self.polygon_layout.addRow(QLabel("Линия"), self.polygon_is_line_checkbox)
+
+        self.polygon_widget = QWidget()
+        self.polygon_widget.setLayout(self.polygon_layout)
+
+        tmplayout = QHBoxLayout()        
+        tmplayout.addWidget(self.polygon_widget)
+
+        tmplayout.addWidget(self.location_widget)
+        self.layoutt.addLayout(tmplayout)
 
         self.image_label.mousePressEvent = self.get_mouse_press_event
 
