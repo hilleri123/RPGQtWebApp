@@ -107,12 +107,15 @@ class TimeEvent(BaseModel):
     note_id: Optional[int]
 
 class ScenarioInfo(BaseModel):
-    id: int
+    id: Optional[int]
     name: str
-    intro: str
-    icon: str
-    max_players: int
-    created: datetime
+    description: Optional[str] = ""
+    intro: Optional[str] = ""
+    icon: Optional[str] = ""
+    difficulty: Optional[str] = "Средняя"
+    min_players: Optional[int] = 1
+    max_players: Optional[int] = 4
+    created: Optional[datetime] = Field(default_factory=datetime.utcnow)
 
 class CompiledScenario(BaseModel):
     id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias="_id")
