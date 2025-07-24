@@ -11,7 +11,7 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
     
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4, index=True)
     username = Column(String(50), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
     is_active = Column(Boolean, default=True)
@@ -22,7 +22,7 @@ class User(Base):
 class UserSession(Base):
     __tablename__ = "user_sessions"
     
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4, index=True)
     user_id = Column(Integer, nullable=False)
     session_token = Column(String(255), unique=True, index=True)
     expires_at = Column(DateTime(timezone=True))
